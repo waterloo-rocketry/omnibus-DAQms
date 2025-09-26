@@ -8,6 +8,10 @@ A React + TypeScript + Vite application for data acquisition and management.
 # Install dependencies
 npm install
 
+# Set up shadcn/ui (if not already done)
+npx shadcn@latest init
+npx shadcn@latest add chart card skeleton
+
 # Start development server
 npm run dev
 
