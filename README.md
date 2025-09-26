@@ -1,73 +1,45 @@
-# React + TypeScript + Vite
+## Omnibus DAQms — Sensor Monitoring Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React + TypeScript + Vite app that renders a clean sensor monitoring dashboard with inline SVG sparklines.
 
-Currently, two official plugins are available:
+### Project structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```text
+omnibus-DAQms/
+  ├─ public/
+  │  └─ vite.svg
+  ├─ src/
+  │  ├─ assets/
+  │  │  └─ react.svg
+  │  ├─ App.css
+  │  ├─ App.tsx            ← Dashboard UI (header, cards, charts, cookie bar)
+  │  ├─ index.css
+  │  └─ main.tsx           ← App bootstrapping
+  ├─ index.html
+  ├─ eslint.config.js
+  ├─ vite.config.ts
+  ├─ tsconfig*.json
+  ├─ package.json
+  └─ README.md
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Setup
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Prerequisites**: Node 20+ and `pnpm` 10+.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm i            # install dependencies
+pnpm dev          # start dev server (http://localhost:5173 by default)
+pnpm build        # type-check and build for production
+pnpm preview      # preview production build locally
+pnpm lint         # run eslint
 ```
+
+### Changelog
+
+- 2025-09-26: Dashboard implementation
+  - Replaced template UI with a dashboard in `src/App.tsx`.
+  - Added `Header`, `SensorCard`, and `SparklineChart` components (inline).
+  - Included responsive layout and inline styles; added dismissible cookie banner.
+  - Sample pressure data renders dot-based sparklines with labeled axes.
+  - No new dependencies added; only `src/App.tsx` was edited.
