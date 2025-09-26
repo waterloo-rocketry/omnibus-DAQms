@@ -35,6 +35,18 @@ pnpm preview      # preview production build locally
 pnpm lint         # run eslint
 ```
 
+If you prefer npm:
+
+```bash
+npm install
+npm run dev
+npm run build
+npm run preview
+npm run lint
+```
+
+Note: use a single package manager to avoid lockfile drift (repo includes `pnpm-lock.yaml`).
+
 ### Changelog
 
 - 2025-09-26: Dashboard implementation
