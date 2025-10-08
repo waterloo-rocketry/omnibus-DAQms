@@ -56,7 +56,19 @@ npm start
 
 ## Testing
 
-You can test the server using a SocketIO client or the browser console:
+### Terminal Test (Recommended)
+
+In a separate terminal window:
+
+```bash
+# Make sure the server is running (npm start in another terminal)
+# Then run the test client:
+node test-client.js
+```
+
+This will connect, display the first 3 messages, and verify the server is working correctly.
+
+### Browser Console Test
 
 ```javascript
 // In browser console (after loading socket.io-client)
