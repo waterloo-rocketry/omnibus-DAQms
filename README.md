@@ -1,49 +1,57 @@
 # Omnibus DAQms
 
-A React + TypeScript + Vite application for data acquisition and management.
+Real-time data acquisition and monitoring dashboard with live WebSocket streaming.
 
 ## Quick Start
 
+**Terminal 1 - Backend:**
 ```bash
-# Install dependencies
-npm install
-
-# Set up shadcn/ui (if not already done)
-npx shadcn@latest init
-npx shadcn@latest add chart card skeleton
-
-# Start development server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-
-# Lint code
-npm run lint
+cd backend
+npm install  # First time only
+npm start    # Runs on port 8081
 ```
+
+**Terminal 2 - Frontend:**
+```bash
+npm install  # First time only
+npm run dev  # Opens on http://localhost:5173
+```
+
+Navigate to `/live-data` to see 6 sensor channels updating in real-time.
 
 ## Tech Stack
 
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **Tailwind CSS** - Responsive styling and layout
-- **shadcn/ui** - Component library for consistent UI
-- **Recharts** - Chart library integrated with shadcn/ui
-- **ESLint** - Code linting
+**Frontend:** React 19, TypeScript, Vite, Socket.IO Client, Tailwind CSS, shadcn/ui, Recharts
+**Backend:** Node.js, Socket.IO (port 8081)
 
-## UI Design Specifications
+## Architecture
 
-### Responsive Design
-- **Desktop, tablet, and mobile** support with consistent functionality
-- **Tailwind CSS** responsive utilities for breakpoint-based layouts
-- **Modern design principles** with proper contrast and readability
+```
+Backend (ws://localhost:8081) → DAQContext → Dashboard → 6 LineGraph Charts
+```
 
-### Component Architecture
-- **shadcn/ui components** for consistent design system
-- **Chart components** using Recharts integrated with shadcn/ui
-- **Loading and error states** with proper visual feedback
-- **Accessible UI** following modern UX patterns
+- `src/context/DAQContext.tsx` - WebSocket connection & state management
+- `src/types/daq.ts` - TypeScript type definitions
+- `src/components/SensorMonitoringDashboard.tsx` - Main dashboard
+- `src/components/LineGraph.tsx` - Reusable chart component
+
+**Data Flow:** Backend emits messages at 40 Hz → Context parses & buffers (100 points/channel) → Charts render live updates
+
+## Development
+
+```bash
+npm run dev      # Start dev server
+npm run build    # Production build
+npm run lint     # Lint code
+```
+
+**Project Structure:**
+```
+src/
+├── components/       # UI components
+├── context/          # DAQContext for WebSocket
+├── types/            # TypeScript definitions
+└── main.tsx          # Entry point
+backend/
+└── server.js         # Mock DAQ server
+```
