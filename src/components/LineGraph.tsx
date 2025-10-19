@@ -1,13 +1,11 @@
 "use client";
 
-// imports (currently keeping unused imports)
-import { TrendingUp } from "lucide-react";
-import { CartesianGrid, LabelList, Line, LineChart, XAxis, YAxis, Label } from "recharts";
+import { useMemo } from "react";
+import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -17,92 +15,109 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
+import type { ChartDataPoint } from "@/types/daq";
 
-// import the data from socket.io into chartData (currently dummy data)
-const chartData = [
-  { time: "00:00", value: 1013.2 },
-  { time: "04:00", value: 1012.5 },
-  { time: "08:00", value: 1013.8 },
-  { time: "12:00", value: 1014.7 },
-  { time: "16:00", value: 1014.1 },
-  { time: "22:00", value: 1013.4 },
-];
+/**
+ * LineGraph component props
+ */
+interface LineGraphProps {
+  channelName: string;
+  data: ChartDataPoint[];
+  title?: string;
+  unit?: string;
+}
 
-// keeping this in case we want to add separate code for mobile (can take out)
+// Chart configuration
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  value: {
+    label: "Value",
     color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
   },
 } satisfies ChartConfig;
 
-export function LineGraph() {
+export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProps) {
+  // Transform data for Recharts with memoization
+  const chartData = useMemo(() => {
+    return data.map((point) => ({
+      time: new Date(point.timestamp).toLocaleTimeString(),
+      value: point.value,
+    }));
+  }, [data]);
+
+  // Calculate current value and Y-axis domain
+  const currentValue = useMemo(() => {
+    if (data.length === 0) return null;
+    return data[data.length - 1].value;
+  }, [data]);
+
+  const yDomain = useMemo(() => {
+    if (data.length === 0) return [0, 1];
+    const values = data.map(d => d.value);
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const padding = (max - min) * 0.1 || 0.1; // 10% padding or 0.1 if all values are same
+    return [min - padding, max + padding];
+  }, [data]);
+
+  const displayTitle = title || channelName;
+  const displayDescription = currentValue !== null
+    ? `Current: ${currentValue.toFixed(2)} ${unit}`
+    : "No data";
+
   return (
-    <div className="flex-1">
-        <Card>
-          <CardHeader className="items-start" >
-            <div className="pl-4" >
-              <CardTitle className="text-left pb-2" >Pressure Sensor</CardTitle>
-              <CardDescription className="text-left" >Current: 1013.4 hPa | 24h average</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <ChartContainer config={chartConfig}>
-              <LineChart
-                accessibilityLayer
-                data={chartData}
-                margin={{
-                  top: 20,
-                  left: 12,
-                  right: 12,
-                }}
-              >
-                <CartesianGrid vertical={true} />
-                <XAxis
-                  dataKey="time"
-                  tickLine={true}
-                  axisLine={true}
-                  tickMargin={8}
-                />
-                <YAxis
-                  tickLine={true}
-                  axisLine={true}
-                  tickMargin={8}
-                  tickFormatter={(value) => `${value} hPa`}
-                  domain={[1011.5, 1015]}
-                >
-                </YAxis>
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent indicator="line" />}
-                />
-                <Line
-                  dataKey="value"
-                  type="natural"
-                  stroke="black"
-                  strokeWidth={2}
-                  dot={{
-                    fill: "black",
-                  }}
-                  activeDot={{
-                    r: 6,
-                  }}
-                >
-                  <LabelList
-                    position="top"
-                    offset={12}
-                    className="fill-foreground"
-                    fontSize={12}
-                  />
-                </Line>
-              </LineChart>
-            </ChartContainer>
-          </CardContent>
-        </Card>
-    </div>
+    <Card>
+      <CardHeader className="items-start">
+        <div className="pl-4">
+          <CardTitle className="text-left pb-2">{displayTitle}</CardTitle>
+          <CardDescription className="text-left">{displayDescription}</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <ChartContainer config={chartConfig}>
+          <LineChart
+            accessibilityLayer
+            data={chartData}
+            margin={{
+              top: 20,
+              left: 12,
+              right: 12,
+            }}
+          >
+            <CartesianGrid vertical={true} />
+            <XAxis
+              dataKey="time"
+              tickLine={true}
+              axisLine={true}
+              tickMargin={8}
+            />
+            <YAxis
+              tickLine={true}
+              axisLine={true}
+              tickMargin={8}
+              tickFormatter={(value) => `${value.toFixed(2)} ${unit}`}
+              domain={yDomain as [number, number]}
+            />
+
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent indicator="line" />}
+            />
+            <Line
+              dataKey="value"
+              type="natural"
+              stroke="var(--chart-1)"
+              strokeWidth={2}
+              dot={{
+                fill: "var(--chart-1)",
+                r: 3,
+              }}
+              activeDot={{
+                r: 6,
+              }}
+            />
+          </LineChart>
+        </ChartContainer>
+      </CardContent>
+    </Card>
   );
 }
