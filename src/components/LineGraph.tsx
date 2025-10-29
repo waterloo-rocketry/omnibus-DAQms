@@ -73,7 +73,7 @@ export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProp
         </div>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig}>
+        <ChartContainer config={chartConfig} className="h-[300px] w-full">
           <LineChart
             accessibilityLayer
             data={chartData}
@@ -81,6 +81,7 @@ export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProp
               top: 20,
               left: 12,
               right: 12,
+              bottom: 5,
             }}
           >
             <CartesianGrid vertical={true} />
@@ -89,6 +90,8 @@ export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProp
               tickLine={true}
               axisLine={true}
               tickMargin={8}
+              minTickGap={50}
+              tick={{ fontSize: 12 }}
             />
             <YAxis
               tickLine={true}
@@ -96,6 +99,8 @@ export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProp
               tickMargin={8}
               tickFormatter={(value) => `${value.toFixed(2)} ${unit}`}
               domain={yDomain as [number, number]}
+              width={60}
+              tick={{ fontSize: 12 }}
             />
 
             <ChartTooltip

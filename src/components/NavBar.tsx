@@ -40,33 +40,49 @@ export function NavBar() {
   const status = getStatusStyle();
 
   return (
-    <NavigationMenu className="mt-4 pl-2">
-      <NavigationMenuList className="flex items-center gap-8 px-4">
-        {/* Static title */}
-        <div className="text-xl font-bold text-gray-800">
-          Sensor Monitoring Dashboard
-        </div>
+    <div className="border-b bg-white sticky top-0 z-50 shadow-sm">
+      <div className="max-w-[1800px] mx-auto px-4 md:px-6 lg:px-8">
+        <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 py-3 md:py-4">
+          {/* Title and Status - Always visible */}
+          <div className="flex items-center justify-between min-w-0">
+            {/* Title - responsive text size */}
+            <div className="text-base md:text-xl font-bold text-gray-800 truncate">
+              <span className="hidden sm:inline">Sensor Monitoring Dashboard</span>
+              <span className="sm:hidden">Dashboard</span>
+            </div>
 
-        {/* Links */}
-        {navItems.map((item) => (
-          <NavigationMenuItem key={item.title}>
-            <NavigationMenuLink asChild>
-              <Link
-                to={item.href}
-                className={navigationMenuTriggerStyle()}
-              >
-                {item.title}
-              </Link>
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        ))}
+            {/* Connection Status Indicator - Visible on mobile */}
+            <div className="flex items-center gap-2 md:hidden">
+              <div className={`w-2 h-2 rounded-full ${status.color}`} />
+              <span className="text-xs text-gray-600">{status.text}</span>
+            </div>
+          </div>
 
-        {/* Connection Status Indicator */}
-        <div className="flex items-center gap-2 ml-auto">
-          <div className={`w-2 h-2 rounded-full ${status.color}`} />
-          <span className="text-sm text-gray-600">{status.text}</span>
+          {/* Navigation Links */}
+          <NavigationMenu className="flex-1">
+            <NavigationMenuList className="flex flex-wrap items-center gap-1 md:gap-2">
+              {navItems.map((item) => (
+                <NavigationMenuItem key={item.title}>
+                  <NavigationMenuLink asChild>
+                    <Link
+                      to={item.href}
+                      className={navigationMenuTriggerStyle() + " text-sm md:text-base"}
+                    >
+                      {item.title}
+                    </Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
+            </NavigationMenuList>
+          </NavigationMenu>
+
+          {/* Connection Status Indicator - Desktop only */}
+          <div className="hidden md:flex items-center gap-2 ml-auto">
+            <div className={`w-2 h-2 rounded-full ${status.color}`} />
+            <span className="text-sm text-gray-600">{status.text}</span>
+          </div>
         </div>
-      </NavigationMenuList>
-    </NavigationMenu>
+      </div>
+    </div>
   );
 }
