@@ -3,29 +3,17 @@ import { LineGraph } from "./LineGraph";
 
 export const SensorMonitoringDashboard = () => {
   return (
-    <>
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <LineGraph />
-        </div>
-        <div className="flex-1">
-          <LineGraph />
-        </div>
-        <div className="flex-1">
-          <LineGraph />
-        </div>
+    <div className="mb-4">
+      <div className="flex flex-col md:flex-row gap-4 mb-4">
+        <LineGraph />
+        <LineGraph />
+        <LineGraph />
       </div>
-      <div className="flex gap-4 mt-4">
-        <div className="flex-1">
-          <LineGraph />
-        </div>
-        <div className="flex-1">
-          <LineGraph />
-        </div>
-        <div className="flex-1">
-          <LineGraph />
-        </div>
+      <div className="flex flex-col md:flex-row gap-4">
+        <LineGraph />
+        <LineGraph />
+        <LineGraph />
       </div>
-    </>
+    </div>
   );
 };

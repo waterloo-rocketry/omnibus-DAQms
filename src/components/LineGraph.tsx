@@ -42,66 +42,67 @@ const chartConfig = {
 
 export function LineGraph() {
   return (
-    <Card>
-      <CardHeader className="items-start" >
-        <div className="pl-4" > 
-          <CardTitle className="text-left pb-2" >Pressure Sensor</CardTitle>
-          <CardDescription className="text-left" >Current: 1013.4 hPa | 24h average</CardDescription>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig}>
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{
-              top: 20,
-              left: 12,
-              right: 12,
-            }}
-          >
-            <CartesianGrid vertical={true} />
-            <XAxis
-              dataKey="time"
-              tickLine={true}
-              axisLine={true}
-              tickMargin={8}
-            />
-            <YAxis
-              tickLine={true}
-              axisLine={true}
-              tickMargin={8}
-              tickFormatter={(value) => `${value} hPa`}
-              domain={[1011.5, 1015]}
-            >
-            </YAxis>
-
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent indicator="line" />}
-            />
-            <Line
-              dataKey="value"
-              type="natural"
-              stroke="none"
-              strokeWidth={2}
-              dot={{
-                fill: "black",
-              }}
-              activeDot={{
-                r: 6,
-              }}
-            >
-              <LabelList
-                position="top"
-                offset={12}
-                className="fill-foreground"
-                fontSize={12}
-              />
-            </Line>
-          </LineChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <div className="flex-1">
+        <Card>
+          <CardHeader className="items-start" >
+            <div className="pl-4" >
+              <CardTitle className="text-left pb-2" >Pressure Sensor</CardTitle>
+              <CardDescription className="text-left" >Current: 1013.4 hPa | 24h average</CardDescription>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <ChartContainer config={chartConfig}>
+              <LineChart
+                accessibilityLayer
+                data={chartData}
+                margin={{
+                  top: 20,
+                  left: 12,
+                  right: 12,
+                }}
+              >
+                <CartesianGrid vertical={true} />
+                <XAxis
+                  dataKey="time"
+                  tickLine={true}
+                  axisLine={true}
+                  tickMargin={8}
+                />
+                <YAxis
+                  tickLine={true}
+                  axisLine={true}
+                  tickMargin={8}
+                  tickFormatter={(value) => `${value} hPa`}
+                  domain={[1011.5, 1015]}
+                >
+                </YAxis>
+                <ChartTooltip
+                  cursor={false}
+                  content={<ChartTooltipContent indicator="line" />}
+                />
+                <Line
+                  dataKey="value"
+                  type="natural"
+                  stroke="black"
+                  strokeWidth={2}
+                  dot={{
+                    fill: "black",
+                  }}
+                  activeDot={{
+                    r: 6,
+                  }}
+                >
+                  <LabelList
+                    position="top"
+                    offset={12}
+                    className="fill-foreground"
+                    fontSize={12}
+                  />
+                </Line>
+              </LineChart>
+            </ChartContainer>
+          </CardContent>
+        </Card>
+    </div>
   );
 }
