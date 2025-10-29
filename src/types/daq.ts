@@ -21,7 +21,7 @@ export interface DAQPayload {
  */
 export interface DAQMessage {
   channel: string; // e.g., "DAQ/Fake"
-  timestamp: number; // Unix timestamp in milliseconds
+  timestamp: number; // Unix timestamp in seconds (backend sends Date.now() / 1000)
   payload: DAQPayload;
 }
 
@@ -29,7 +29,7 @@ export interface DAQMessage {
  * Chart-ready data point format
  */
 export interface ChartDataPoint {
-  timestamp: number; // Unix timestamp in milliseconds
+  timestamp: number; // Unix timestamp in milliseconds (converted from backend seconds)
   value: number;
 }
 

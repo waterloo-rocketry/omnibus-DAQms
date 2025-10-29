@@ -40,7 +40,7 @@ export const DAQProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     Object.entries(data).forEach(([sensorName, values]) => {
       // Convert each sample to chart data point
       const chartPoints: ChartDataPoint[] = values.map((value, idx) => ({
-        timestamp: baseTimestamp + (relative_timestamps_nanoseconds[idx] / 1_000_000), // ns to ms
+        timestamp: (baseTimestamp * 1000) + (relative_timestamps_nanoseconds[idx] / 1_000_000), // Convert base to ms, add relative offset in ms
         value: value,
       }));
 
