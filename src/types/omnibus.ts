@@ -1,12 +1,12 @@
 /**
- * TypeScript type definitions for DAQ message format
+ * TypeScript type definitions for Omnibus message format
  * Matches the backend Socket.IO message structure
  */
 
 /**
- * DAQ message payload containing sensor data
+ * Omnibus message payload containing sensor data
  */
-export interface DAQPayload {
+export interface OmnibusPayload {
   timestamp: number;
   data: {
     [sensorName: string]: number[]; // e.g., "Fake0": [25 floats]
@@ -17,12 +17,12 @@ export interface DAQPayload {
 }
 
 /**
- * Complete DAQ message received from backend
+ * Complete Omnibus message received from backend
  */
-export interface DAQMessage {
+export interface OmnibusMessage {
   channel: string; // e.g., "DAQ/Fake"
   timestamp: number; // Unix timestamp in seconds (backend sends Date.now() / 1000)
-  payload: DAQPayload;
+  payload: OmnibusPayload;
 }
 
 /**

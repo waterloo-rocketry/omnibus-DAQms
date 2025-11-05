@@ -1,9 +1,9 @@
 import { LineGraph } from "./LineGraph";
-import { useDAQContext } from "@/context/DAQContext";
+import { useOmnibusContext } from "@/context/OmnibusContext";
 
 export const SensorMonitoringDashboard = () => {
-  // Consume DAQ context to get real-time channel data
-  const { channelData } = useDAQContext();
+  // Consume Omnibus context to get real-time channel data
+  const { channelData } = useOmnibusContext();
 
   // Map backend channels to dashboard (6 charts from 8 available channels)
   const channels = [

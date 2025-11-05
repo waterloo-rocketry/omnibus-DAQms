@@ -13,7 +13,7 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import type { ChartDataPoint } from "@/types/daq";
+import type { ChartDataPoint } from "@/types/omnibus";
 
 /**
  * LineGraph component props

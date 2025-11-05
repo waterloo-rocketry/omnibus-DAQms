@@ -1,20 +1,20 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import type { DAQMessage, ChartDataPoint, ConnectionStatus, ChannelDataMap } from '../types/daq';
+import type { OmnibusMessage, ChartDataPoint, ConnectionStatus, ChannelDataMap } from '../types/omnibus';
 
 /**
  * Context value interface
  */
-interface DAQContextValue {
+interface OmnibusContextValue {
   channelData: ChannelDataMap;
   connectionStatus: ConnectionStatus;
   error: string | null;
 }
 
 /**
- * DAQ Context for global WebSocket state management
+ * Omnibus Context for global WebSocket state management
  */
-const DAQContext = createContext<DAQContextValue | undefined>(undefined);
+const OmnibusContext = createContext<OmnibusContextValue | undefined>(undefined);
 
 /**
  * Configuration
@@ -23,17 +23,17 @@ const SOCKET_URL = 'ws://localhost:8081';
 const MAX_BUFFER_SIZE = 100; // Keep last 100 data points per channel
 
 /**
- * DAQ Provider Component
+ * Omnibus Provider Component
  */
-export const DAQProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
   const [channelData, setChannelData] = useState<ChannelDataMap>(new Map());
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Parse DAQ message and convert to chart-ready format
+   * Parse Omnibus message and convert to chart-ready format
    */
-  const parseMessage = useCallback((msg: DAQMessage) => {
+  const parseMessage = useCallback((msg: OmnibusMessage) => {
     const { data, relative_timestamps_nanoseconds, timestamp: baseTimestamp } = msg.payload;
 
     // Process each sensor channel (Fake0-Fake7)
@@ -70,50 +70,50 @@ export const DAQProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     // Connection event handlers
     newSocket.on('connect', () => {
-      console.log('[DAQ] Connected to backend');
+      console.log('[Omnibus] Connected to backend');
       setConnectionStatus('connected');
       setError(null);
     });
 
     newSocket.on('disconnect', (reason) => {
-      console.log('[DAQ] Disconnected:', reason);
+      console.log('[Omnibus] Disconnected:', reason);
       setConnectionStatus('disconnected');
     });
 
     newSocket.on('connect_error', (err) => {
-      console.error('[DAQ] Connection error:', err.message);
+      console.error('[Omnibus] Connection error:', err.message);
       setConnectionStatus('error');
       setError(err.message);
     });
 
-    // Message handler - parse incoming DAQ data
-    newSocket.on('message', (msg: DAQMessage) => {
+    // Message handler - parse incoming Omnibus data
+    newSocket.on('message', (msg: OmnibusMessage) => {
       parseMessage(msg);
     });
 
     // Cleanup on unmount
     return () => {
-      console.log('[DAQ] Disconnecting socket');
+      console.log('[Omnibus] Disconnecting socket');
       newSocket.close();
     };
   }, [parseMessage]);
 
-  const value: DAQContextValue = {
+  const value: OmnibusContextValue = {
     channelData,
     connectionStatus,
     error,
   };
 
-  return <DAQContext.Provider value={value}>{children}</DAQContext.Provider>;
+  return <OmnibusContext.Provider value={value}>{children}</OmnibusContext.Provider>;
 };
 
 /**
- * Custom hook to consume DAQ context
+ * Custom hook to consume Omnibus context
  */
-export const useDAQContext = (): DAQContextValue => {
-  const context = useContext(DAQContext);
+export const useOmnibusContext = (): OmnibusContextValue => {
+  const context = useContext(OmnibusContext);
   if (context === undefined) {
-    throw new Error('useDAQContext must be used within a DAQProvider');
+    throw new Error('useOmnibusContext must be used within an OmnibusProvider');
   }
   return context;
 };

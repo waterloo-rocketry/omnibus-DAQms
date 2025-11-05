@@ -2,12 +2,12 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { DAQProvider } from './context/DAQContext'
+import { OmnibusProvider } from './context/OmnibusContext'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <DAQProvider>
+    <OmnibusProvider>
       <App />
-    </DAQProvider>
+    </OmnibusProvider>
   </StrictMode>,
 )

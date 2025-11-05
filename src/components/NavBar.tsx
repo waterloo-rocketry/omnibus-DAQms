@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { useDAQContext } from "@/context/DAQContext";
+import { useOmnibusContext } from "@/context/OmnibusContext";
 
 export function NavBar() {
   const navItems = [
@@ -16,8 +16,8 @@ export function NavBar() {
     { title: "Settings", href: "/settings" },
   ];
 
-  // Get connection status from DAQ context
-  const { connectionStatus } = useDAQContext();
+  // Get connection status from Omnibus context
+  const { connectionStatus } = useOmnibusContext();
 
   // Determine status color and text
   const getStatusStyle = () => {
