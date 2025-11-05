@@ -13,14 +13,14 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
-import type { ChartDataPoint } from "@/types/omnibus";
+import type { DataPoint } from "@/types/omnibus";
 
 /**
  * LineGraph component props
  */
 interface LineGraphProps {
   channelName: string;
-  data: ChartDataPoint[];
+  data: DataPoint[];
   title?: string;
   unit?: string;
 }

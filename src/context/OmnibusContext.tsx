@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import type { OmnibusMessage, ChartDataPoint, ConnectionStatus, ChannelDataMap } from '../types/omnibus';
+import type { OmnibusMessage, DataPoint, ConnectionStatus, ChannelDataMap } from '../types/omnibus';
 
 /**
  * Context value interface
@@ -38,8 +38,8 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Process each sensor channel (Fake0-Fake7)
     Object.entries(data).forEach(([sensorName, values]) => {
-      // Convert each sample to chart data point
-      const chartPoints: ChartDataPoint[] = values.map((value, idx) => ({
+      // Convert each sample to data point
+      const dataPoints: DataPoint[] = values.map((value, idx) => ({
         timestamp: (baseTimestamp * 1000) + (relative_timestamps_nanoseconds[idx] / 1_000_000), // Convert base to ms, add relative offset in ms
         value: value,
       }));
@@ -47,7 +47,7 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
       // Update channel data with buffer limit
       setChannelData((prev) => {
         const existing = prev.get(sensorName) || [];
-        const updated = [...existing, ...chartPoints].slice(-MAX_BUFFER_SIZE);
+        const updated = [...existing, ...dataPoints].slice(-MAX_BUFFER_SIZE);
         const newMap = new Map(prev);
         newMap.set(sensorName, updated);
         return newMap;

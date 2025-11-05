@@ -26,9 +26,9 @@ export interface OmnibusMessage {
 }
 
 /**
- * Chart-ready data point format
+ * Data point format (timestamp + value)
  */
-export interface ChartDataPoint {
+export interface DataPoint {
   timestamp: number; // Unix timestamp in milliseconds (converted from backend seconds)
   value: number;
 }
@@ -41,4 +41,4 @@ export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'er
 /**
  * Channel data map: sensor name -> array of data points
  */
-export type ChannelDataMap = Map<string, ChartDataPoint[]>;
+export type ChannelDataMap = Map<string, DataPoint[]>;
