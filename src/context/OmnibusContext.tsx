@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import type { OmnibusMessage, ChartDataPoint, ConnectionStatus, ChannelDataMap } from '../types/omnibus';
 
 /**
  * Context value interface
  */
-interface OmnibusContextValue {
+export interface OmnibusContextValue {
   channelData: ChannelDataMap;
   connectionStatus: ConnectionStatus;
   error: string | null;
@@ -14,7 +14,7 @@ interface OmnibusContextValue {
 /**
  * Omnibus Context for global WebSocket state management
  */
-const OmnibusContext = createContext<OmnibusContextValue | undefined>(undefined);
+export const OmnibusContext = createContext<OmnibusContextValue | undefined>(undefined);
 
 /**
  * Configuration
@@ -105,15 +105,4 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   return <OmnibusContext.Provider value={value}>{children}</OmnibusContext.Provider>;
-};
-
-/**
- * Custom hook to consume Omnibus context
- */
-export const useOmnibusContext = (): OmnibusContextValue => {
-  const context = useContext(OmnibusContext);
-  if (context === undefined) {
-    throw new Error('useOmnibusContext must be used within an OmnibusProvider');
-  }
-  return context;
 };

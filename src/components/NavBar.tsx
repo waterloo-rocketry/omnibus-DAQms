@@ -6,7 +6,7 @@ import {
   NavigationMenuLink,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { useOmnibusContext } from "@/context/OmnibusContext";
+import { useOmnibusContext } from "@/hooks/useOmnibusContext";
 
 export function NavBar() {
   const navItems = [

@@ -1,5 +1,5 @@
 import { LineGraph } from "./LineGraph";
-import { useOmnibusContext } from "@/context/OmnibusContext";
+import { useOmnibusContext } from "@/hooks/useOmnibusContext";
 
 export const SensorMonitoringDashboard = () => {
   // Consume Omnibus context to get real-time channel data
