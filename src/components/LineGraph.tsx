@@ -40,8 +40,8 @@ export function LineGraph({
   unit = "",
   maxDataPoints = 100
 }: LineGraphProps) {
-  // Subscribe to ONLY this channel's latest value from Zustand
-  const latestValue = useOmnibusStore((state) => state.channels[channelName]);
+  // Subscribe to ONLY this channel's latest value + timestamp from Zustand
+  const latestDataPoint = useOmnibusStore((state) => state.channels[channelName]);
 
   // Store history locally in ref (persists across renders, doesn't trigger re-renders)
   const historyRef = useRef<DataPoint[]>([]);
@@ -51,10 +51,10 @@ export function LineGraph({
 
   // When new value arrives, add to local history
   useEffect(() => {
-    if (latestValue !== undefined) {
+    if (latestDataPoint !== undefined) {
       const newPoint: DataPoint = {
-        timestamp: Date.now(),
-        value: latestValue,
+        timestamp: latestDataPoint.timestamp, // ← Use backend timestamp!
+        value: latestDataPoint.value,
       };
 
       // Update history (keep last N points)
@@ -66,7 +66,7 @@ export function LineGraph({
       // Force re-render to display new data
       forceUpdate();
     }
-  }, [latestValue, maxDataPoints]);
+  }, [latestDataPoint, maxDataPoints]);
 
   // Use local history instead of prop data
   const data = historyRef.current;

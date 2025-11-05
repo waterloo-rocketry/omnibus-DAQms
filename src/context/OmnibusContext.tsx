@@ -35,15 +35,24 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
    */
   const parseMessage = useCallback((msg: OmnibusMessage) => {
     console.log('[Omnibus] parseMessage called');
-    const { data } = msg.payload;
+    const { data, relative_timestamps_nanoseconds, timestamp: baseTimestamp } = msg.payload;
 
-    // Collect latest values for all sensors in this message
-    const updates: Record<string, number> = {};
+    // Collect latest values with timestamps for all sensors in this message
+    const updates: Record<string, { value: number; timestamp: number }> = {};
 
     Object.entries(data).forEach(([sensorName, values]) => {
       // Take the last value from the array as the latest
       const latestValue = values[values.length - 1];
-      updates[sensorName] = latestValue;
+
+      // Calculate the precise timestamp for this sample
+      // Base timestamp (seconds) + relative offset (nanoseconds) → milliseconds
+      const latestTimestamp = (baseTimestamp * 1000) +
+        (relative_timestamps_nanoseconds[values.length - 1] / 1_000_000);
+
+      updates[sensorName] = {
+        value: latestValue,
+        timestamp: latestTimestamp
+      };
     });
 
     // Single batch update to Zustand store
@@ -68,8 +77,6 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
       reconnectionDelay: 1000, // Start with 1s delay
       reconnectionDelayMax: 5000, // Max 5s delay
       reconnectionAttempts: Infinity, // Keep trying
-      pingInterval: 25000, // Send ping every 25 seconds (default: 25000)
-      pingTimeout: 120000, // Wait 120 seconds for pong (default: 20000) - INCREASED!
     });
 
     // Connection event handlers
