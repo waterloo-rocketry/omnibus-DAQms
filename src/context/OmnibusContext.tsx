@@ -1,12 +1,12 @@
 import React, { createContext, useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import type { OmnibusMessage, DataPoint, ConnectionStatus, ChannelDataMap } from '../types/omnibus';
+import type { OmnibusMessage, ConnectionStatus } from '../types/omnibus';
+import { useOmnibusStore } from '../store/omnibusStore';
 
 /**
  * Context value interface
  */
 export interface OmnibusContextValue {
-  channelData: ChannelDataMap;
   connectionStatus: ConnectionStatus;
   error: string | null;
 }
@@ -19,46 +19,48 @@ export const OmnibusContext = createContext<OmnibusContextValue | undefined>(und
 /**
  * Configuration
  */
-const SOCKET_URL = 'ws://localhost:8081';
-const MAX_BUFFER_SIZE = 100; // Keep last 100 data points per channel
+const SOCKET_URL = 'http://localhost:8081';
 
 /**
  * Omnibus Provider Component
  */
 export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  console.log('[Omnibus] Provider rendering');
+
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
-  const [channelData, setChannelData] = useState<ChannelDataMap>(new Map());
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Parse Omnibus message and convert to chart-ready format
+   * Parse Omnibus message and update latest values in Zustand store
    */
   const parseMessage = useCallback((msg: OmnibusMessage) => {
-    const { data, relative_timestamps_nanoseconds, timestamp: baseTimestamp } = msg.payload;
+    console.log('[Omnibus] parseMessage called');
+    const { data } = msg.payload;
 
-    // Process each sensor channel (Fake0-Fake7)
+    // Collect latest values for all sensors in this message
+    const updates: Record<string, number> = {};
+
     Object.entries(data).forEach(([sensorName, values]) => {
-      // Convert each sample to data point
-      const dataPoints: DataPoint[] = values.map((value, idx) => ({
-        timestamp: (baseTimestamp * 1000) + (relative_timestamps_nanoseconds[idx] / 1_000_000), // Convert base to ms, add relative offset in ms
-        value: value,
-      }));
-
-      // Update channel data with buffer limit
-      setChannelData((prev) => {
-        const existing = prev.get(sensorName) || [];
-        const updated = [...existing, ...dataPoints].slice(-MAX_BUFFER_SIZE);
-        const newMap = new Map(prev);
-        newMap.set(sensorName, updated);
-        return newMap;
-      });
+      // Take the last value from the array as the latest
+      const latestValue = values[values.length - 1];
+      updates[sensorName] = latestValue;
     });
+
+    // Single batch update to Zustand store
+    useOmnibusStore.getState().updateChannels(updates);
   }, []);
+
+  // Debug: Track when parseMessage changes
+  useEffect(() => {
+    console.log('[Omnibus] parseMessage function changed!');
+  }, [parseMessage]);
 
   /**
    * Initialize Socket.IO connection
    */
   useEffect(() => {
+    console.log('[Omnibus] useEffect running - creating socket');
+
     // Create socket connection
     const newSocket = io(SOCKET_URL, {
       transports: ['websocket'], // Force WebSocket transport
@@ -66,6 +68,8 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
       reconnectionDelay: 1000, // Start with 1s delay
       reconnectionDelayMax: 5000, // Max 5s delay
       reconnectionAttempts: Infinity, // Keep trying
+      pingInterval: 25000, // Send ping every 25 seconds (default: 25000)
+      pingTimeout: 120000, // Wait 120 seconds for pong (default: 20000) - INCREASED!
     });
 
     // Connection event handlers
@@ -93,13 +97,13 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     // Cleanup on unmount
     return () => {
-      console.log('[Omnibus] Disconnecting socket');
+      console.log('[Omnibus] useEffect cleanup - disconnecting socket');
+      console.trace('[Omnibus] Cleanup stack trace');
       newSocket.close();
     };
   }, [parseMessage]);
 
   const value: OmnibusContextValue = {
-    channelData,
     connectionStatus,
     error,
   };

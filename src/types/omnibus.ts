@@ -37,8 +37,3 @@ export interface DataPoint {
  * Connection status states
  */
 export type ConnectionStatus = 'connecting' | 'connected' | 'disconnected' | 'error';
-
-/**
- * Channel data map: sensor name -> array of data points
- */
-export type ChannelDataMap = Map<string, DataPoint[]>;

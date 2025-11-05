@@ -6,7 +6,7 @@ Real-time data acquisition and monitoring dashboard with live WebSocket streamin
 
 **Terminal 1 - Backend:**
 ```bash
-cd backend
+cd tests/mock-backend
 npm install  # First time only
 npm start    # Runs on port 8081
 ```
@@ -27,11 +27,11 @@ Navigate to `/live-data` to see 6 sensor channels updating in real-time.
 ## Architecture
 
 ```
-Backend (ws://localhost:8081) → DAQContext → Dashboard → 6 LineGraph Charts
+Backend (ws://localhost:8081) → OmnibusContext → Dashboard → 6 LineGraph Charts
 ```
 
-- `src/context/DAQContext.tsx` - WebSocket connection & state management
-- `src/types/daq.ts` - TypeScript type definitions
+- `src/context/OmnibusContext.tsx` - WebSocket connection & state management
+- `src/types/omnibus.ts` - TypeScript type definitions
 - `src/components/SensorMonitoringDashboard.tsx` - Main dashboard
 - `src/components/LineGraph.tsx` - Reusable chart component
 
@@ -49,9 +49,10 @@ npm run lint     # Lint code
 ```
 src/
 ├── components/       # UI components
-├── context/          # DAQContext for WebSocket
+├── context/          # OmnibusContext for WebSocket
 ├── types/            # TypeScript definitions
 └── main.tsx          # Entry point
-backend/
-└── server.js         # Mock DAQ server
+tests/
+└── mock-backend/     # Mock data server
+    └── server.js
 ```

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useReducer } from "react";
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts";
 import {
   Card,
@@ -14,15 +14,16 @@ import {
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import type { DataPoint } from "@/types/omnibus";
+import { useOmnibusStore } from "@/store/omnibusStore";
 
 /**
  * LineGraph component props
  */
 interface LineGraphProps {
   channelName: string;
-  data: DataPoint[];
   title?: string;
   unit?: string;
+  maxDataPoints?: number; // Maximum number of data points to keep in history
 }
 
 // Chart configuration
@@ -33,7 +34,43 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function LineGraph({ channelName, data, title, unit = "" }: LineGraphProps) {
+export function LineGraph({
+  channelName,
+  title,
+  unit = "",
+  maxDataPoints = 100
+}: LineGraphProps) {
+  // Subscribe to ONLY this channel's latest value from Zustand
+  const latestValue = useOmnibusStore((state) => state.channels[channelName]);
+
+  // Store history locally in ref (persists across renders, doesn't trigger re-renders)
+  const historyRef = useRef<DataPoint[]>([]);
+
+  // Force re-render when history updates
+  const [, forceUpdate] = useReducer(x => x + 1, 0);
+
+  // When new value arrives, add to local history
+  useEffect(() => {
+    if (latestValue !== undefined) {
+      const newPoint: DataPoint = {
+        timestamp: Date.now(),
+        value: latestValue,
+      };
+
+      // Update history (keep last N points)
+      historyRef.current = [
+        ...historyRef.current,
+        newPoint,
+      ].slice(-maxDataPoints);
+
+      // Force re-render to display new data
+      forceUpdate();
+    }
+  }, [latestValue, maxDataPoints]);
+
+  // Use local history instead of prop data
+  const data = historyRef.current;
+
   // Transform data for Recharts with memoization
   const chartData = useMemo(() => {
     return data.map((point) => ({
