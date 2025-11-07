@@ -30,9 +30,6 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
   const [error, setError] = useState<string | null>(null);
 
-  /**
-   * Parse Omnibus message and update latest values in Zustand store
-   */
   const parseMessage = useCallback((msg: OmnibusMessage) => {
     console.log('[Omnibus] parseMessage called');
     const { data, relative_timestamps_nanoseconds, timestamp: baseTimestamp } = msg.payload;
@@ -64,22 +61,17 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
     console.log('[Omnibus] parseMessage function changed!');
   }, [parseMessage]);
 
-  /**
-   * Initialize Socket.IO connection
-   */
   useEffect(() => {
     console.log('[Omnibus] useEffect running - creating socket');
 
-    // Create socket connection
     const newSocket = io(SOCKET_URL, {
-      transports: ['websocket'], // Force WebSocket transport
-      reconnection: true, // Enable auto-reconnection
-      reconnectionDelay: 1000, // Start with 1s delay
-      reconnectionDelayMax: 5000, // Max 5s delay
-      reconnectionAttempts: Infinity, // Keep trying
+      transports: ['websocket'],
+      reconnection: true,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      reconnectionAttempts: Infinity,
     });
 
-    // Connection event handlers
     newSocket.on('connect', () => {
       console.log('[Omnibus] Connected to backend');
       setConnectionStatus('connected');
@@ -97,12 +89,10 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
       setError(err.message);
     });
 
-    // Message handler - parse incoming Omnibus data
     newSocket.on('message', (msg: OmnibusMessage) => {
       parseMessage(msg);
     });
 
-    // Cleanup on unmount
     return () => {
       console.log('[Omnibus] useEffect cleanup - disconnecting socket');
       console.trace('[Omnibus] Cleanup stack trace');
