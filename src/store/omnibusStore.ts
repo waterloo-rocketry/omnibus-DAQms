@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 /**
  * Data point with timestamp from backend
@@ -23,16 +24,18 @@ interface OmnibusStore {
     updateChannels: (updates: Record<string, LatestDataPoint>) => void
 }
 
-export const useOmnibusStore = create<OmnibusStore>((set) => ({
-    channels: {},
+export const useOmnibusStore = create<OmnibusStore>()(
+    subscribeWithSelector((set) => ({
+        channels: {},
 
-    updateChannel: (channelName, dataPoint) =>
-        set((state) => ({
-            channels: { ...state.channels, [channelName]: dataPoint },
-        })),
+        updateChannel: (channelName, dataPoint) =>
+            set((state) => ({
+                channels: { ...state.channels, [channelName]: dataPoint },
+            })),
 
-    updateChannels: (updates) =>
-        set((state) => ({
-            channels: { ...state.channels, ...updates },
-        })),
-}))
+        updateChannels: (updates) =>
+            set((state) => ({
+                channels: { ...state.channels, ...updates },
+            })),
+    })),
+)

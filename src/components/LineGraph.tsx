@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useReducer } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import {
     Card,
@@ -40,37 +40,32 @@ export function LineGraph({
     unit = '',
     maxDataPoints = 100,
 }: LineGraphProps) {
-    // Subscribe to ONLY this channel's latest value + timestamp from Zustand
-    const latestDataPoint = useOmnibusStore(
-        (state) => state.channels[channelName]
-    )
+    // Store graph history in state (proper React state management)
+    const [data, setData] = useState<DataPoint[]>([])
 
-    // Store history locally in ref (persists across renders, doesn't trigger re-renders)
-    const historyRef = useRef<DataPoint[]>([])
-
-    // Force re-render when history updates
-    const [, forceUpdate] = useReducer((x) => x + 1, 0)
-
-    // When new value arrives, add to local history
+    // Subscribe to this channel's updates using imperative subscription
     useEffect(() => {
-        if (latestDataPoint !== undefined) {
-            const newPoint: DataPoint = {
-                timestamp: latestDataPoint.timestamp, // ← Use backend timestamp!
-                value: latestDataPoint.value,
-            }
+        const unsubscribe = useOmnibusStore.subscribe(
+            (state) => state.channels[channelName], // Selector: watch this specific channel
+            (latestDataPoint) => {
+                // Callback: only fires when channelName changes
+                if (latestDataPoint !== undefined) {
+                    const newPoint: DataPoint = {
+                        timestamp: latestDataPoint.timestamp, // Use backend timestamp
+                        value: latestDataPoint.value,
+                    }
 
-            // Update history (keep last N points)
-            historyRef.current = [...historyRef.current, newPoint].slice(
-                -maxDataPoints
-            )
+                    // Update state with new point (triggers single re-render)
+                    setData((prev) =>
+                        [...prev, newPoint].slice(-maxDataPoints), // Keep last N points
+                    )
+                }
+            },
+        )
 
-            // Force re-render to display new data
-            forceUpdate()
-        }
-    }, [latestDataPoint, maxDataPoints])
-
-    // Use local history instead of prop data
-    const data = historyRef.current
+        // Cleanup subscription on unmount
+        return unsubscribe
+    }, [channelName, maxDataPoints])
 
     // Transform data for Recharts with memoization
     const chartData = useMemo(() => {
