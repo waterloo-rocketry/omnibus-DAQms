@@ -1,20 +1,10 @@
-import React, { createContext, useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import type { OmnibusMessage, ConnectionStatus } from '../types/omnibus';
 import { useOmnibusStore } from '../store/omnibusStore';
 
-/**
- * Context value interface
- */
-export interface OmnibusContextValue {
-  connectionStatus: ConnectionStatus;
-  error: string | null;
-}
-
-/**
- * Omnibus Context for global WebSocket state management
- */
-export const OmnibusContext = createContext<OmnibusContextValue | undefined>(undefined);
+import { OmnibusContext } from '../context/OmnibusContext';
+import type { OmnibusContextValue } from '../context/OmnibusContext.ts';
 
 /**
  * Configuration
@@ -24,7 +14,7 @@ const SOCKET_URL = 'http://localhost:8081';
 /**
  * Omnibus Provider Component
  */
-export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   console.log('[Omnibus] Provider rendering');
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('connecting');
@@ -107,3 +97,6 @@ export const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   return <OmnibusContext.Provider value={value}>{children}</OmnibusContext.Provider>;
 };
+
+export default OmnibusProvider;
+
