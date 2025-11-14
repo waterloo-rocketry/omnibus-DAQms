@@ -23,7 +23,7 @@ interface LineGraphProps {
     channelName: string
     title?: string
     unit?: string
-    maxDataPoints?: number // Maximum number of data points to keep in history
+    timeRangeMs?: number // Time window to display in milliseconds
 }
 
 // Chart configuration
@@ -38,34 +38,28 @@ export function LineGraph({
     channelName,
     title,
     unit = '',
-    maxDataPoints = 100,
+    timeRangeMs = 60000,
 }: LineGraphProps) {
-    // Store graph history in state (proper React state management)
     const [data, setData] = useState<DataPoint[]>([])
 
-    // Subscribe to this channel's updates using imperative subscription
     useEffect(() => {
         const unsubscribe = useOmnibusStore.subscribe(
-            (state) => state.channels[channelName], // Selector: watch this specific channel
+            (state) => state.channels[channelName],
             (latestDataPoint) => {
-                // Callback: only fires when channelName changes
-                if (latestDataPoint !== undefined) {
-                    const newPoint: DataPoint = {
-                        timestamp: latestDataPoint.timestamp, // Use backend timestamp
-                        value: latestDataPoint.value,
-                    }
+                if (!latestDataPoint) return
 
-                    // Update state with new point (triggers single re-render)
-                    setData((prev) =>
-                        [...prev, newPoint].slice(-maxDataPoints), // Keep last N points
-                    )
-                }
+                const cutoffTime = Date.now() - timeRangeMs
+
+                setData((prev) =>
+                    [...prev, latestDataPoint].filter(
+                        (point) => point.timestamp >= cutoffTime,
+                    ),
+                )
             },
         )
 
-        // Cleanup subscription on unmount
         return unsubscribe
-    }, [channelName, maxDataPoints])
+    }, [channelName, timeRangeMs])
 
     // Transform data for Recharts with memoization
     const chartData = useMemo(() => {
@@ -75,7 +69,6 @@ export function LineGraph({
         }))
     }, [data])
 
-    // Calculate current value and Y-axis domain
     const currentValue = useMemo(() => {
         if (data.length === 0) return null
         return data[data.length - 1].value
