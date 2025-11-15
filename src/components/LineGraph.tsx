@@ -1,4 +1,4 @@
-import { useMemo, useState, useEffect } from 'react'
+import { useMemo, useState, useEffect, useRef } from 'react'
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts'
 import {
     Card,
@@ -40,6 +40,7 @@ export function LineGraph({
     timeRangeSec = 60,
 }: LineGraphProps) {
     const [data, setData] = useState<DataPoint[]>([])
+    const prevChannelRef = useRef(channelName)
 
     useEffect(() => {
         const cutoffTime = Date.now() - timeRangeSec * 1000
@@ -47,7 +48,10 @@ export function LineGraph({
     }, [timeRangeSec])
 
     useEffect(() => {
-        setData([])
+        if (prevChannelRef.current !== channelName) {
+            setData([])
+        }
+        prevChannelRef.current = channelName
 
         const unsubscribe = useLastDatapointStore.subscribe(
             (state) => state.series[channelName],
