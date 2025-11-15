@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react'
 import { io } from 'socket.io-client'
 import type { OmnibusMessage, ConnectionStatus } from '../types/omnibus'
-import { useOmnibusStore } from '../store/omnibusStore'
+import { useLastDatapointStore } from '../store/omnibusStore'
 
 import { OmnibusContext } from '../context/OmnibusContext'
 import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
@@ -51,7 +51,7 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
         })
 
         // Single batch update to Zustand store
-        useOmnibusStore.getState().updateChannels(updates)
+        useLastDatapointStore.getState().updateMultipleSeries(updates)
     }, [])
 
     // Debug: Track when parseMessage changes
