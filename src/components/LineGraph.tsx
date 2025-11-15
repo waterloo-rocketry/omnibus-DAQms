@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/chart'
 import type { ChartConfig } from '@/components/ui/chart'
 import type { DataPoint } from '@/types/omnibus'
-import { useOmnibusStore } from '@/store/omnibusStore'
+import { useLastDatapointStore } from '@/store/omnibusStore'
 
 /**
  * LineGraph component props
@@ -23,10 +23,9 @@ interface LineGraphProps {
     channelName: string
     title?: string
     unit?: string
-    timeRangeMs?: number // Time window to display in milliseconds
+    timeRangeSec?: number
 }
 
-// Chart configuration
 const chartConfig = {
     value: {
         label: 'Value',
@@ -38,17 +37,24 @@ export function LineGraph({
     channelName,
     title,
     unit = '',
-    timeRangeMs = 60000,
+    timeRangeSec = 60,
 }: LineGraphProps) {
     const [data, setData] = useState<DataPoint[]>([])
 
     useEffect(() => {
-        const unsubscribe = useOmnibusStore.subscribe(
-            (state) => state.channels[channelName],
+        const cutoffTime = Date.now() - timeRangeSec * 1000
+        setData((prev) => prev.filter((point) => point.timestamp >= cutoffTime))
+    }, [timeRangeSec])
+
+    useEffect(() => {
+        setData([])
+
+        const unsubscribe = useLastDatapointStore.subscribe(
+            (state) => state.series[channelName],
             (latestDataPoint) => {
                 if (!latestDataPoint) return
 
-                const cutoffTime = Date.now() - timeRangeMs
+                const cutoffTime = Date.now() - timeRangeSec * 1000
 
                 setData((prev) =>
                     [...prev, latestDataPoint].filter(
@@ -59,7 +65,7 @@ export function LineGraph({
         )
 
         return unsubscribe
-    }, [channelName, timeRangeMs])
+    }, [channelName, timeRangeSec])
 
     // Transform data for Recharts with memoization
     const chartData = useMemo(() => {
