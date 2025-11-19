@@ -1,48 +1,46 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { io } from 'socket.io-client'
-import type { OmnibusMessage, ConnectionStatus } from '../types/omnibus'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import { communicator } from '@waterloorocketry/omnibus-ts'
+import type { ConnectionStatus } from '../types/omnibus'
 import { useLastDatapointStore } from '../store/omnibusStore'
 
 import { OmnibusContext } from '../context/OmnibusContext'
 import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
 
-/**
- * Configuration
- */
 const SOCKET_URL = 'http://localhost:8081'
 
-/**
- * Omnibus Provider Component
- */
 const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    console.log('[Omnibus] Provider rendering')
-
     const [connectionStatus, setConnectionStatus] =
         useState<ConnectionStatus>('connecting')
     const [error, setError] = useState<string | null>(null)
+    const communicatorRef = useRef<ReturnType<typeof communicator> | null>(
+        null,
+    )
 
-    const parseMessage = useCallback((msg: OmnibusMessage) => {
-        console.log('[Omnibus] parseMessage called')
-        const {
-            data,
-            relative_timestamps_nanoseconds,
-            timestamp: baseTimestamp,
-        } = msg.payload
+    const onReceiveDAQ = useCallback((msg: { channel: string; timestamp: number; payload: any }) => {
+        console.log('[DEBUG] Message received:', msg)
+        const payload = msg.payload
 
-        // Collect latest values with timestamps for all sensors in this message
+        if (!payload.data || !payload.relativeTimestamps) {
+            console.warn('[DEBUG] Early return - missing fields:', {
+                hasData: !!payload.data,
+                hasRelativeTimestamps: !!payload.relativeTimestamps,
+                payloadKeys: Object.keys(payload)
+            })
+            return
+        }
+
+        const { data, relativeTimestamps, timestamp: baseTimestamp } = payload
         const updates: Record<string, { value: number; timestamp: number }> = {}
 
         Object.entries(data).forEach(([sensorName, values]) => {
-            // Take the last value from the array as the latest
-            const latestValue = values[values.length - 1]
+            if (!Array.isArray(values) || values.length === 0) return
 
-            // Calculate the precise timestamp for this sample
-            // Base timestamp (seconds) + relative offset (nanoseconds) → milliseconds
+            const latestValue = values[values.length - 1] as number
             const latestTimestamp =
                 baseTimestamp * 1000 +
-                relative_timestamps_nanoseconds[values.length - 1] / 1_000_000
+                (relativeTimestamps[values.length - 1] as number) / 1_000_000
 
             updates[sensorName] = {
                 value: latestValue,
@@ -50,53 +48,40 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             }
         })
 
-        // Single batch update to Zustand store
+        console.log('[DEBUG] Updating store with:', Object.keys(updates))
         useLastDatapointStore.getState().updateMultipleSeries(updates)
     }, [])
 
-    // Debug: Track when parseMessage changes
     useEffect(() => {
-        console.log('[Omnibus] parseMessage function changed!')
-    }, [parseMessage])
-
-    useEffect(() => {
-        console.log('[Omnibus] useEffect running - creating socket')
-
-        const newSocket = io(SOCKET_URL, {
-            transports: ['websocket'],
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: Infinity,
+        const omnibusCommunicator = communicator({
+            serverURL: SOCKET_URL,
+            allowExposeSocket: true,
         })
 
-        newSocket.on('connect', () => {
-            console.log('[Omnibus] Connected to backend')
-            setConnectionStatus('connected')
-            setError(null)
-        })
+        communicatorRef.current = omnibusCommunicator
 
-        newSocket.on('disconnect', (reason) => {
-            console.log('[Omnibus] Disconnected:', reason)
-            setConnectionStatus('disconnected')
-        })
+        if (omnibusCommunicator.socket) {
+            omnibusCommunicator.socket.on('connect', () => {
+                setConnectionStatus('connected')
+                setError(null)
+            })
 
-        newSocket.on('connect_error', (err) => {
-            console.error('[Omnibus] Connection error:', err.message)
-            setConnectionStatus('error')
-            setError(err.message)
-        })
+            omnibusCommunicator.socket.on('disconnect', () => {
+                setConnectionStatus('disconnected')
+            })
 
-        newSocket.on('message', (msg: OmnibusMessage) => {
-            parseMessage(msg)
-        })
+            omnibusCommunicator.socket.on('connect_error', (err) => {
+                setConnectionStatus('error')
+                setError(err.message)
+            })
+        }
+
+        omnibusCommunicator.receiver.receiveAll(onReceiveDAQ)
 
         return () => {
-            console.log('[Omnibus] useEffect cleanup - disconnecting socket')
-            console.trace('[Omnibus] Cleanup stack trace')
-            newSocket.close()
+            omnibusCommunicator.disconnect()
         }
-    }, [parseMessage])
+    }, [onReceiveDAQ])
 
     const value: OmnibusContextValue = {
         connectionStatus,
