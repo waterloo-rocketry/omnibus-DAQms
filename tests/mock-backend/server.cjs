@@ -1,5 +1,6 @@
 const io = require('socket.io')(8081, {
     cors: { origin: '*' },
+    parser: require('socket.io-msgpack-parser'),
 })
 
 function generateDaqMessage() {
@@ -11,22 +12,17 @@ function generateDaqMessage() {
         data[`Fake${i}`] = Array.from({ length: 25 }, () => Math.random())
     }
 
-    // Generate relative timestamps (25 samples, 1ms apart in nanoseconds)
-    const relative_timestamps = Array.from(
+    const relativeTimestamps = Array.from(
         { length: 25 },
         (_, i) => i * 1000000
     )
 
     return {
-        channel: 'DAQ/Fake',
         timestamp: timestamp,
-        payload: {
-            timestamp: timestamp,
-            data: data,
-            relative_timestamps_nanoseconds: relative_timestamps,
-            sample_rate: 1000,
-            message_format_version: 2,
-        },
+        data: data,
+        relative_timestamps: relativeTimestamps,
+        sample_rate: 1000,
+        message_version: 2,
     }
 }
 
@@ -40,8 +36,8 @@ io.on('connection', (socket) => {
 
 // Emit DAQ data at 40 Hz (every 25ms)
 setInterval(() => {
-    const message = generateDaqMessage()
-    io.emit('message', message)
+    const payload = generateDaqMessage()
+    io.emit('DAQ/Fake', payload.timestamp, payload)
 }, 25)
 
 console.log('Mock DAQ server running on port 8081')
