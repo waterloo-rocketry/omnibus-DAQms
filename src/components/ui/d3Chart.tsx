@@ -92,7 +92,7 @@ export default function D3Chart({
         const values = data.map((d) => d.value);
         const min = Math.min(...values);
         const max = Math.max(...values);
-        const padding = (max - min) * 0.1;
+        const padding = (max - min) * 0.1 || 0.1;
 
         if (scaleType === 'log') {
             return d3.scaleLog().domain([min - padding, max + padding]).range([innerH, 0]);
@@ -121,10 +121,10 @@ export default function D3Chart({
     // Render y-axis using D3
     useLayoutEffect(() => {
         if (!yAxisRef.current) return;
-        const yAxis = d3.axisLeft<number>(yScale).ticks(rangeTickCount).tickFormat((v: number) => Number(v).toFixed(2));
+        const yAxis = d3.axisLeft<number>(yScale).ticks(rangeTickCount).tickFormat((v: number) => `${Number(v).toFixed(2)}${unit ? ' ' + unit : ''}`); // Add unit if provided
         d3.select(yAxisRef.current).call(yAxis as any);
         d3.select(yAxisRef.current).selectAll("text").attr("font-size", 11).attr("fill", "var(--muted-foreground)");
-    }, [yScale, rangeTickCount, innerH, scaleType]);
+    }, [yScale, rangeTickCount, innerH, scaleType, unit]);
 
     return (
         <svg width={width} height={height} aria-label={title} role="img">
@@ -155,8 +155,8 @@ export default function D3Chart({
 
                 {/* Horizontal y-axis stuff */}
                 <g aria-hidden="true">
-                    {/* Y-axis grid lines (tick labels already rendered by D3) */}
-                    {yScale.ticks(5).map((v: number, i: number) => (
+                    {/* Y-axis grid lines */}
+                    {yScale.ticks(rangeTickCount).map((v: number, i: number) => (
                         <g key={`gy-${i}`} transform={`translate(0, ${yScale(v)})`}>
                             <line x1={0} x2={innerW} y1={0} y2={0} stroke="rgba(0,0,0,0.06)" />
                         </g>
@@ -186,6 +186,16 @@ export default function D3Chart({
                         </g>
                     ))}
                 </g>
+
+                {/* X axis grid stuff*/}
+                <g>
+                    {xTicks.map((tk, i) => (
+                        <g key={`gx-${i}`} transform={`translate(${tk.x}, 0)`}>
+                            <line x1={0} x2={0} y1={0} y2={innerH} stroke="rgba(0,0,0,0.06)" />
+                        </g>
+                    ))}
+                </g>
+
                 <g ref={yAxisRef as any} />
             </g>
         </svg>
