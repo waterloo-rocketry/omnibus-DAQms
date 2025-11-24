@@ -14,7 +14,6 @@ interface D3ChartProps {
     fixedDomain?: [number, number];
     domainTickCount?: number; //MUST BE > 0
     title?: string;
-    scaleType?: 'linear' | 'log';
 }
 
 export default function D3Chart({
@@ -28,7 +27,6 @@ export default function D3Chart({
     fixedDomain,
     rangeTickCount = 5,
     domainTickCount = 5,
-    scaleType = 'linear',
     title = "D3 Line Chart"
 }: D3ChartProps) {
     const { top = 10, right = 33, bottom = 24, left = 56 } = margin;
@@ -71,36 +69,20 @@ export default function D3Chart({
     const yScale = useMemo(() => {
         // Use fixed domain if provided
         if (fixedDomain && fixedDomain.length === 2) {
-            if (scaleType === 'log') {
-                return d3.scaleLog().domain(fixedDomain).range([innerH, 0]);
-            }
-            else {
-                return d3.scaleLinear().domain(fixedDomain).range([innerH, 0]);
-            }
+            return d3.scaleLinear().domain(fixedDomain).range([innerH, 0]);
         }
 
         // No data loaded yet
         if (data.length === 0){
-            if (scaleType === 'log') {
-                return d3.scaleLog().domain([0, 1]).range([innerH, 0]);
-            }
-            else {
-                return d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
-            }
+            return d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
         }
 
         const values = data.map((d) => d.value);
         const min = Math.min(...values);
         const max = Math.max(...values);
         const padding = (max - min) * 0.1 || 0.1;
-
-        if (scaleType === 'log') {
-            return d3.scaleLog().domain([min - padding, max + padding]).range([innerH, 0]);
-        }
-        else {
-            return d3.scaleLinear().domain([min - padding, max + padding]).range([innerH, 0]);
-        }
-    }, [data, innerH, fixedDomain, scaleType]);
+        return d3.scaleLinear().domain([min - padding, max + padding]).range([innerH, 0]);
+    }, [data, innerH, fixedDomain]);
 
     // Latest Value
     const latestValue = useMemo(() => {
@@ -124,7 +106,7 @@ export default function D3Chart({
         const yAxis = d3.axisLeft<number>(yScale).ticks(rangeTickCount).tickFormat((v: number) => `${Number(v).toFixed(2)}${unit ? ' ' + unit : ''}`); // Add unit if provided
         d3.select(yAxisRef.current).call(yAxis as any);
         d3.select(yAxisRef.current).selectAll("text").attr("font-size", 11).attr("fill", "var(--muted-foreground)");
-    }, [yScale, rangeTickCount, innerH, scaleType, unit]);
+    }, [yScale, rangeTickCount, innerH, unit]);
 
     return (
         <svg width={width} height={height} aria-label={title} role="img">
