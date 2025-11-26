@@ -19,15 +19,9 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     )
 
     const onReceiveDAQ = useCallback((msg: { channel: string; timestamp: number; payload: any }) => {
-        console.log('[DEBUG] Message received:', msg)
         const payload = msg.payload
 
         if (!payload.data || !payload.relativeTimestamps) {
-            console.warn('[DEBUG] Early return - missing fields:', {
-                hasData: !!payload.data,
-                hasRelativeTimestamps: !!payload.relativeTimestamps,
-                payloadKeys: Object.keys(payload)
-            })
             return
         }
 
@@ -48,7 +42,6 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             }
         })
 
-        console.log('[DEBUG] Updating store with:', Object.keys(updates))
         useLastDatapointStore.getState().updateMultipleSeries(updates)
     }, [])
 
