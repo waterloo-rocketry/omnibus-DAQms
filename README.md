@@ -5,6 +5,7 @@ Real-time data acquisition and monitoring dashboard with live WebSocket streamin
 ## Quick Start
 
 **Terminal 1 - Backend:**
+
 ```bash
 cd tests/mock-backend
 npm install  # First time only
@@ -12,6 +13,7 @@ npm start    # Runs on port 8081
 ```
 
 **Terminal 2 - Frontend:**
+
 ```bash
 npm install  # First time only
 npm run dev  # Opens on http://localhost:5173
@@ -46,6 +48,7 @@ npm run lint     # Lint code
 ```
 
 **Project Structure:**
+
 ```
 src/
 ├── components/       # UI components

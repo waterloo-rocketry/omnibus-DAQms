@@ -1,38 +1,36 @@
-import { create } from 'zustand';
+import { create } from 'zustand'
+import { subscribeWithSelector } from 'zustand/middleware'
 
 /**
  * Data point with timestamp from backend
  */
 export interface LatestDataPoint {
-  value: number;
-  timestamp: number; // Unix timestamp in milliseconds (from backend)
+    value: number
+    timestamp: number // Unix timestamp in milliseconds (from backend)
 }
 
 /**
  * Zustand store for Omnibus sensor data
- * Stores ONLY the latest value + timestamp per channel (not history)
+ * Stores ONLY the latest value + timestamp per series (not history)
  */
 interface OmnibusStore {
-  // Latest sensor values with timestamps: { "Fake0": { value: 25.3, timestamp: 1699... }, ... }
-  channels: Record<string, LatestDataPoint>;
-
-  // Update a single channel
-  updateChannel: (channelName: string, dataPoint: LatestDataPoint) => void;
-
-  // Update multiple channels at once (for batching)
-  updateChannels: (updates: Record<string, LatestDataPoint>) => void;
+    series: Record<string, LatestDataPoint>
+    updateSeries: (seriesName: string, dataPoint: LatestDataPoint) => void
+    updateMultipleSeries: (updates: Record<string, LatestDataPoint>) => void
 }
 
-export const useOmnibusStore = create<OmnibusStore>((set) => ({
-  channels: {},
+export const useLastDatapointStore = create<OmnibusStore>()(
+    subscribeWithSelector((set) => ({
+        series: {},
 
-  updateChannel: (channelName, dataPoint) =>
-    set((state) => ({
-      channels: { ...state.channels, [channelName]: dataPoint }
-    })),
+        updateSeries: (seriesName, dataPoint) =>
+            set((state) => ({
+                series: { ...state.series, [seriesName]: dataPoint },
+            })),
 
-  updateChannels: (updates) =>
-    set((state) => ({
-      channels: { ...state.channels, ...updates }
+        updateMultipleSeries: (updates) =>
+            set((state) => ({
+                series: { ...state.series, ...updates },
+            })),
     })),
-}));
+)
