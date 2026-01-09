@@ -95,14 +95,13 @@ export default function D3LineGraph({
   const displayTitle = title || channelName;
   const displayDescription = currentValue !== null ? `Current: ${currentValue.toFixed(2)} ${unit}` : "No data";
 
-  // Validate tick counts
-  if (rangeTickCount <= 0 || domainTickCount <= 0) {
-      console.error("rangeTickCount and domainTickCount must be greater than 0");
-      rangeTickCount = 5;
-      domainTickCount = 5;
-      return null;
-  }
+  const RangeTickCountNew = rangeTickCount > 0 ? rangeTickCount : 5;
+  const DomainTickCountNew = domainTickCount > 0 ? domainTickCount : 5;
 
+  if (rangeTickCount <= 0 || domainTickCount <= 0) {
+    console.warn("rangeTickCount and domainTickCount must be > 0; using defaults (5)");
+  }
+  
   return (
   <Card>
       <CardHeader className="items-start">
@@ -113,7 +112,7 @@ export default function D3LineGraph({
       </CardHeader>
       <CardContent>
       <ChartContainer config={chartConfig} className="h-[300px] w-full">
-          <D3Chart data={data} width={width} height={height} unit={unit} strokeColor={strokeColor} strokeWidth={strokeWidth} rangeTickCount={rangeTickCount} fixedDomain={fixedDomain} domainTickCount={domainTickCount} />
+          <D3Chart data={data} width={width} height={height} unit={unit} strokeColor={strokeColor} strokeWidth={strokeWidth} rangeTickCount={RangeTickCountNew} fixedDomain={fixedDomain} domainTickCount={DomainTickCountNew} />
       </ChartContainer>
       </CardContent>
   </Card>
