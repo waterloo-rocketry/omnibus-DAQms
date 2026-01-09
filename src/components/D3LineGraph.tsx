@@ -70,7 +70,7 @@ export default function D3LineGraph({
 
     // Prevent duplicates by checking last timestamp
     const lastPoint = historyRef.current[historyRef.current.length - 1];
-    if (lastPoint && lastPoint.timestamp === newPoint.timestamp) {
+    if (lastPoint && lastPoint.timestamp === newPoint.timestamp && lastPoint.value === newPoint.value) {
         return;
     }
 
@@ -94,6 +94,14 @@ export default function D3LineGraph({
   // Prepare display title and description
   const displayTitle = title || channelName;
   const displayDescription = currentValue !== null ? `Current: ${currentValue.toFixed(2)} ${unit}` : "No data";
+
+  // Validate tick counts
+  if (rangeTickCount <= 0 || domainTickCount <= 0) {
+      console.error("rangeTickCount and domainTickCount must be greater than 0");
+      rangeTickCount = 5;
+      domainTickCount = 5;
+      return null;
+  }
 
   return (
   <Card>

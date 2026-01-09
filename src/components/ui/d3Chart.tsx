@@ -29,12 +29,6 @@ export default function D3Chart({
 }: D3ChartProps) {
     const { top = 10, right = 33, bottom = 24, left = 56 } = margin;
 
-    // Validate tick counts
-    if (rangeTickCount <= 0 || domainTickCount <= 0) {
-        console.error("rangeTickCount and domainTickCount must be greater than 0");
-        return null;
-    }
-
     const innerW = Math.max(0, width - left - right);
     const innerH = Math.max(0, height - top - bottom);
 
@@ -106,7 +100,7 @@ export default function D3Chart({
     useLayoutEffect(() => {
         if (!yAxisRef.current) return;
         const yAxis = d3.axisLeft<number>(yScale).ticks(rangeTickCount).tickFormat((v: number) => `${Number(v).toFixed(2)}${unit ? ' ' + unit : ''}`); // Add unit if provided
-        d3.select(yAxisRef.current).call(yAxis as any);
+        d3.select(yAxisRef.current).call(yAxis);
         d3.select(yAxisRef.current).selectAll("text").attr("font-size", 11).attr("fill", "var(--muted-foreground)");
     }, [yScale, rangeTickCount, innerH, unit]);
 
