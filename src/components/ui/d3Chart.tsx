@@ -1,4 +1,4 @@
-import { useRef, useMemo, useLayoutEffect } from "react"; // Changed to useLayoutEffect as it runs before useEffect
+import { useRef, useMemo, useLayoutEffect} from "react"; // Stops potential flicker on y-axis
 import * as d3 from 'd3';
 import type { DataPoint } from "@/types/omnibus";
 
@@ -13,7 +13,6 @@ interface D3ChartProps {
     rangeTickCount?: number; // MUST BE > 0
     fixedDomain?: [number, number];
     domainTickCount?: number; //MUST BE > 0
-    title?: string;
 }
 
 export default function D3Chart({
@@ -27,17 +26,26 @@ export default function D3Chart({
     fixedDomain,
     rangeTickCount = 5,
     domainTickCount = 5,
-    title = "D3 Line Chart"
 }: D3ChartProps) {
     const { top = 10, right = 33, bottom = 24, left = 56 } = margin;
+
+    // Validate tick counts
+    if (rangeTickCount <= 0 || domainTickCount <= 0) {
+        console.error("rangeTickCount and domainTickCount must be greater than 0");
+        return null;
+    }
 
     const innerW = Math.max(0, width - left - right);
     const innerH = Math.max(0, height - top - bottom);
 
-    const yAxisRef = useRef<SVGGElement | null>(null);
+    const yAxisRef = useRef<SVGGElement>(null);
 
     // X scale
     const xScale = useMemo(() => {
+        if (data.length === 0) {
+            const now = new Date();
+            return d3.scaleTime().domain([now, now]).range([0, innerW]);
+        }
         const times = data.map((d) => new Date(d.timestamp));
         const domain = d3.extent(times) as [Date, Date];
         return d3.scaleTime().domain(domain).range([0, innerW]);
@@ -84,12 +92,6 @@ export default function D3Chart({
         return d3.scaleLinear().domain([min - padding, max + padding]).range([innerH, 0]);
     }, [data, innerH, fixedDomain]);
 
-    // Latest Value
-    const latestValue = useMemo(() => {
-        if (data.length === 0) return null;
-        return data[data.length - 1].value;
-    }, [data]);
-
     // Line path
     const pathD = useMemo(() => {
         const line = d3.line<DataPoint>()
@@ -109,31 +111,9 @@ export default function D3Chart({
     }, [yScale, rangeTickCount, innerH, unit]);
 
     return (
-        <svg width={width} height={height} aria-label={title} role="img">
+            <svg width="100%" height="100%" viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none" role="img">
         
             <g transform={`translate(${margin.left},${top})`}>
-
-                {/* Title */}
-                <text
-                    x={innerW / 2}
-                    y={top / 2}
-                    textAnchor="middle"
-                    style={{ fontSize: 15, fontWeight: 600, fill: "currentColor" }}
-                >
-                    {title}
-                </text>
-
-                {/* Latest Value Display */}
-                {latestValue !== null && (
-                    <text
-                        x={innerW - 4}
-                        y={top / 2}
-                        textAnchor="end"
-                        style={{ fontSize: 13, fill: "var(--muted-foreground)" }}
-                    >
-                        {`Latest: ${latestValue.toFixed(2)} ${unit}`}
-                    </text>
-                )}
 
                 {/* Horizontal y-axis stuff */}
                 <g aria-hidden="true">
@@ -178,9 +158,8 @@ export default function D3Chart({
                     ))}
                 </g>
 
-                <g ref={yAxisRef as any} />
+                <g ref={yAxisRef} />
             </g>
         </svg>
     );
-
 }

@@ -51,58 +51,63 @@ export default function D3LineGraph({
   domainTickCount = 5,
   maxDataPoints = 100,
 }: D3LineGraphProps) {
-    // Subscribe to ONLY this channel's latest value + timestamp from Zustand
-    const latestDataPoint = useOmnibusStore((s) => s.channels[channelName]);
+  // Subscribe to ONLY this channel's latest value + timestamp from Zustand
+  const latestDataPoint = useOmnibusStore((s) => s.channels[channelName]);
 
-    // Store history locally in ref (persists across renders, doesn't trigger re-renders)
-    const historyRef = useRef<DataPoint[]>([]);
+  // Store history locally in ref (persists across renders, doesn't trigger re-renders)
+  const historyRef = useRef<DataPoint[]>([]);
 
-    // Force re-render when history updates
-    const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
+  // Force re-render when history updates
+  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
 
-    // When new value arrives, add to local history
-    useEffect(() => {
-    if (latestDataPoint !== undefined) {
-        const newPoint: DataPoint = {
-        timestamp: latestDataPoint.timestamp, // ← Use backend timestamp!
-        value: latestDataPoint.value,
-        };
+  // When new value arrives, add to local history
+  useEffect(() => {
+  if (latestDataPoint !== undefined) {
+    const newPoint: DataPoint = {
+    timestamp: latestDataPoint.timestamp,
+    value: latestDataPoint.value,
+    };
 
-        // Update history (keep last N points)
-        historyRef.current = [...historyRef.current, newPoint].slice(-maxDataPoints);
-
-        // Force re-render to display new data
-        forceUpdate();
+    // Prevent duplicates by checking last timestamp
+    const lastPoint = historyRef.current[historyRef.current.length - 1];
+    if (lastPoint && lastPoint.timestamp === newPoint.timestamp) {
+        return;
     }
-    }, [latestDataPoint, maxDataPoints]);
 
-    // Use local history instead of prop data
-    const data = historyRef.current;
+    // Update history (keep last N points)
+    historyRef.current = [...historyRef.current, newPoint].slice(-maxDataPoints);
 
-    // Get current value for display
-    const currentValue = useMemo(() => {
-    if (data.length === 0) return null;
-    return data[data.length - 1].value;
-    }, [data]);
+    // Force re-render to display new data
+    forceUpdate();
+  }
+  }, [latestDataPoint, maxDataPoints]);
 
-    // Prepare display title and description
-    const displayTitle = title || channelName;
-    const displayDescription = currentValue !== null ? `Current: ${currentValue.toFixed(2)} ${unit}` : "No data";
+  // Use local history instead of prop data
+  const data = historyRef.current;
 
-    return (
-    <Card>
-        <CardHeader className="items-start">
-        <div className="pl-4">
-            <CardTitle className="text-left pb-2">{displayTitle}</CardTitle>
-            <CardDescription className="text-left">{displayDescription}</CardDescription>
-        </div>
-        </CardHeader>
-        <CardContent>
-        <ChartContainer config={chartConfig} className="h-[300px] w-full">
-            {/* NOTE: D3Chart is not auto responsive so pass a reasonable size to fill the container */}
-            <D3Chart data={data} width={width} height={height} unit={unit} strokeColor={strokeColor} strokeWidth={strokeWidth} rangeTickCount={rangeTickCount} fixedDomain={fixedDomain} domainTickCount={domainTickCount} title={displayTitle} />
-        </ChartContainer>
-        </CardContent>
-    </Card>
-    );
-    }
+  // Get current value for display
+  const currentValue = useMemo(() => {
+  if (data.length === 0) return null;
+  return data[data.length - 1].value;
+  }, [data]);
+
+  // Prepare display title and description
+  const displayTitle = title || channelName;
+  const displayDescription = currentValue !== null ? `Current: ${currentValue.toFixed(2)} ${unit}` : "No data";
+
+  return (
+  <Card>
+      <CardHeader className="items-start">
+      <div className="pl-4">
+          <CardTitle className="text-left pb-2">{displayTitle}</CardTitle>
+          <CardDescription className="text-left">{displayDescription}</CardDescription>
+      </div>
+      </CardHeader>
+      <CardContent>
+      <ChartContainer config={chartConfig} className="h-[300px] w-full">
+          <D3Chart data={data} width={width} height={height} unit={unit} strokeColor={strokeColor} strokeWidth={strokeWidth} rangeTickCount={rangeTickCount} fixedDomain={fixedDomain} domainTickCount={domainTickCount} />
+      </ChartContainer>
+      </CardContent>
+  </Card>
+  );
+}
