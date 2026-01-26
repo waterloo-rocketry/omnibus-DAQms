@@ -153,3 +153,4 @@ export default function D3Chart({
         </svg>
     );
 }
+
