@@ -1,29 +1,8 @@
-/**
- * TypeScript type definitions for Omnibus message format
- * Matches the backend Socket.IO message structure
- */
+import type { DAQMessage } from '@waterloorocketry/omnibus-ts/dist/types/data/daqMessage'
+import type { Message } from '@waterloorocketry/omnibus-ts/dist/types/message'
 
-/**
- * Omnibus message payload containing sensor data
- */
-export interface OmnibusPayload {
-    timestamp: number
-    data: {
-        [sensorName: string]: number[] // e.g., "Fake0": [25 floats]
-    }
-    relative_timestamps_nanoseconds: number[]
-    sample_rate: number
-    message_format_version: number
-}
-
-/**
- * Complete Omnibus message received from backend
- */
-export interface OmnibusMessage {
-    channel: string // e.g., "DAQ/Fake"
-    timestamp: number // Unix timestamp in seconds (backend sends Date.now() / 1000)
-    payload: OmnibusPayload
-}
+export type { DAQMessage }
+export type OmnibusMessage = Message<DAQMessage>
 
 /**
  * Data point format (timestamp + value)
