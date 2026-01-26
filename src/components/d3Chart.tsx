@@ -80,6 +80,9 @@ export default function D3Chart({
         }
 
         const values = data.map((d) => d.value);
+        if (values.length === 0) {
+            return d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
+        }
         const min = Math.min(...values);
         const max = Math.max(...values);
         const padding = (max - min) * 0.1 || 0.1;

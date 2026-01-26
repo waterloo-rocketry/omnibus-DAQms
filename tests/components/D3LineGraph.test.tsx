@@ -65,6 +65,15 @@ describe('D3LineGraph', () => {
         render(<D3LineGraph channelName="Fake0" timeRangeSec={timeRange} />)
 
         useLastDatapointStore.getState().updateSeries('Fake0', {
+            timestamp: now - 20000, // older than 15s
+            value: 10,
+        })
+
+        await waitFor(() => {
+            expect(screen.getByText('No data')).toBeInTheDocument()
+        })
+
+        useLastDatapointStore.getState().updateSeries('Fake0', {
             timestamp: now - 10000,
             value: 10,
         })
