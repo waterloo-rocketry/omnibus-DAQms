@@ -122,13 +122,6 @@ export default function D3Chart({
                 {/* Data path */}
                 <path d={pathD} fill="none" stroke={strokeColor} strokeWidth={strokeWidth} strokeLinejoin="round" strokeLinecap="round" />
 
-                {/* Points */}
-                <g>
-                {data.map((d, i) => (
-                    <circle key={`p-${i}`} cx={xScale(new Date(d.timestamp))} cy={yScale(d.value)} r={2} fill={strokeColor} />
-                ))}
-                </g>
-
                 {/* X axis manual fixed-position ticks */}
                 <g transform={`translate(0, ${innerH})`} aria-hidden="true">
                     {/* baseline */}

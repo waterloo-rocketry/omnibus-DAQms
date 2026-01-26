@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1769460425421" clover="3.2.0">
+  <project timestamp="1769460425421" name="All files">
+    <metrics statements="219" coveredstatements="145" conditionals="175" coveredconditionals="72" methods="76" coveredmethods="52" elements="470" coveredelements="269" complexity="0" loc="219" ncloc="219" packages="7" files="13" classes="13"/>
+    <package name="src">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="App.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/App.tsx">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="6" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.components">
+      <metrics statements="132" coveredstatements="109" conditionals="68" coveredconditionals="60" methods="39" coveredmethods="31"/>
+      <file name="D3LineGraph.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/D3LineGraph.tsx">
+        <metrics statements="28" coveredstatements="28" conditionals="27" coveredconditionals="26" methods="10" coveredmethods="9"/>
+        <line num="29" count="2" type="stmt"/>
+        <line num="50" count="40" type="stmt"/>
+        <line num="51" count="40" type="stmt"/>
+        <line num="53" count="40" type="stmt"/>
+        <line num="54" count="15" type="stmt"/>
+        <line num="55" count="15" type="stmt"/>
+        <line num="58" count="40" type="stmt"/>
+        <line num="59" count="16" type="cond" truecount="2" falsecount="0"/>
+        <line num="60" count="1" type="stmt"/>
+        <line num="62" count="16" type="stmt"/>
+        <line num="64" count="16" type="stmt"/>
+        <line num="65" count="25" type="stmt"/>
+        <line num="67" count="8" type="cond" truecount="1" falsecount="1"/>
+        <line num="69" count="8" type="stmt"/>
+        <line num="70" count="8" type="stmt"/>
+        <line num="71" count="8" type="stmt"/>
+        <line num="72" count="10" type="stmt"/>
+        <line num="77" count="16" type="stmt"/>
+        <line num="80" count="40" type="stmt"/>
+        <line num="81" count="39" type="cond" truecount="2" falsecount="0"/>
+        <line num="82" count="8" type="stmt"/>
+        <line num="85" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="86" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="88" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="89" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="91" count="40" type="cond" truecount="4" falsecount="0"/>
+        <line num="92" count="4" type="stmt"/>
+        <line num="95" count="40" type="stmt"/>
+      </file>
+      <file name="NavBar.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/NavBar.tsx">
+        <metrics statements="12" coveredstatements="8" conditionals="5" coveredconditionals="1" methods="3" coveredmethods="3"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="1" type="cond" truecount="1" falsecount="4"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="28" count="1" type="stmt"/>
+        <line num="30" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="34" count="0" type="stmt"/>
+        <line num="38" count="1" type="stmt"/>
+        <line num="40" count="1" type="stmt"/>
+        <line num="63" count="4" type="stmt"/>
+      </file>
+      <file name="OmnibusProvider.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/OmnibusProvider.tsx">
+        <metrics statements="38" coveredstatements="21" conditionals="0" coveredconditionals="0" methods="10" coveredmethods="4"/>
+        <line num="12" count="1" type="stmt"/>
+        <line num="17" count="1" type="stmt"/>
+        <line num="20" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="24" count="1" type="stmt"/>
+        <line num="26" count="1" type="stmt"/>
+        <line num="27" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="35" count="0" type="stmt"/>
+        <line num="37" count="0" type="stmt"/>
+        <line num="39" count="0" type="stmt"/>
+        <line num="44" count="0" type="stmt"/>
+        <line num="47" count="0" type="stmt"/>
+        <line num="54" count="0" type="stmt"/>
+        <line num="58" count="1" type="stmt"/>
+        <line num="59" count="1" type="stmt"/>
+        <line num="62" count="1" type="stmt"/>
+        <line num="63" count="1" type="stmt"/>
+        <line num="65" count="1" type="stmt"/>
+        <line num="73" count="1" type="stmt"/>
+        <line num="74" count="0" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="79" count="1" type="stmt"/>
+        <line num="80" count="0" type="stmt"/>
+        <line num="81" count="0" type="stmt"/>
+        <line num="84" count="1" type="stmt"/>
+        <line num="85" count="0" type="stmt"/>
+        <line num="86" count="0" type="stmt"/>
+        <line num="87" count="0" type="stmt"/>
+        <line num="90" count="1" type="stmt"/>
+        <line num="91" count="0" type="stmt"/>
+        <line num="94" count="1" type="stmt"/>
+        <line num="95" count="1" type="stmt"/>
+        <line num="96" count="1" type="stmt"/>
+        <line num="97" count="1" type="stmt"/>
+        <line num="101" count="1" type="stmt"/>
+        <line num="106" count="1" type="stmt"/>
+      </file>
+      <file name="SensorMonitoringDashboard.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/SensorMonitoringDashboard.tsx">
+        <metrics statements="3" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="0"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="5" count="0" type="stmt"/>
+        <line num="14" count="0" type="stmt"/>
+      </file>
+      <file name="d3Chart.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/d3Chart.tsx">
+        <metrics statements="51" coveredstatements="51" conditionals="36" coveredconditionals="33" methods="15" coveredmethods="15"/>
+        <line num="30" count="25" type="cond" truecount="4" falsecount="0"/>
+        <line num="32" count="25" type="stmt"/>
+        <line num="33" count="25" type="stmt"/>
+        <line num="35" count="25" type="stmt"/>
+        <line num="38" count="25" type="stmt"/>
+        <line num="39" count="24" type="cond" truecount="2" falsecount="0"/>
+        <line num="40" count="16" type="stmt"/>
+        <line num="41" count="16" type="stmt"/>
+        <line num="43" count="10" type="stmt"/>
+        <line num="44" count="8" type="stmt"/>
+        <line num="45" count="8" type="stmt"/>
+        <line num="49" count="25" type="stmt"/>
+        <line num="50" count="24" type="stmt"/>
+        <line num="51" count="24" type="stmt"/>
+        <line num="52" count="24" type="stmt"/>
+        <line num="53" count="24" type="stmt"/>
+        <line num="55" count="24" type="stmt"/>
+        <line num="56" count="116" type="stmt"/>
+        <line num="57" count="116" type="cond" truecount="2" falsecount="0"/>
+        <line num="58" count="1" type="stmt"/>
+        <line num="59" count="115" type="cond" truecount="1" falsecount="1"/>
+        <line num="61" count="115" type="stmt"/>
+        <line num="63" count="116" type="stmt"/>
+        <line num="64" count="116" type="stmt"/>
+        <line num="65" count="116" type="stmt"/>
+        <line num="67" count="24" type="stmt"/>
+        <line num="71" count="25" type="stmt"/>
+        <line num="73" count="24" type="cond" truecount="4" falsecount="0"/>
+        <line num="74" count="1" type="stmt"/>
+        <line num="78" count="23" type="cond" truecount="2" falsecount="0"/>
+        <line num="79" count="15" type="stmt"/>
+        <line num="82" count="10" type="stmt"/>
+        <line num="83" count="8" type="stmt"/>
+        <line num="84" count="8" type="stmt"/>
+        <line num="85" count="8" type="cond" truecount="2" falsecount="0"/>
+        <line num="86" count="24" type="stmt"/>
+        <line num="90" count="25" type="stmt"/>
+        <line num="91" count="24" type="stmt"/>
+        <line num="92" count="10" type="cond" truecount="2" falsecount="0"/>
+        <line num="93" count="10" type="stmt"/>
+        <line num="94" count="10" type="stmt"/>
+        <line num="96" count="24" type="cond" truecount="3" falsecount="1"/>
+        <line num="100" count="25" type="stmt"/>
+        <line num="101" count="24" type="cond" truecount="1" falsecount="1"/>
+        <line num="102" count="136" type="cond" truecount="2" falsecount="0"/>
+        <line num="103" count="24" type="stmt"/>
+        <line num="104" count="24" type="stmt"/>
+        <line num="107" count="25" type="stmt"/>
+        <line num="116" count="141" type="stmt"/>
+        <line num="130" count="121" type="stmt"/>
+        <line num="142" count="121" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.components.ui">
+      <metrics statements="75" coveredstatements="26" conditionals="105" coveredconditionals="11" methods="29" coveredmethods="15"/>
+      <file name="card.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/ui/card.tsx">
+        <metrics statements="7" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="7" coveredmethods="5"/>
+        <line num="6" count="40" type="stmt"/>
+        <line num="19" count="40" type="stmt"/>
+        <line num="32" count="40" type="stmt"/>
+        <line num="42" count="40" type="stmt"/>
+        <line num="52" count="0" type="stmt"/>
+        <line num="65" count="40" type="stmt"/>
+        <line num="75" count="0" type="stmt"/>
+      </file>
+      <file name="chart.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/ui/chart.tsx">
+        <metrics statements="59" coveredstatements="15" conditionals="102" coveredconditionals="8" methods="14" coveredmethods="5"/>
+        <line num="7" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="26" count="0" type="stmt"/>
+        <line num="28" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="29" count="0" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+        <line num="47" count="40" type="stmt"/>
+        <line num="48" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="50" count="40" type="stmt"/>
+        <line num="70" count="2" type="stmt"/>
+        <line num="71" count="40" type="stmt"/>
+        <line num="72" count="40" type="cond" truecount="2" falsecount="0"/>
+        <line num="75" count="40" type="cond" truecount="1" falsecount="1"/>
+        <line num="76" count="0" type="stmt"/>
+        <line num="79" count="40" type="stmt"/>
+        <line num="84" count="80" type="stmt"/>
+        <line num="89" count="80" type="cond" truecount="2" falsecount="0"/>
+        <line num="91" count="80" type="cond" truecount="1" falsecount="1"/>
+        <line num="103" count="2" type="stmt"/>
+        <line num="127" count="0" type="stmt"/>
+        <line num="129" count="0" type="stmt"/>
+        <line num="130" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="131" count="0" type="stmt"/>
+        <line num="134" count="0" type="stmt"/>
+        <line num="135" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="136" count="0" type="stmt"/>
+        <line num="138" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="142" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="143" count="0" type="stmt"/>
+        <line num="150" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="151" count="0" type="stmt"/>
+        <line num="154" count="0" type="stmt"/>
+        <line num="165" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="166" count="0" type="stmt"/>
+        <line num="169" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="171" count="0" type="stmt"/>
+        <line num="181" count="0" type="stmt"/>
+        <line num="183" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="184" count="0" type="stmt"/>
+        <line num="185" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="187" count="0" type="stmt"/>
+        <line num="251" count="2" type="stmt"/>
+        <line num="264" count="0" type="stmt"/>
+        <line num="266" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="267" count="0" type="stmt"/>
+        <line num="270" count="0" type="stmt"/>
+        <line num="279" count="0" type="stmt"/>
+        <line num="281" count="0" type="cond" truecount="0" falsecount="3"/>
+        <line num="282" count="0" type="stmt"/>
+        <line num="284" count="0" type="stmt"/>
+        <line num="315" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="316" count="0" type="stmt"/>
+        <line num="320" count="0" type="cond" truecount="0" falsecount="5"/>
+        <line num="326" count="0" type="stmt"/>
+        <line num="328" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="332" count="0" type="stmt"/>
+        <line num="333" count="0" type="cond" truecount="0" falsecount="2"/>
+        <line num="338" count="0" type="stmt"/>
+        <line num="343" count="0" type="cond" truecount="0" falsecount="2"/>
+      </file>
+      <file name="navigation-menu.tsx" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/components/ui/navigation-menu.tsx">
+        <metrics statements="9" coveredstatements="6" conditionals="3" coveredconditionals="3" methods="8" coveredmethods="5"/>
+        <line num="16" count="1" type="stmt"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="52" count="4" type="stmt"/>
+        <line num="61" count="1" type="stmt"/>
+        <line num="70" count="0" type="stmt"/>
+        <line num="89" count="0" type="stmt"/>
+        <line num="106" count="1" type="stmt"/>
+        <line num="128" count="4" type="stmt"/>
+        <line num="144" count="0" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.context">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+      <file name="OmnibusContext.ts" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/context/OmnibusContext.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
+        <line num="13" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.hooks">
+      <metrics statements="5" coveredstatements="4" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
+      <file name="useOmnibusContext.ts" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/hooks/useOmnibusContext.ts">
+        <metrics statements="5" coveredstatements="4" conditionals="2" coveredconditionals="1" methods="1" coveredmethods="1"/>
+        <line num="8" count="1" type="stmt"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="cond" truecount="1" falsecount="1"/>
+        <line num="11" count="0" type="stmt"/>
+        <line num="13" count="1" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.lib">
+      <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+      <file name="utils.ts" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/lib/utils.ts">
+        <metrics statements="1" coveredstatements="1" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
+        <line num="5" count="252" type="stmt"/>
+      </file>
+    </package>
+    <package name="src.store">
+      <metrics statements="4" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="3"/>
+      <file name="omnibusStore.ts" path="/Users/shrey/Downloads/Coding/Rockets/omnibus-DAQms/src/store/omnibusStore.ts">
+        <metrics statements="4" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="5" coveredmethods="3"/>
+        <line num="22" count="2" type="stmt"/>
+        <line num="23" count="2" type="stmt"/>
+        <line num="27" count="9" type="stmt"/>
+        <line num="32" count="0" type="stmt"/>
+      </file>
+    </package>
+  </project>
+</coverage>

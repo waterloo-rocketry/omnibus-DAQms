@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useReducer } from "react";
+import { useMemo, useEffect, useState, useRef } from "react";
 import {
   Card,
   CardContent,
@@ -7,13 +7,9 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ChartContainer } from "@/components/ui/chart";
-import D3Chart from "@/components/ui/d3Chart";
+import D3Chart from "@/components/d3Chart";
 import type { DataPoint } from "@/types/omnibus";
-import { useOmnibusStore } from "@/store/omnibusStore";
-
-/**
- * LineGraph component props
-*/
+import { useLastDatapointStore, type LatestDataPoint } from "@/store/omnibusStore";
 
 interface D3LineGraphProps {
     channelName: string;
@@ -23,14 +19,13 @@ interface D3LineGraphProps {
     height?: number;
     strokeColor?: string;
     strokeWidth?: number;
-    rangeTickCount?: number; // MUST BE > 0
+    rangeTickCount?: number;
     fixedDomain?: [number, number];
-    domainTickCount?: number; //MUST BE > 0
-
-    maxDataPoints?: number; // Maximum number of data points to keep in history
+    domainTickCount?: number;
+    timeRangeSec?: number;
+    maxDataPoints?: number;
 }
 
-// Chart configuration
 const chartConfig = {
   value: {
     label: "Value",
@@ -49,49 +44,44 @@ export default function D3LineGraph({
   rangeTickCount = 5,
   fixedDomain,
   domainTickCount = 5,
+  timeRangeSec = 60,
   maxDataPoints = 100,
 }: D3LineGraphProps) {
-  // Subscribe to ONLY this channel's latest value + timestamp from Zustand
-  const latestDataPoint = useOmnibusStore((s) => s.channels[channelName]);
+  const [data, setData] = useState<DataPoint[]>([]);
+  const prevChannelRef = useRef(channelName);
 
-  // Store history locally in ref (persists across renders, doesn't trigger re-renders)
-  const historyRef = useRef<DataPoint[]>([]);
-
-  // Force re-render when history updates
-  const [, forceUpdate] = useReducer((x: number) => x + 1, 0);
-
-  // When new value arrives, add to local history
   useEffect(() => {
-  if (latestDataPoint !== undefined) {
-    const newPoint: DataPoint = {
-    timestamp: latestDataPoint.timestamp,
-    value: latestDataPoint.value,
-    };
+    const cutoffTime = Date.now() - timeRangeSec * 1000;
+    setData((prev) => prev.filter((point) => point.timestamp >= cutoffTime).slice(-maxDataPoints));
+  }, [timeRangeSec, maxDataPoints]);
 
-    // Prevent duplicates by checking last timestamp
-    const lastPoint = historyRef.current[historyRef.current.length - 1];
-    if (lastPoint && lastPoint.timestamp === newPoint.timestamp && lastPoint.value === newPoint.value) {
-        return;
+  useEffect(() => {
+    if (prevChannelRef.current !== channelName) {
+      setData([]);
     }
+    prevChannelRef.current = channelName;
 
-    // Update history (keep last N points)
-    historyRef.current = [...historyRef.current, newPoint].slice(-maxDataPoints);
+    const unsubscribe = useLastDatapointStore.subscribe(
+      (state) => state.series[channelName],
+      (newDataPoint: LatestDataPoint | undefined) => {
+        if (!newDataPoint) return;
 
-    // Force re-render to display new data
-    forceUpdate();
-  }
-  }, [latestDataPoint, maxDataPoints]);
+        const cutoffTime = Date.now() - timeRangeSec * 1000;
+        setData((prev) =>
+          [...prev, newDataPoint]
+            .filter((point) => point.timestamp >= cutoffTime)
+            .slice(-maxDataPoints)
+        );
+      }
+    );
+    return unsubscribe;
+  }, [channelName, timeRangeSec, maxDataPoints]);
 
-  // Use local history instead of prop data
-  const data = historyRef.current;
-
-  // Get current value for display
   const currentValue = useMemo(() => {
-  if (data.length === 0) return null;
-  return data[data.length - 1].value;
+    if (data.length === 0) return null;
+    return data[data.length - 1].value;
   }, [data]);
 
-  // Prepare display title and description
   const displayTitle = title || channelName;
   const displayDescription = currentValue !== null ? `Current: ${currentValue.toFixed(2)} ${unit}` : "No data";
 
