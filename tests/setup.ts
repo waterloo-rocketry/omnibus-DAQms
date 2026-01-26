@@ -3,11 +3,11 @@ import { cleanup } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest'
 
 globalThis.ResizeObserver = class ResizeObserver {
-  observe() {}
-  unobserve() {}
-  disconnect() {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
 }
 
 afterEach(() => {
-  cleanup();
+    cleanup()
 })
