@@ -83,7 +83,7 @@ export function NavBar() {
                         </NavigationMenuList>
                     </NavigationMenu>
 
-                    {/* Connection Status Indicator - Desktop only */}
+                    {/* Connection Status Indicator - Desktop only */}/*
                     <div className="hidden md:flex items-center gap-2 ml-auto">
                         <div
                             className={`w-2 h-2 rounded-full ${status.color}`}
