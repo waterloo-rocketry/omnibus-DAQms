@@ -1,4 +1,5 @@
 import { LineGraph } from "./LineGraph";
+import { useState } from "react";
 
 export const SensorMonitoringDashboard = () => {
   // Map backend channels to dashboard (6 charts from 8 available channels)
@@ -10,6 +11,20 @@ export const SensorMonitoringDashboard = () => {
     { name: "Fake4", title: "Sensor 4" },
     { name: "Fake5", title: "Sensor 5" },
   ];
+
+  // Define sensor plot interface
+  interface SensorPlot {
+    name: string;
+    title : string;
+  }
+
+   // State stores currently active plots on dashboard
+  const [activePlots, setActivePlots] = useState<SensorPlot[]>([]);
+
+  // Function to add plots to dashboard
+  const addPlot = (newPlot: SensorPlot) =>{
+    setActivePlots((prev) => [...prev, newPlot]);
+  }
 
   return (
     <div className="mb-4">
