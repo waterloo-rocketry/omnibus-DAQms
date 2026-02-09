@@ -29,7 +29,7 @@ interface EditGraphDropDownProps {
   setDeleteGraph: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export default function DropDownActions({
+export default function EditGraphDropDown({
   graphTitle,
   setGraphTitle,
   titleColor,
