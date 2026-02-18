@@ -106,23 +106,73 @@ describe('SensorModule', () => {
     })
 
     describe('Time Window Filtering', () => {
-        it('respects custom time window', () => {
-            render(
+        it('filters out data points older than timeWindowSeconds', async () => {
+            const now = Date.now()
+
+            const { container } = render(
                 <SensorModule
                     channelName="test-channel"
-                    timeWindowSeconds={60}
+                    timeWindowSeconds={10}
+                    minUpdateIntervalMs={0}
+                    unit="u"
                 />
             )
 
-            expect(screen.getByText('--')).toBeInTheDocument()
+            // Point outside the 10s window (15s ago)
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 1.00,
+                timestamp: now - 15000,
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTitle('1')).toHaveTextContent('1.00')
+            })
+
+            // Point inside the window (now) — should evict the old one
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 99.00,
+                timestamp: now,
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTitle('99')).toHaveTextContent('99.00')
+            })
+
+            // The old point was outside the 10s window and should have been
+            // filtered out, leaving only 1 point. With <2 points the rate
+            // overlay (.font-mono) should not render.
+            const rateDisplay = container.querySelector('.font-mono')
+            expect(rateDisplay).not.toBeInTheDocument()
         })
 
-        it('respects custom max data points', () => {
+        it('respects maxDataPoints by dropping oldest points', async () => {
+            const now = Date.now()
+
             render(
-                <SensorModule channelName="test-channel" maxDataPoints={50} />
+                <SensorModule
+                    channelName="test-channel"
+                    maxDataPoints={3}
+                    minUpdateIntervalMs={0}
+                />
             )
 
-            expect(screen.getByText('--')).toBeInTheDocument()
+            // Push 4 points (all within the time window), exceeding maxDataPoints=3
+            for (let i = 0; i < 4; i++) {
+                useLastDatapointStore.getState().updateSeries('test-channel', {
+                    value: (i + 1) * 10,
+                    timestamp: now + i * 200,
+                })
+
+                await waitFor(() => {
+                    expect(
+                        screen.getByTitle(String((i + 1) * 10))
+                    ).toHaveTextContent(((i + 1) * 10).toFixed(2))
+                })
+            }
+
+            // After 4 pushes with maxDataPoints=3, the displayed value
+            // should be the latest (40.00)
+            expect(screen.getByTitle('40')).toHaveTextContent('40.00')
         })
     })
 
