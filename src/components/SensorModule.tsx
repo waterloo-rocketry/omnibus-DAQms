@@ -1,8 +1,8 @@
 import { useMemo, useRef, useEffect, useReducer } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import D3Chart from '@/components/ui/d3Chart'
+import D3Chart from '@/components/d3Chart'
 import type { DataPoint } from '@/types/omnibus'
-import { useOmnibusStore } from '@/store/omnibusStore'
+import { useLastDatapointStore, type LatestDataPoint } from '@/store/omnibusStore'
 import { cn } from '@/lib/utils'
 
 interface SensorModuleProps {
@@ -86,34 +86,40 @@ export function SensorModule({
     minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS,
     titleColor = 'text-teal-500',
 }: SensorModuleProps) {
-    const latestDataPoint = useOmnibusStore((state) => state.channels[channelName])
     const historyRef = useRef<DataPoint[]>([])
+    const prevChannelRef = useRef(channelName)
     const [, forceUpdate] = useReducer((x) => x + 1, 0)
 
     useEffect(() => {
-        if (latestDataPoint === undefined) return
-
-        const newPoint: DataPoint = {
-            timestamp: latestDataPoint.timestamp,
-            value: latestDataPoint.value,
+        if (prevChannelRef.current !== channelName) {
+            historyRef.current = []
+            prevChannelRef.current = channelName
         }
 
-        // Time-bound filtering: Skip points that arrive too quickly
-        const lastPoint = historyRef.current[historyRef.current.length - 1]
-        const lastTimestamp = lastPoint?.timestamp ?? null
-        
-        if (!shouldAddPoint(newPoint.timestamp, lastTimestamp, minUpdateIntervalMs)) {
-            return // Discard point - too soon after last update
-        }
+        const unsubscribe = useLastDatapointStore.subscribe(
+            (state) => state.series[channelName],
+            (newDataPoint: LatestDataPoint | undefined) => {
+                if (newDataPoint === undefined) return
 
-        // Remove stale data outside time window
-        const cutoffTime = newPoint.timestamp - timeWindowSeconds * 1000
-        const filtered = filterStaleData(historyRef.current, cutoffTime)
-        
-        // Add new point and enforce max length
-        historyRef.current = [...filtered, newPoint].slice(-maxDataPoints)
-        forceUpdate()
-    }, [latestDataPoint, maxDataPoints, timeWindowSeconds, minUpdateIntervalMs])
+                const newPoint: DataPoint = {
+                    timestamp: newDataPoint.timestamp,
+                    value: newDataPoint.value,
+                }
+
+                const lastPoint = historyRef.current[historyRef.current.length - 1]
+                const lastTimestamp = lastPoint?.timestamp ?? null
+                if (!shouldAddPoint(newPoint.timestamp, lastTimestamp, minUpdateIntervalMs)) {
+                    return
+                }
+
+                const cutoffTime = newPoint.timestamp - timeWindowSeconds * 1000
+                const filtered = filterStaleData(historyRef.current, cutoffTime)
+                historyRef.current = [...filtered, newPoint].slice(-maxDataPoints)
+                forceUpdate()
+            }
+        )
+        return unsubscribe
+    }, [channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
 
     const data = historyRef.current
 
