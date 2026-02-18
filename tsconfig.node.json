@@ -4,7 +4,7 @@
         "target": "ES2023",
         "lib": ["ES2023"],
         "module": "ESNext",
-        "types": ["@testing-library/jest-dom/vitest"],
+        "types": [],
         "skipLibCheck": true,
 
         /* Bundler mode */
