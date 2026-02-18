@@ -1,4 +1,4 @@
-import { useMemo, useRef, useEffect, useReducer } from 'react'
+import { useMemo, useRef, useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from '@/components/d3Chart'
 import type { DataPoint } from '@/types/omnibus'
@@ -86,51 +86,36 @@ export function SensorModule({
     minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS,
     titleColor = 'text-teal-500',
 }: SensorModuleProps) {
-    const historyRef = useRef<DataPoint[]>([])
+    const [data, setData] = useState<DataPoint[]>([])
     const prevChannelRef = useRef(channelName)
-    const [, forceUpdate] = useReducer((x) => x + 1, 0)
+    const lastTimestampRef = useRef<number | null>(null)
 
     useEffect(() => {
         if (prevChannelRef.current !== channelName) {
-            historyRef.current = []
-            prevChannelRef.current = channelName
+            setData([])
+            lastTimestampRef.current = null
         }
+        prevChannelRef.current = channelName
 
         const unsubscribe = useLastDatapointStore.subscribe(
             (state) => state.series[channelName],
             (newDataPoint: LatestDataPoint | undefined) => {
                 if (newDataPoint === undefined) return
 
-                const newPoint: DataPoint = {
-                    timestamp: newDataPoint.timestamp,
-                    value: newDataPoint.value,
-                }
-
-                const lastPoint =
-                    historyRef.current[historyRef.current.length - 1]
-                const lastTimestamp = lastPoint?.timestamp ?? null
-                if (
-                    !shouldAddPoint(
-                        newPoint.timestamp,
-                        lastTimestamp,
-                        minUpdateIntervalMs
-                    )
-                ) {
+                if (!shouldAddPoint(newDataPoint.timestamp, lastTimestampRef.current, minUpdateIntervalMs)) {
                     return
                 }
+                lastTimestampRef.current = newDataPoint.timestamp
 
-                const cutoffTime = newPoint.timestamp - timeWindowSeconds * 1000
-                const filtered = filterStaleData(historyRef.current, cutoffTime)
-                historyRef.current = [...filtered, newPoint].slice(
-                    -maxDataPoints
+                const cutoffTime = newDataPoint.timestamp - timeWindowSeconds * 1000
+                setData((prev) =>
+                    [...filterStaleData(prev, cutoffTime), { timestamp: newDataPoint.timestamp, value: newDataPoint.value }]
+                        .slice(-maxDataPoints)
                 )
-                forceUpdate()
             }
         )
         return unsubscribe
     }, [channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
-
-    const data = historyRef.current
 
     const currentValue = useMemo(() => {
         if (data.length === 0) return null
