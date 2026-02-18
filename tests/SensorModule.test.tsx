@@ -42,10 +42,7 @@ describe('SensorModule', () => {
         it('truncates long titles with ellipsis', () => {
             const longTitle = 'A'.repeat(100)
             render(
-                <SensorModule
-                    channelName="test-channel"
-                    title={longTitle}
-                />
+                <SensorModule channelName="test-channel" title={longTitle} />
             )
 
             const title = screen.getByTitle(longTitle)

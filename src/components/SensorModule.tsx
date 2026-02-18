@@ -2,7 +2,10 @@ import { useMemo, useRef, useEffect, useReducer } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from '@/components/d3Chart'
 import type { DataPoint } from '@/types/omnibus'
-import { useLastDatapointStore, type LatestDataPoint } from '@/store/omnibusStore'
+import {
+    useLastDatapointStore,
+    type LatestDataPoint,
+} from '@/store/omnibusStore'
 import { cn } from '@/lib/utils'
 
 interface SensorModuleProps {
@@ -21,7 +24,7 @@ const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
 function formatValue(value: number): string {
     const str = value.toFixed(2)
     if (str.length <= 6) return str
-    
+
     const parts = str.split('.')
     if (parts[0].length >= 6) {
         return parts[0].substring(0, 6)
@@ -32,29 +35,26 @@ function formatValue(value: number): string {
 // Utility: Calculate rate of change from recent data
 function calculateRate(data: DataPoint[]): number | null {
     if (data.length < 2) return null
-    
+
     const recent = data.slice(-10)
     if (recent.length < 2) return null
-    
+
     const first = recent[0]
     const last = recent[recent.length - 1]
     const timeDiffSeconds = (last.timestamp - first.timestamp) / 1000
-    
+
     if (timeDiffSeconds === 0) return null
-    
+
     const valueDiff = last.value - first.value
     return valueDiff / timeDiffSeconds
 }
 
 // Utility: Remove stale data points outside time window
-function filterStaleData(
-    data: DataPoint[],
-    cutoffTime: number
-): DataPoint[] {
+function filterStaleData(data: DataPoint[], cutoffTime: number): DataPoint[] {
     if (data.length === 0 || data[0].timestamp > cutoffTime) {
         return data
     }
-    
+
     // Find first valid index (early termination)
     let firstValidIdx = 0
     while (
@@ -63,7 +63,7 @@ function filterStaleData(
     ) {
         firstValidIdx++
     }
-    
+
     return data.slice(firstValidIdx)
 }
 
@@ -74,7 +74,7 @@ function shouldAddPoint(
     minInterval: number
 ): boolean {
     if (lastTimestamp === null) return true
-    return (newTimestamp - lastTimestamp) >= minInterval
+    return newTimestamp - lastTimestamp >= minInterval
 }
 
 export function SensorModule({
@@ -106,15 +106,24 @@ export function SensorModule({
                     value: newDataPoint.value,
                 }
 
-                const lastPoint = historyRef.current[historyRef.current.length - 1]
+                const lastPoint =
+                    historyRef.current[historyRef.current.length - 1]
                 const lastTimestamp = lastPoint?.timestamp ?? null
-                if (!shouldAddPoint(newPoint.timestamp, lastTimestamp, minUpdateIntervalMs)) {
+                if (
+                    !shouldAddPoint(
+                        newPoint.timestamp,
+                        lastTimestamp,
+                        minUpdateIntervalMs
+                    )
+                ) {
                     return
                 }
 
                 const cutoffTime = newPoint.timestamp - timeWindowSeconds * 1000
                 const filtered = filterStaleData(historyRef.current, cutoffTime)
-                historyRef.current = [...filtered, newPoint].slice(-maxDataPoints)
+                historyRef.current = [...filtered, newPoint].slice(
+                    -maxDataPoints
+                )
                 forceUpdate()
             }
         )
@@ -148,13 +157,19 @@ export function SensorModule({
                     >
                         {displayTitle}
                     </h3>
-                    
+
                     <div className="grid grid-rows-[auto] gap-0.5 justify-end text-right">
                         <div
                             className="text-4xl font-bold tabular-nums text-foreground"
-                            title={currentValue !== null ? currentValue.toString() : 'No data'}
+                            title={
+                                currentValue !== null ?
+                                    currentValue.toString()
+                                :   'No data'
+                            }
                         >
-                            {currentValue !== null ? formatValue(currentValue) : '--'}
+                            {currentValue !== null ?
+                                formatValue(currentValue)
+                            :   '--'}
                         </div>
                     </div>
                 </div>
