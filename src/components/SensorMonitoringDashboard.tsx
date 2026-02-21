@@ -38,7 +38,7 @@ export const SensorMonitoringDashboard = () => {
           <div
             key={plot.name}
             className="max-h-[25vh] overflow-hidden">
-            <LineGraph
+            <D3LineGraph
               channelName={plot.name}
               title={plot.title}
             />
