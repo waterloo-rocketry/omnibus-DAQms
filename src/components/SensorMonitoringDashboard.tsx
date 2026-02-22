@@ -9,7 +9,7 @@ export interface SensorPlot {
 
 export const SensorMonitoringDashboard = () => {
   // Map backend channels to dashboard (6 charts from 8 available channels)
-  const channels = [
+  const channels: SensorPlot[] = [
     { name: "Fake0", title: "Sensor 0" },
     { name: "Fake1", title: "Sensor 1" },
     { name: "Fake2", title: "Sensor 2" },
