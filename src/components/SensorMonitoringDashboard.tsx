@@ -1,6 +1,12 @@
 import D3LineGraph from "./D3LineGraph";
 import { useState } from "react";
 
+// Define sensor plot interface
+export interface SensorPlot {
+    name: string;
+    title : string;
+  }
+
 export const SensorMonitoringDashboard = () => {
   // Map backend channels to dashboard (6 charts from 8 available channels)
   const channels = [
@@ -12,24 +18,8 @@ export const SensorMonitoringDashboard = () => {
     { name: "Fake5", title: "Sensor 5" },
   ];
 
-  // Define sensor plot interface
-  interface SensorPlot {
-    name: string;
-    title : string;
-  }
-
    // State stores currently active plots on dashboard
   const [activePlots, setActivePlots] = useState<SensorPlot[]>(channels);
-
-  // Function to add plots to dashboard
-  const addPlot = (newPlot: SensorPlot) => {
-    setActivePlots((prev) => [...prev, newPlot]);
-  }
-
-  // Function to remove plots from dashboard
-  const removePlot = (plotName : string) => {
-    setActivePlots((prev) => prev.filter(plot => plotName !== plot.name));
-  }
 
   return (
   // Responsive grid layout has max 4 columns on large displays
