@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { addPlot, removePlot } from '@/lib/utils'
-import { type SensorPlot } from '@/components/SensorMonitoringDashboard'
+import type { SensorPlot } from '@/components/SensorMonitoringDashboard'
 
 describe('arbitrarily remove and add plots to dashboard', () => {
     let nonEmptyTestPlots: SensorPlot[];
@@ -70,6 +70,11 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const expectedPlots: SensorPlot[] = [];
             const result = removePlot(plotToRemove, testPlots);
             expect(result).toStrictEqual(expectedPlots);
+        })
+        it('should NOT mutate the current plot array', () => {
+            const plotToRemove: string = "Test0";
+            const result = removePlot(plotToRemove, nonEmptyTestPlots);
+            expect(result).not.toBe(nonEmptyTestPlots);
         })
     })
 })
