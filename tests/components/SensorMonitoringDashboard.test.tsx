@@ -57,7 +57,7 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const result = removePlot(plotToRemove, nonEmptyTestPlots);
             expect(result).toStrictEqual(expectedPlots);
         })
-        it('should return an empty plot if it removes the last item in current array', () => {
+        it('should return an empty array if it removes the last plot in current array', () => {
             const plotToRemove: string = "Test0";
             const testPlots: SensorPlot[] = [{name: "Test0", title: "Test Plot 0"}];
             const expectedPlots: SensorPlot[] = [];
