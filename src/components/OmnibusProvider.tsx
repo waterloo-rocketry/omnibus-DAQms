@@ -1,6 +1,7 @@
-import React, { useEffect, useState, useCallback } from 'react'
-import { io } from 'socket.io-client'
-import type { OmnibusMessage, ConnectionStatus } from '../types/omnibus'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
+import { communicator } from '@waterloorocketry/omnibus-ts'
+import type { DAQMessage } from '@waterloorocketry/omnibus-ts'
+import type { ConnectionStatus } from '../types/omnibus'
 import { useLastDatapointStore } from '../store/omnibusStore'
 
 import { OmnibusContext } from '../context/OmnibusContext'
@@ -13,88 +14,88 @@ const SOCKET_URL = 'http://localhost:8081'
 
 /**
  * Omnibus Provider Component
+ *
+ * Uses @waterloorocketry/omnibus-ts communicator() to receive typed DAQ messages
+ * with Zod validation and automatic snake_case to camelCase conversion.
  */
 const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
-    console.log('[Omnibus] Provider rendering')
-
     const [connectionStatus, setConnectionStatus] =
         useState<ConnectionStatus>('connecting')
     const [error, setError] = useState<string | null>(null)
 
-    const parseMessage = useCallback((msg: OmnibusMessage) => {
-        console.log('[Omnibus] parseMessage called')
-        const {
-            data,
-            relative_timestamps_nanoseconds,
-            timestamp: baseTimestamp,
-        } = msg.payload
+    const commRef = useRef<ReturnType<typeof communicator> | null>(null)
 
-        // Collect latest values with timestamps for all sensors in this message
-        const updates: Record<string, { value: number; timestamp: number }> = {}
+    const parseMessage = useCallback(
+        (msg: { channel: string; timestamp: number; payload: DAQMessage }) => {
+            const { data, relativeTimestamps, timestamp: baseTimestamp } = msg.payload
 
-        Object.entries(data).forEach(([sensorName, values]) => {
-            // Take the last value from the array as the latest
-            const latestValue = values[values.length - 1]
+            // Collect latest values with timestamps for all sensors in this message
+            const updates: Record<string, { value: number; timestamp: number }> =
+                {}
 
-            // Calculate the precise timestamp for this sample
-            // Base timestamp (seconds) + relative offset (nanoseconds) → milliseconds
-            const latestTimestamp =
-                baseTimestamp * 1000 +
-                relative_timestamps_nanoseconds[values.length - 1] / 1_000_000
+            // Cast entries to the expected type since omnibus-ts Zod v4 inference
+            // does not fully resolve Record<string, number[]> through Object.entries
+            const dataEntries = Object.entries(data) as [string, number[]][]
 
-            updates[sensorName] = {
-                value: latestValue,
-                timestamp: latestTimestamp,
-            }
-        })
+            dataEntries.forEach(([sensorName, values]) => {
+                // Take the last value from the array as the latest
+                const latestValue = values[values.length - 1]
 
-        // Single batch update to Zustand store
-        useLastDatapointStore.getState().updateMultipleSeries(updates)
-    }, [])
+                // Calculate the precise timestamp for this sample
+                // Base timestamp (seconds) + relative offset (nanoseconds) -> milliseconds
+                const latestTimestamp =
+                    baseTimestamp * 1000 +
+                    relativeTimestamps[values.length - 1] / 1_000_000
 
-    // Debug: Track when parseMessage changes
+                updates[sensorName] = {
+                    value: latestValue,
+                    timestamp: latestTimestamp,
+                }
+            })
+
+            // Single batch update to Zustand store
+            useLastDatapointStore.getState().updateMultipleSeries(updates)
+        },
+        []
+    )
+
     useEffect(() => {
-        console.log('[Omnibus] parseMessage function changed!')
-    }, [parseMessage])
-
-    useEffect(() => {
-        console.log('[Omnibus] useEffect running - creating socket')
-
-        const newSocket = io(SOCKET_URL, {
-            transports: ['websocket'],
-            reconnection: true,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            reconnectionAttempts: Infinity,
+        const comm = communicator({
+            serverURL: SOCKET_URL,
+            allowExposeSocket: true,
         })
+        commRef.current = comm
 
-        newSocket.on('connect', () => {
-            console.log('[Omnibus] Connected to backend')
+        // Use the exposed socket for connection status events
+        // (omnibus-ts does not natively expose connection lifecycle events yet)
+        const socket = comm.socket!
+
+        socket.on('connect', () => {
             setConnectionStatus('connected')
             setError(null)
         })
 
-        newSocket.on('disconnect', (reason) => {
-            console.log('[Omnibus] Disconnected:', reason)
+        socket.on('disconnect', () => {
             setConnectionStatus('disconnected')
         })
 
-        newSocket.on('connect_error', (err) => {
-            console.error('[Omnibus] Connection error:', err.message)
+        socket.on('connect_error', (err: Error) => {
             setConnectionStatus('error')
             setError(err.message)
         })
 
-        newSocket.on('message', (msg: OmnibusMessage) => {
-            parseMessage(msg)
-        })
+        // Use receive('DAQ', ...) to handle typed DAQ messages with Zod validation
+        const unsubscribe = comm.receiver.receive<DAQMessage>(
+            'DAQ',
+            parseMessage
+        )
 
         return () => {
-            console.log('[Omnibus] useEffect cleanup - disconnecting socket')
-            console.trace('[Omnibus] Cleanup stack trace')
-            newSocket.close()
+            unsubscribe()
+            comm.disconnect()
+            commRef.current = null
         }
     }, [parseMessage])
 
