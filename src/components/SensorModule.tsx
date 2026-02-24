@@ -22,14 +22,23 @@ const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
 
 // Utility: Format value to max 6 chars with 2 decimals
 function formatValue(value: number): string {
-    const str = value.toFixed(2)
-    if (str.length <= 6) return str
+    if (!Number.isFinite(value)) return '---'
 
-    const parts = str.split('.')
-    if (parts[0].length >= 6) {
-        return parts[0].substring(0, 6)
+    // For values that fit in 6 chars with 2 decimals, use fixed notation
+    const fixed = value.toFixed(2)
+    if (fixed.length <= 6) return fixed
+
+    // For large/small values, use compact notation
+    const abs = Math.abs(value)
+    if (abs >= 1e6 || (abs < 0.01 && abs > 0)) {
+        return value.toExponential(1)
     }
-    return str.substring(0, 6)
+
+    // For medium values, show as many decimals as fit
+    const intPart = Math.trunc(value).toString()
+    if (intPart.length >= 6) return intPart.substring(0, 7)
+    const decimals = Math.max(0, 6 - intPart.length - 1)
+    return value.toFixed(decimals)
 }
 
 // Utility: Calculate rate of change from recent data

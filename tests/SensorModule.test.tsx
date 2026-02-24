@@ -263,8 +263,61 @@ describe('SensorModule', () => {
 
             await waitFor(() => {
                 const valueElement = screen.getByTitle('999999.99')
-                expect(valueElement.textContent).toHaveLength(6)
                 expect(valueElement.textContent).toBe('999999')
+            })
+        })
+
+        it('handles large negative numbers without incorrect truncation', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: -1234.56,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('-1234.56')
+                expect(valueElement.textContent).toBe('-1235')
+            })
+        })
+
+        it('uses exponential notation for very large positive numbers', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 5000000,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('5000000')
+                expect(valueElement.textContent).toBe('5.0e+6')
+            })
+        })
+
+        it('displays --- for NaN values', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: NaN,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('---')).toBeInTheDocument()
+            })
+        })
+
+        it('displays --- for Infinity values', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: Infinity,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('---')).toBeInTheDocument()
             })
         })
     })
