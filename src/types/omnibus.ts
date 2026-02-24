@@ -34,7 +34,6 @@ export interface DataPoint {
 }
 
 /**
-/**
  * Connection status states
  */
 export type ConnectionStatus =
@@ -42,13 +41,3 @@ export type ConnectionStatus =
     | 'connected'
     | 'disconnected'
     | 'error'
-
-/**
- * A sensor plot configuration for dynamic dashboard management
- */
-export interface SensorPlot {
-    id: string
-    channelName: string
-    title: string
-    unit?: string
-}
