@@ -1,6 +1,6 @@
 import { createContext } from 'react'
 
-import type { ConnectionStatus } from '../types/omnibus'
+import type { ConnectionStatus } from '@waterloorocketry/omnibus-ts'
 
 /**
  * Context value interface

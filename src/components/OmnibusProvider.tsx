@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { communicator } from '@waterloorocketry/omnibus-ts'
-import type { DAQMessage } from '@waterloorocketry/omnibus-ts'
-import type { ConnectionStatus } from '../types/omnibus'
+import type { DAQMessage, ConnectionStatus } from '@waterloorocketry/omnibus-ts'
 import { useLastDatapointStore } from '../store/omnibusStore'
 
 import { OmnibusContext } from '../context/OmnibusContext'
@@ -64,36 +63,30 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     useEffect(() => {
         const comm = communicator({
             serverURL: SOCKET_URL,
-            allowExposeSocket: true,
         })
         commRef.current = comm
 
-        // Use the exposed socket for connection status events
-        // (omnibus-ts does not natively expose connection lifecycle events yet)
-        const socket = comm.socket!
-
-        socket.on('connect', () => {
-            setConnectionStatus('connected')
-            setError(null)
-        })
-
-        socket.on('disconnect', () => {
-            setConnectionStatus('disconnected')
-        })
-
-        socket.on('connect_error', (err: Error) => {
-            setConnectionStatus('error')
-            setError(err.message)
-        })
+        // Subscribe to connection status changes
+        const unsubConnection = comm.connection.onConnectionChange(
+            (status, error) => {
+                setConnectionStatus(status)
+                if (error) {
+                    setError(error.message)
+                } else {
+                    setError(null)
+                }
+            }
+        )
 
         // Use receive('DAQ', ...) to handle typed DAQ messages with Zod validation
-        const unsubscribe = comm.receiver.receive<DAQMessage>(
+        const unsubReceive = comm.receiver.receive<DAQMessage>(
             'DAQ',
             parseMessage
         )
 
         return () => {
-            unsubscribe()
+            unsubConnection()
+            unsubReceive()
             comm.disconnect()
             commRef.current = null
         }
