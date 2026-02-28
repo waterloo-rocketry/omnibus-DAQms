@@ -18,11 +18,9 @@ export const SensorMonitoringDashboard = () => {
 
   return (
   // Responsive grid layout has max 4 columns on large displays
-    <div className="max-h-[80vh] overflow-y-auto grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-4">
+    <div className="overflow-y-auto grid grid-cols-1 md:grid-cols-3 2xl:grid-cols-4 gap-4">
         {activePlots.map(plot => (
-          <div
-            key={plot.name}
-            className="max-h-[25vh] overflow-hidden">
+          <div key={plot.name}>
             <D3LineGraph
               channelName={plot.name}
               title={plot.title}

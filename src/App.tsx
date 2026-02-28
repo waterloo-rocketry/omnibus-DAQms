@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { NavBar } from './components/NavBar'
-import { SensorMonitoringDashboard } from './components/SensorMonitoringDashboard'
+import { SensorMonitoringDashboard } from './components/SensorMonitoringDashboard/SensorMonitoringDashboard'
 import OmnibusProvider from './components/OmnibusProvider'
 export default function App() {
     return (
