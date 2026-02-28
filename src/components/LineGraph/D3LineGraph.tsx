@@ -7,13 +7,14 @@ import {
     CardTitle,
 } from '@/components/ui/card'
 import { ChartContainer } from '@/components/ui/chart'
-import D3Chart from '@/components/d3Chart'
+import D3Chart from '@/components/LineGraph/d3Chart'
+import type { ColorType, GraphType, HistoryType } from './types/lineGraph'
 import type { DataPoint } from '@/types/omnibus'
 import {
     useLastDatapointStore,
     type LatestDataPoint,
 } from '@/store/omnibusStore'
-import EditGraphDropDown from './LineGraph/EditGraphDropDown'
+import EditGraphDropDown from './EditGraphDropDown'
 
 interface D3LineGraphProps {
     channelName: string
@@ -53,11 +54,12 @@ export default function D3LineGraph({
 }: D3LineGraphProps) {
     // useStates to allow changes to graph properties
     const [graphTitle, setGraphTitle] = useState(title)
-    const [titleColor, setTitleColor] = useState('black')
+    const [titleColor, setTitleColor] = useState('black' as ColorType)
     const [offset, setOffset] = useState(0.0)
-    const [setZeroPoint, setSetZeroPoint] = useState(false)
-    const [graphType, setGraphType] = useState('Graph')
-    const [displayedHistory, setDisplayedHistory] = useState('30s')
+    const [graphType, setGraphType] = useState('Graph' as GraphType)
+    const [displayedHistory, setDisplayedHistory] = useState(
+        '30s' as HistoryType
+    )
     const [deleteGraph, setDeleteGraph] = useState(false)
 
     const [data, setData] = useState<DataPoint[]>([])
@@ -108,23 +110,12 @@ export default function D3LineGraph({
         }))
     }, [data, offset])
 
-    useEffect(() => { // setting the zero point
-        if (!setZeroPoint) return
-
-        if (data.length === 0) {
-            setSetZeroPoint(false)
-            return
-        }
-
+    const handleSetZeroPoint = () => {
+        if (data.length === 0) return
         const values = data.map((d) => d.value)
         const avg = values.reduce((a, b) => a + b, 0) / values.length
-
-        // set offset such that (value + offset) - avg = 0 -> offset = -avg
         setOffset(parseFloat((-avg).toFixed(2)))
-
-        // clear the toggle trigger
-        setSetZeroPoint(false)
-    }, [setZeroPoint])
+    }
 
     const displayTitle = graphTitle || channelName
     const displayDescription =
@@ -174,18 +165,19 @@ export default function D3LineGraph({
                     />
                 </ChartContainer>
                 <EditGraphDropDown
-                    graphTitle={graphTitle}
-                    setGraphTitle={setGraphTitle}
-                    titleColor={titleColor}
-                    setTitleColor={setTitleColor}
-                    offset={offset}
-                    setOffset={setOffset}
-                    setZeroPoint={setZeroPoint}
-                    setSetZeroPoint={setSetZeroPoint}
-                    graphType={graphType}
-                    setGraphType={setGraphType}
-                    displayedHistory={displayedHistory}
-                    setDisplayedHistory={setDisplayedHistory}
+                    options={{
+                        graphTitle,
+                        setGraphTitle,
+                        titleColor,
+                        setTitleColor,
+                        offset,
+                        setOffset,
+                        graphType,
+                        setGraphType,
+                        displayedHistory,
+                        setDisplayedHistory,
+                    }}
+                    onSetZeroPoint={handleSetZeroPoint}
                     deleteGraph={deleteGraph}
                     setDeleteGraph={setDeleteGraph}
                 ></EditGraphDropDown>

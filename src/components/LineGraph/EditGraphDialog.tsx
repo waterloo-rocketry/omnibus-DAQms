@@ -17,69 +17,80 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import type {
+    GraphOptions,
+    ColorType,
+    GraphType,
+    HistoryType,
+} from './types/lineGraph'
+import { COLOR_OPTIONS, HISTORY_OPTIONS } from './types/lineGraph'
 
 interface EditGraphDialogProps {
     openEdit: boolean
-    setOpenEdit: React.Dispatch<React.SetStateAction<boolean>>
-    currentTitle: string
-    setGraphTitle: React.Dispatch<React.SetStateAction<string>>
-    currentColor: string
-    setTitleColor: React.Dispatch<React.SetStateAction<string>>
-    currentOffset: number
-    setCurrentOffset: React.Dispatch<React.SetStateAction<number>>
-    currentGraphType: string
-    setCurrentGraphType: React.Dispatch<React.SetStateAction<string>>
-    displayedHistory: string
-    setDisplayedHistory: React.Dispatch<React.SetStateAction<string>>
+    setOpenEdit: (open: boolean) => void
+    options: GraphOptions
 }
-
-const COLORS = ['black', 'green', 'red', 'blue']
-const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
 
 export default function EditGraphDialog({
     openEdit,
     setOpenEdit,
-    currentTitle,
-    setGraphTitle,
-    currentColor,
-    setTitleColor,
-    currentOffset,
-    setCurrentOffset,
-    currentGraphType,
-    setCurrentGraphType,
-    displayedHistory,
-    setDisplayedHistory,
+    options,
 }: EditGraphDialogProps) {
-    const [name, setName] = useState(currentTitle)
-    const [color, setColor] = useState(currentColor)
-    // keep the input as a string so the user can type a lone '-' before it's a valid number
-    const [offsetInput, setOffsetInput] = useState(String(currentOffset))
-    const [graphType, setGraphType] = useState(currentGraphType)
-    const [history, setHistory] = useState(displayedHistory)
-
-    // sync local state with props when they change
-    useEffect(() => {
-        setName(currentTitle)
-        setColor(currentColor)
-        setOffsetInput(String(currentOffset))
-        setGraphType(currentGraphType)
-        setHistory(displayedHistory)
-    }, [
-        currentTitle,
-        currentColor,
-        currentOffset,
-        currentGraphType,
+    const {
+        graphTitle,
+        setGraphTitle,
+        titleColor,
+        setTitleColor,
+        offset,
+        setOffset,
+        graphType,
+        setGraphType,
         displayedHistory,
-    ])
+        setDisplayedHistory,
+    } = options
+
+    const [formData, setFormData] = useState({
+        title: graphTitle,
+        color: titleColor as ColorType,
+        offsetInput: String(offset),
+        type: graphType as GraphType,
+        history: displayedHistory as HistoryType,
+    })
+
+    // sync local state with props when dialog opens
+    useEffect(() => {
+        setFormData({
+            title: graphTitle,
+            color: titleColor as ColorType,
+            offsetInput: String(offset),
+            type: graphType as GraphType,
+            history: displayedHistory as HistoryType,
+        })
+    }, [openEdit])
+
+    const updateFormData = (key: keyof typeof formData, value: string) => {
+        setFormData((prev) => ({ ...prev, [key]: value }))
+    }
+
+    // allow only partial numeric input while typing (digits, optional leading '-', optional single '.')
+    const partialNumberRE = /^-?\d*\.?\d*$/
+    const fullNumberRE = /^-?\d+(?:\.\d+)?$/
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        setGraphTitle(name)
-        setTitleColor(color)
-        const parsed = parseFloat(offsetInput)
-        setCurrentOffset(Number.isNaN(parsed) ? currentOffset : parsed)
-        setCurrentGraphType(graphType)
-        setDisplayedHistory(history)
+        setGraphTitle(formData.title)
+        setTitleColor(formData.color)
+
+        // only accept and save if the input is a fully-formed number
+        if (fullNumberRE.test(formData.offsetInput)) {
+            setOffset(parseFloat(formData.offsetInput))
+        } else {
+            // fallback to stored value if invalid
+            setOffset(offset)
+        }
+
+        setGraphType(formData.type)
+        setDisplayedHistory(formData.history)
         // close the Edit dialog
         setOpenEdit(false)
     }
@@ -89,7 +100,9 @@ export default function EditGraphDialog({
             <DialogContent className="sm:max-w-[500px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
-                        <DialogTitle>Edit — {name || 'Graph'}</DialogTitle>
+                        <DialogTitle>
+                            Edit — {formData.title || 'Graph'}
+                        </DialogTitle>
                     </DialogHeader>
 
                     <div className="grid gap-6 mt-4">
@@ -97,8 +110,10 @@ export default function EditGraphDialog({
                         <div className="grid gap-3">
                             <Label>Title</Label>
                             <Input
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
+                                value={formData.title}
+                                onChange={(e) =>
+                                    updateFormData('title', e.target.value)
+                                }
                             />
                         </div>
 
@@ -108,15 +123,17 @@ export default function EditGraphDialog({
                             <div className="grid gap-3">
                                 <Label>Title Color</Label>
                                 <div className="flex gap-3 mt-1">
-                                    {COLORS.map((c) => (
+                                    {COLOR_OPTIONS.map((c) => (
                                         <button
                                             key={c}
                                             type="button"
-                                            onClick={() => setColor(c)}
+                                            onClick={() =>
+                                                updateFormData('color', c)
+                                            }
                                             className={`w-8 h-8 rounded-full border-2 ${
-                                                color === c ? 'border-black' : (
-                                                    'border-gray-300'
-                                                )
+                                                formData.color === c ?
+                                                    'border-black'
+                                                :   'border-gray-300'
                                             }`}
                                             style={{ backgroundColor: c }}
                                         />
@@ -128,8 +145,10 @@ export default function EditGraphDialog({
                             <div className="grid gap-3">
                                 <Label>Type</Label>
                                 <Select
-                                    value={graphType}
-                                    onValueChange={setGraphType}
+                                    value={formData.type}
+                                    onValueChange={(value) =>
+                                        updateFormData('type', value)
+                                    }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
@@ -153,12 +172,19 @@ export default function EditGraphDialog({
                                 <Label>Offset</Label>
                                 <Input
                                     type="text"
-                                    placeholder={currentOffset.toString()}
+                                    placeholder={offset.toString()}
                                     inputMode="decimal"
-                                    value={offsetInput}
-                                    onChange={(e) =>
-                                        setOffsetInput(e.target.value)
-                                    }
+                                    value={formData.offsetInput}
+                                    onChange={(e) => {
+                                        const v = e.target.value
+                                        // allow empty, a lone '-', partial numbers like '5.' etc.
+                                        if (
+                                            v === '' ||
+                                            partialNumberRE.test(v)
+                                        ) {
+                                            updateFormData('offsetInput', v)
+                                        }
+                                    }}
                                 />
                             </div>
 
@@ -166,8 +192,13 @@ export default function EditGraphDialog({
                             <div className="grid gap-3">
                                 <Label>History</Label>
                                 <Select
-                                    value={history}
-                                    onValueChange={setHistory}
+                                    value={formData.history}
+                                    onValueChange={(value) =>
+                                        updateFormData(
+                                            'history',
+                                            value as HistoryType
+                                        )
+                                    }
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="History" />

@@ -2,6 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import EditGraphDialog from '@/components/LineGraph/EditGraphDialog'
+import type { ColorType, GraphType, HistoryType } from '@/components/LineGraph/types/lineGraph'
 
 describe('EditGraphDialog', () => {
     const noop = () => {}
@@ -9,16 +10,18 @@ describe('EditGraphDialog', () => {
     const baseProps = {
         openEdit: true,
         setOpenEdit: noop,
-        currentTitle: 'Initial Title',
-        setGraphTitle: vi.fn(),
-        currentColor: 'black',
-        setTitleColor: vi.fn(),
-        currentOffset: 1.2,
-        setCurrentOffset: vi.fn(),
-        currentGraphType: 'Graph',
-        setCurrentGraphType: noop,
-        displayedHistory: '30s',
-        setDisplayedHistory: noop,
+        options: {
+            graphTitle: 'Initial Title',
+            setGraphTitle: vi.fn(),
+            titleColor: 'black' as ColorType,
+            setTitleColor: vi.fn(),
+            offset: 1.2,
+            setOffset: vi.fn(),
+            graphType: 'Graph' as GraphType,
+            setGraphType: noop,
+            displayedHistory: '30s' as HistoryType,
+            setDisplayedHistory: noop,
+        },
     }
 
     it('shows current offset value in the input placeholder', () => {
@@ -30,7 +33,12 @@ describe('EditGraphDialog', () => {
 
     it('updates graph title on save', async () => {
         const setGraphTitle = vi.fn()
-        render(<EditGraphDialog {...baseProps} setGraphTitle={setGraphTitle} />)
+        render(
+            <EditGraphDialog
+                {...baseProps}
+                options={{ ...baseProps.options, setGraphTitle }}
+            />
+        )
 
         const titleInput = screen.getByDisplayValue(
             'Initial Title'
@@ -47,7 +55,12 @@ describe('EditGraphDialog', () => {
 
     it('sets title color chosen under Title Color', async () => {
         const setTitleColor = vi.fn()
-        render(<EditGraphDialog {...baseProps} setTitleColor={setTitleColor} />)
+        render(
+            <EditGraphDialog
+                {...baseProps}
+                options={{ ...baseProps.options, setTitleColor }}
+            />
+        )
 
         // click the blue color button
         const buttons = screen.getAllByRole('button')
@@ -65,11 +78,11 @@ describe('EditGraphDialog', () => {
     })
 
     it('accepts numeric offset on save', async () => {
-        const setCurrentOffset = vi.fn()
+        const setOffset = vi.fn()
         render(
             <EditGraphDialog
                 {...baseProps}
-                setCurrentOffset={setCurrentOffset}
+                options={{ ...baseProps.options, setOffset }}
             />
         )
 
@@ -81,16 +94,16 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setCurrentOffset).toHaveBeenCalledWith(-3.4)
+            expect(setOffset).toHaveBeenCalledWith(-3.4)
         })
     })
 
-    it('ignores invalid non-numeric input and falls back to 0', async () => {
-        const setCurrentOffset = vi.fn()
+    it('ignores invalid non-numeric input and falls back to valid stored value', async () => {
+        const setOffset = vi.fn()
         render(
             <EditGraphDialog
                 {...baseProps}
-                setCurrentOffset={setCurrentOffset}
+                options={{ ...baseProps.options, setOffset }}
             />
         )
         const offsetInputs = screen.getAllByPlaceholderText('1.2')
@@ -100,7 +113,7 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setCurrentOffset).toHaveBeenCalledWith(1.2)
+            expect(setOffset).toHaveBeenCalledWith(1.2)
         })
     })
 })

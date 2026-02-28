@@ -5,33 +5,37 @@ import EditGraphDropDown from '@/components/LineGraph/EditGraphDropDown'
 
 describe('EditGraphDropDown', () => {
     const mockSetters = {
-        setGraphTitle: () => {},
-        setTitleColor: () => {},
-        setOffset: () => {},
-        setSetZeroPoint: () => {},
-        setGraphType: () => {},
-        setDisplayedHistory: () => {},
-        setDeleteGraph: () => {},
+        setGraphTitle: vi.fn(),
+        setTitleColor: vi.fn(),
+        setOffset: vi.fn(),
+        setGraphType: vi.fn(),
+        setDisplayedHistory: vi.fn(),
     }
 
     const defaultProps = {
-        graphTitle: 'Test Graph',
-        titleColor: 'black',
-        offset: 0,
-        setZeroPoint: false,
-        graphType: 'Graph',
-        displayedHistory: '30s',
+        options: {
+            graphTitle: 'Test Graph',
+            titleColor: 'black' as const,
+            offset: 0,
+            graphType: 'Graph' as const,
+            displayedHistory: '30s' as const,
+            ...mockSetters,
+        },
+        onSetZeroPoint: vi.fn(),
         deleteGraph: false,
-        ...mockSetters,
+        setDeleteGraph: vi.fn(),
     }
 
     it('increments offset by 0.1 when + button is pressed', async () => {
         const setOffsetMock = vi.fn()
-        const { rerender } = render(
+        render(
             <EditGraphDropDown
                 {...defaultProps}
-                offset={0}
-                setOffset={setOffsetMock}
+                options={{
+                    ...defaultProps.options,
+                    offset: 0,
+                    setOffset: setOffsetMock,
+                }}
             />
         )
 
@@ -49,8 +53,11 @@ describe('EditGraphDropDown', () => {
         render(
             <EditGraphDropDown
                 {...defaultProps}
-                offset={0.5}
-                setOffset={setOffsetMock}
+                options={{
+                    ...defaultProps.options,
+                    offset: 0.5,
+                    setOffset: setOffsetMock,
+                }}
             />
         )
 

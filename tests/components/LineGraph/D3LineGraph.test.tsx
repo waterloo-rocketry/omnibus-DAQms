@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import D3LineGraph from '@/components/D3LineGraph'
+import D3LineGraph from '@/components/LineGraph/D3LineGraph'
 import { useLastDatapointStore } from '@/store/omnibusStore'
 
 describe('D3LineGraph', () => {
