@@ -1,6 +1,6 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { addPlot, removePlot } from '@/lib/utils'
-import type { SensorPlot } from '@/components/SensorMonitoringDashboard'
+import { describe, it, expect, beforeEach } from "vitest";
+import { addPlot, removePlot } from "./utils";
+import type { SensorPlot } from "./types";
 
 describe('arbitrarily remove and add plots to dashboard', () => {
     let nonEmptyTestPlots: SensorPlot[];

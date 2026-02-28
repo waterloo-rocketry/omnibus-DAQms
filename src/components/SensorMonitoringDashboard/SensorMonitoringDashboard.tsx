@@ -1,11 +1,6 @@
-import D3LineGraph from "./D3LineGraph";
+import D3LineGraph from "../D3LineGraph";
 import { useState } from "react";
-
-// Define sensor plot interface
-export interface SensorPlot {
-    name: string;
-    title : string;
-  }
+import type { SensorPlot } from "./types";
 
 export const SensorMonitoringDashboard = () => {
   // Map backend channels to dashboard (6 charts from 8 available channels)
