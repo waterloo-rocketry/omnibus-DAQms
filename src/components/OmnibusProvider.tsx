@@ -28,9 +28,9 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
 
     const parseMessage = useCallback(
         (msg: { channel: string; timestamp: number; payload: DAQMessage }) => {
-            const { data, relativeTimestamps, timestamp: baseTimestamp } = msg.payload
+            const { data, timestamp: baseTimestamp } = msg.payload
 
-            // Collect latest values with timestamps for all sensors in this message
+            // Collect averaged values with message-level timestamp (seconds → ms) for all sensors
             const updates: Record<string, { value: number; timestamp: number }> =
                 {}
 
@@ -39,18 +39,17 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             const dataEntries = Object.entries(data) as [string, number[]][]
 
             dataEntries.forEach(([sensorName, values]) => {
-                // Take the last value from the array as the latest
-                const latestValue = values[values.length - 1]
+                if (values.length === 0) return
 
-                // Calculate the precise timestamp for this sample
-                // Base timestamp (seconds) + relative offset (nanoseconds) -> milliseconds
-                const latestTimestamp =
-                    baseTimestamp * 1000 +
-                    relativeTimestamps[values.length - 1] / 1_000_000
+                // Average all samples in this message
+                const averageValue = values.reduce((sum, v) => sum + v, 0) / values.length
+
+                // Use the message-level timestamp (seconds → milliseconds)
+                const timestamp = baseTimestamp * 1000
 
                 updates[sensorName] = {
-                    value: latestValue,
-                    timestamp: latestTimestamp,
+                    value: averageValue,
+                    timestamp,
                 }
             })
 
