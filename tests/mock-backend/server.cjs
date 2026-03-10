@@ -1,8 +1,12 @@
-const io = require('socket.io')(8081, {
+const { Server } = require('socket.io')
+const parser = require('socket.io-msgpack-parser')
+
+const io = new Server(8081, {
     cors: { origin: '*' },
+    parser,
 })
 
-function generateDaqMessage() {
+function generateDaqPayload() {
     const timestamp = Date.now() / 1000
     const data = {}
 
@@ -18,14 +22,13 @@ function generateDaqMessage() {
     )
 
     return {
-        channel: 'DAQ/Fake',
-        timestamp: timestamp,
+        timestamp,
         payload: {
             timestamp: timestamp,
             data: data,
             relative_timestamps_nanoseconds: relative_timestamps,
             sample_rate: 1000,
-            message_format_version: 2,
+            message_format_version: 3,
         },
     }
 }
@@ -38,12 +41,13 @@ io.on('connection', (socket) => {
     })
 })
 
-// Emit DAQ data at 40 Hz (every 25ms)
+// Emit DAQ data at 40 Hz (every 25ms) using channel-based events
+// The omnibus-ts library listens via socket.onAny((event, timestamp, payload) => ...)
 setInterval(() => {
-    const message = generateDaqMessage()
-    io.emit('message', message)
+    const { timestamp, payload } = generateDaqPayload()
+    io.emit('DAQ/Fake', timestamp, payload)
 }, 25)
 
-console.log('Mock DAQ server running on port 8081')
-console.log('Emitting "message" events at 40 Hz (every 25ms)')
+console.log('Mock DAQ server running on port 8081 (msgpack parser)')
+console.log('Emitting "DAQ/Fake" events at 40 Hz (every 25ms)')
 console.log('Data format: 8 channels (Fake0-Fake7), 25 samples each')
