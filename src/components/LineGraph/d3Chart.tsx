@@ -84,8 +84,11 @@ export default function D3Chart({
         if (values.length === 0) {
             return d3.scaleLinear().domain([0, 1]).range([innerH, 0])
         }
-        const min = Math.min(...values)
-        const max = Math.max(...values)
+        let min = values[0], max = values[0]
+        for (const v of values) {
+            if (v < min) min = v
+            if (v > max) max = v
+        }
         const padding = (max - min) * 0.1 || 0.1
         return d3
             .scaleLinear()
@@ -104,12 +107,20 @@ export default function D3Chart({
         return data.length ? (line(data) ?? '') : ''
     }, [data, xScale, yScale])
 
+    // Compute explicit Y-axis tick values so the count is exact
+    const yTickValues = useMemo(() => {
+        const [domainMin, domainMax] = yScale.domain()
+        if (rangeTickCount <= 1) return [domainMin]
+        const step = (domainMax - domainMin) / (rangeTickCount - 1)
+        return Array.from({ length: rangeTickCount }, (_, i) => domainMin + i * step)
+    }, [yScale, rangeTickCount])
+
     // Render y-axis using D3
     useLayoutEffect(() => {
         if (!yAxisRef.current) return
         const yAxis = d3
             .axisLeft<number>(yScale)
-            .ticks(rangeTickCount)
+            .tickValues(yTickValues)
             .tickFormat(
                 (v: number) =>
                     `${Number(v).toFixed(2)}${unit ? ' ' + unit : ''}`
@@ -119,7 +130,7 @@ export default function D3Chart({
             .selectAll('text')
             .attr('font-size', 11)
             .attr('fill', 'var(--muted-foreground)')
-    }, [yScale, rangeTickCount, innerH, unit])
+    }, [yScale, yTickValues, innerH, unit])
 
     return (
         <svg
@@ -133,9 +144,7 @@ export default function D3Chart({
                 {/* Horizontal y-axis stuff */}
                 <g aria-hidden="true">
                     {/* Y-axis grid lines */}
-                    {yScale
-                        .ticks(rangeTickCount)
-                        .map((v: number, i: number) => (
+                    {yTickValues.map((v: number, i: number) => (
                             <g
                                 key={`gy-${i}`}
                                 transform={`translate(0, ${yScale(v)})`}

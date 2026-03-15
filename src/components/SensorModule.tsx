@@ -1,6 +1,6 @@
 import { useMemo, useRef, useEffect, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import D3Chart from '@/components/d3Chart'
+import D3Chart from '@/components/LineGraph/d3Chart'
 import type { DataPoint } from '@/types/omnibus'
 import {
     useLastDatapointStore,
@@ -139,7 +139,7 @@ export function SensorModule({
 
     return (
         <Card className="h-full">
-            <CardContent className="grid grid-rows-[auto_1fr] h-full p-4 gap-3">
+            <CardContent className="grid grid-rows-[auto_auto_1fr] h-full p-4 gap-2">
                 {/* Header: Title and Value on same row */}
                 <div className="grid grid-cols-[2fr_1fr] gap-4 items-start">
                     <h3
@@ -168,24 +168,26 @@ export function SensorModule({
                     </div>
                 </div>
 
-                {/* Chart area */}
-                <div className="relative min-h-[150px]">
+                {/* Rate indicator — fixed height to keep charts aligned across cards */}
+                <div className="min-h-[28px] flex items-center">
                     {rate !== null && (
-                        <div className="absolute top-2 left-2 z-10 bg-background/80 px-2 py-1 rounded text-xs font-mono border">
+                        <div className="bg-background/80 px-2 py-1 rounded text-xs font-mono border w-fit">
                             {rate >= 0 ? '+' : ''}
                             {rate.toFixed(3)} {unit}/s
                         </div>
                     )}
-                    <div className="h-full w-full">
-                        <D3Chart
-                            data={data}
-                            unit={unit}
-                            strokeColor="var(--chart-1)"
-                            strokeWidth={2}
-                            rangeTickCount={4}
-                            domainTickCount={4}
-                        />
-                    </div>
+                </div>
+
+                {/* Chart area */}
+                <div className="min-h-[150px]">
+                    <D3Chart
+                        data={data}
+                        unit={unit}
+                        strokeColor="var(--chart-1)"
+                        strokeWidth={2}
+                        rangeTickCount={4}
+                        domainTickCount={4}
+                    />
                 </div>
             </CardContent>
         </Card>
