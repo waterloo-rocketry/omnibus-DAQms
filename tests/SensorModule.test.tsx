@@ -1,0 +1,324 @@
+import { describe, it, expect, beforeEach } from 'vitest'
+import { render, screen, waitFor } from '@testing-library/react'
+import { SensorModule } from '../src/components/SensorModule'
+import { useLastDatapointStore } from '../src/store/omnibusStore'
+
+describe('SensorModule', () => {
+    beforeEach(() => {
+        useLastDatapointStore.setState({ series: {} })
+    })
+
+    describe('Title Display', () => {
+        it('renders title correctly', () => {
+            render(
+                <SensorModule
+                    channelName="test-channel"
+                    title="Ox Fill (psi)"
+                />
+            )
+
+            expect(screen.getByText('Ox Fill (psi)')).toBeInTheDocument()
+        })
+
+        it('falls back to channelName when no title provided', () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            expect(screen.getByText('test-channel')).toBeInTheDocument()
+        })
+
+        it('applies custom title color', () => {
+            render(
+                <SensorModule
+                    channelName="test-channel"
+                    title="Test Sensor"
+                    titleColor="text-blue-500"
+                />
+            )
+
+            const title = screen.getByText('Test Sensor')
+            expect(title).toHaveClass('text-blue-500')
+        })
+
+        it('truncates long titles with ellipsis', () => {
+            const longTitle = 'A'.repeat(100)
+            render(
+                <SensorModule channelName="test-channel" title={longTitle} />
+            )
+
+            const title = screen.getByTitle(longTitle)
+            expect(title).toHaveClass('line-clamp-2')
+        })
+    })
+
+    describe('Value Display', () => {
+        it('displays current value with 2 decimal places', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 45.98,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('45.98')).toBeInTheDocument()
+            })
+        })
+
+        it('displays -- when no data available', () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            expect(screen.getByText('--')).toBeInTheDocument()
+        })
+
+        it('truncates value to 6 characters when too long', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 123456.789,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('123456.789')
+                expect(valueElement.textContent).toHaveLength(6)
+            })
+        })
+    })
+
+    describe('Rate Calculation', () => {
+        it('does not display rate with insufficient data', async () => {
+            const { container } = render(
+                <SensorModule channelName="test-channel" unit="psi" />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 45.98,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('45.98')).toBeInTheDocument()
+            })
+
+            const rateDisplay = container.querySelector('.font-mono')
+            expect(rateDisplay).not.toBeInTheDocument()
+        })
+    })
+
+    describe('Time Window Filtering', () => {
+        it('filters out data points older than timeWindowSeconds', async () => {
+            const now = Date.now()
+
+            const { container } = render(
+                <SensorModule
+                    channelName="test-channel"
+                    timeWindowSeconds={10}
+                    minUpdateIntervalMs={0}
+                    unit="u"
+                />
+            )
+
+            // Point outside the 10s window (15s ago)
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 1.00,
+                timestamp: now - 15000,
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTitle('1')).toHaveTextContent('1.00')
+            })
+
+            // Point inside the window (now) — should evict the old one
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 99.00,
+                timestamp: now,
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTitle('99')).toHaveTextContent('99.00')
+            })
+
+            // The old point was outside the 10s window and should have been
+            // filtered out, leaving only 1 point. With <2 points the rate
+            // overlay (.font-mono) should not render.
+            const rateDisplay = container.querySelector('.font-mono')
+            expect(rateDisplay).not.toBeInTheDocument()
+        })
+
+        it('respects maxDataPoints by dropping oldest points', async () => {
+            const now = Date.now()
+
+            render(
+                <SensorModule
+                    channelName="test-channel"
+                    maxDataPoints={3}
+                    minUpdateIntervalMs={0}
+                />
+            )
+
+            // Push 4 points (all within the time window), exceeding maxDataPoints=3
+            for (let i = 0; i < 4; i++) {
+                useLastDatapointStore.getState().updateSeries('test-channel', {
+                    value: (i + 1) * 10,
+                    timestamp: now + i * 200,
+                })
+
+                await waitFor(() => {
+                    expect(
+                        screen.getByTitle(String((i + 1) * 10))
+                    ).toHaveTextContent(((i + 1) * 10).toFixed(2))
+                })
+            }
+
+            // After 4 pushes with maxDataPoints=3, the displayed value
+            // should be the latest (40.00)
+            expect(screen.getByTitle('40')).toHaveTextContent('40.00')
+        })
+    })
+
+    describe('Time-bound Filtering', () => {
+        it('accepts first data point immediately', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 100,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const value = screen.getByTitle('100')
+                expect(value.textContent).toBe('100.00')
+            })
+        })
+
+        it('respects custom minUpdateIntervalMs prop', async () => {
+            render(
+                <SensorModule
+                    channelName="test-channel"
+                    minUpdateIntervalMs={1000}
+                />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 100,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const value = screen.getByTitle('100')
+                expect(value.textContent).toBe('100.00')
+            })
+        })
+    })
+
+    describe('Value Formatting', () => {
+        it('formats values with exactly 2 decimal places', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 45,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const value = screen.getByTitle('45')
+                expect(value.textContent).toBe('45.00')
+            })
+        })
+
+        it('handles negative values correctly', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: -12.34,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('-12.34')).toBeInTheDocument()
+            })
+        })
+
+        it('handles zero correctly', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 0,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const value = screen.getByTitle('0')
+                expect(value.textContent).toBe('0.00')
+            })
+        })
+
+        it('handles very large numbers', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 999999.99,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('999999.99')
+                expect(valueElement.textContent).toBe('999999')
+            })
+        })
+
+        it('handles large negative numbers without incorrect truncation', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: -1234.56,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('-1234.56')
+                expect(valueElement.textContent).toBe('-1235')
+            })
+        })
+
+        it('uses exponential notation for very large positive numbers', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 5000000,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                const valueElement = screen.getByTitle('5000000')
+                expect(valueElement.textContent).toBe('5.0e+6')
+            })
+        })
+
+        it('displays --- for NaN values', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: NaN,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('---')).toBeInTheDocument()
+            })
+        })
+
+        it('displays --- for Infinity values', async () => {
+            render(<SensorModule channelName="test-channel" />)
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: Infinity,
+                timestamp: Date.now(),
+            })
+
+            await waitFor(() => {
+                expect(screen.getByText('---')).toBeInTheDocument()
+            })
+        })
+    })
+})
