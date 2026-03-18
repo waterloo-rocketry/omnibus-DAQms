@@ -7,7 +7,7 @@ const io = new Server(8081, {
 })
 
 function generateDaqPayload() {
-    const timestamp = Date.now() / 1000
+    const timestamp = Date.now()
     const data = {}
 
     // Generate 8 channels with 25 samples each
@@ -18,15 +18,15 @@ function generateDaqPayload() {
     // Generate relative timestamps (25 samples, 1ms apart in nanoseconds)
     const relative_timestamps = Array.from(
         { length: 25 },
-        (_, i) => i * 1000000
+        (_, i) => (timestamp + i) / 1000
     )
 
     return {
-        timestamp,
+        timestamp: timestamp / 1000,
         payload: {
             timestamp: timestamp,
             data: data,
-            relative_timestamps_nanoseconds: relative_timestamps,
+            relative_timestamps: relative_timestamps,
             sample_rate: 1000,
             message_format_version: 3,
         },

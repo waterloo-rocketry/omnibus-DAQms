@@ -31,8 +31,10 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             const { data, timestamp: baseTimestamp } = msg.payload
 
             // Collect averaged values with message-level timestamp (seconds → ms) for all sensors
-            const updates: Record<string, { value: number; timestamp: number }> =
-                {}
+            const updates: Record<
+                string,
+                { value: number; timestamp: number }
+            > = {}
 
             // Cast entries to the expected type since omnibus-ts Zod v4 inference
             // does not fully resolve Record<string, number[]> through Object.entries
@@ -42,7 +44,8 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
                 if (values.length === 0) return
 
                 // Average all samples in this message
-                const averageValue = values.reduce((sum, v) => sum + v, 0) / values.length
+                const averageValue =
+                    values.reduce((sum, v) => sum + v, 0) / values.length
 
                 // Use the message-level timestamp (seconds → milliseconds)
                 const timestamp = baseTimestamp * 1000
