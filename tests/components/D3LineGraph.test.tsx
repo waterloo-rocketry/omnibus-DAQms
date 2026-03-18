@@ -223,7 +223,7 @@ describe('D3LineGraph', () => {
         await userEvent.click(screen.getByText('+'))
 
         await waitFor(() => {
-            expect(screen.getByText(/Current: 10\.10/)).toBeInTheDocument()
+            expect(screen.getByText(/Current: 10\.50/)).toBeInTheDocument()
         })
     })
 

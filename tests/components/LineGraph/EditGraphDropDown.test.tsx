@@ -40,11 +40,11 @@ describe('EditGraphDropDown', () => {
 
         expect(setOffsetMock).toHaveBeenCalledWith(expect.any(Function))
         const updateFn = setOffsetMock.mock.calls[0][0]
-        expect(updateFn(0)).toBe(0.1)
-        expect(updateFn(2.5)).toBe(2.6)
+        expect(updateFn(0)).toBe(0.5)
+        expect(updateFn(2.5)).toBe(3.0)
     })
 
-    it('decrements offset by 0.1 when - button is pressed', async () => {
+    it('decrements offset by 0.5 when - button is pressed', async () => {
         const setOffsetMock = vi.fn()
         render(
             <EditGraphDropDown
@@ -59,8 +59,8 @@ describe('EditGraphDropDown', () => {
 
         expect(setOffsetMock).toHaveBeenCalledWith(expect.any(Function))
         const updateFn = setOffsetMock.mock.calls[0][0]
-        expect(updateFn(0.5)).toBe(0.4)
-        expect(updateFn(2.5)).toBe(2.4)
+        expect(updateFn(0.5)).toBe(0.0)
+        expect(updateFn(2.5)).toBe(2.0)
     })
 
     it('opens EditGraphDialog when Edit button is pressed', async () => {
