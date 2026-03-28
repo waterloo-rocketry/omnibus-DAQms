@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import EditGraphDialog from './EditGraphDialog'
 import DeleteGraphDialog from './DeleteGraphDialog'
+import { Input } from '@/components/ui/input'
 
 interface EditGraphDropDownProps {
     graphTitle: string
@@ -45,16 +46,19 @@ export default function EditGraphDropDown({
     deleteGraph,
     setDeleteGraph,
 }: EditGraphDropDownProps) {
-  // saving values
-  // const [offset, setOffset] = useState(0.0);
-  // const [setZeroPoint, setSetZeroPoint] = useState(false);
+    // saving values
+    // const [offset, setOffset] = useState(0.0);
+    // const [setZeroPoint, setSetZeroPoint] = useState(false);
 
     // dialog states (Edit and Delete)
     const [openEdit, setOpenEdit] = useState(false)
     const [openDelete, setOpenDelete] = useState(false)
 
-    // format offset to 1 decimal
-    const formattedOffset = offset.toFixed(1) // UPDATE: is this needed
+    // local offset value for input
+    const [offsetInput, setOffsetInput] = useState(String(offset))
+    useEffect(() => {
+        setOffsetInput(String(offset))
+    }, [offset])
 
     return (
         <div className="flex justify-end w-full mt-2">
@@ -69,7 +73,7 @@ export default function EditGraphDropDown({
                     </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className="w-40" align="end">
+                <DropdownMenuContent className="w-45" align="end">
                     {/* set offset */}
                     <DropdownMenuLabel>Offset</DropdownMenuLabel>
                     <div className="flex items-center justify-between px-2 py-2">
@@ -85,9 +89,26 @@ export default function EditGraphDropDown({
                             –
                         </Button>
 
-                        <span className="text-md w-12 text-center">
+                        {/* <span className="text-md w-12 text-center">
                             {formattedOffset}
-                        </span>
+                        </span> */}
+
+                        <div className="grid gap-3 px-1">
+                            <Input
+                                type="text"
+                                inputMode="decimal"
+                                value={offsetInput}
+                                onChange={(e) => setOffsetInput(e.target.value)}
+                                onBlur={() => {
+                                    const parsed = parseFloat(offsetInput)
+                                    if (!Number.isNaN(parsed)) {
+                                        setOffset(parsed)
+                                    } else {
+                                        setOffsetInput(String(offset)) // reset to last valid value
+                                    }
+                                }}
+                            />
+                        </div>
 
                         <Button
                             size="sm"
