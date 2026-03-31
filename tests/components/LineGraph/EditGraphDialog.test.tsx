@@ -6,15 +6,15 @@ import EditGraphDialog from '@/components/LineGraph/EditGraphDialog'
 describe('EditGraphDialog', () => {
     const noop = () => {}
 
-    const baseProps = {
+    const defaultProps = {
         openEdit: true,
         setOpenEdit: noop,
         currentTitle: 'Initial Title',
-        setGraphTitle: vi.fn(),
+        setGraphTitle: noop,
         currentColor: 'black',
-        setTitleColor: vi.fn(),
+        setTitleColor: noop,
         currentOffset: 1.2,
-        setCurrentOffset: vi.fn(),
+        setCurrentOffset: noop,
         currentGraphType: 'Graph',
         setCurrentGraphType: noop,
         displayedHistory: '30s',
@@ -22,7 +22,7 @@ describe('EditGraphDialog', () => {
     }
 
     it('shows current offset value in the input placeholder', () => {
-        render(<EditGraphDialog {...baseProps} />)
+        render(<EditGraphDialog {...defaultProps} />)
         const input = screen.getByPlaceholderText('1.2') as HTMLInputElement
         expect(input).toBeTruthy()
         expect(input.placeholder).toBe('1.2')
@@ -30,7 +30,7 @@ describe('EditGraphDialog', () => {
 
     it('updates graph title on save', async () => {
         const setGraphTitle = vi.fn()
-        render(<EditGraphDialog {...baseProps} setGraphTitle={setGraphTitle} />)
+        render(<EditGraphDialog {...defaultProps} setGraphTitle={setGraphTitle} />)
 
         const titleInput = screen.getByDisplayValue(
             'Initial Title'
@@ -47,7 +47,7 @@ describe('EditGraphDialog', () => {
 
     it('sets title color chosen under Title Color', async () => {
         const setTitleColor = vi.fn()
-        render(<EditGraphDialog {...baseProps} setTitleColor={setTitleColor} />)
+        render(<EditGraphDialog {...defaultProps} setTitleColor={setTitleColor} />)
 
         // click the blue color button
         const buttons = screen.getAllByRole('button')
@@ -68,7 +68,7 @@ describe('EditGraphDialog', () => {
         const setCurrentOffset = vi.fn()
         render(
             <EditGraphDialog
-                {...baseProps}
+                {...defaultProps}
                 setCurrentOffset={setCurrentOffset}
             />
         )
@@ -89,7 +89,7 @@ describe('EditGraphDialog', () => {
         const setCurrentOffset = vi.fn()
         render(
             <EditGraphDialog
-                {...baseProps}
+                {...defaultProps}
                 setCurrentOffset={setCurrentOffset}
             />
         )

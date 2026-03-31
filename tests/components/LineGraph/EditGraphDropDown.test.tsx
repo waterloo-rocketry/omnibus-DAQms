@@ -4,24 +4,22 @@ import userEvent from '@testing-library/user-event'
 import EditGraphDropDown from '@/components/LineGraph/EditGraphDropDown'
 
 describe('EditGraphDropDown', () => {
-    const mockSetters = {
-        setGraphTitle: vi.fn(),
-        setTitleColor: vi.fn(),
-        setSetZeroPoint: vi.fn(),
-        setGraphType: vi.fn(),
-        setDisplayedHistory: vi.fn(),
-        setDeleteGraph: vi.fn(),
-    }
+    const noop = () => {}
 
     const defaultProps = {
         graphTitle: 'Test Graph',
+        setGraphTitle: noop,
         titleColor: 'black',
+        setTitleColor: noop,
         offset: 0,
         setZeroPoint: false,
+        setSetZeroPoint: noop,
         graphType: 'Graph',
+        setGraphType: noop,
         displayedHistory: '30s',
+        setDisplayedHistory: noop,
         deleteGraph: false,
-        ...mockSetters,
+        setDeleteGraph: noop
     }
 
     async function openDropdown() {
