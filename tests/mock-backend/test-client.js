@@ -1,7 +1,7 @@
 const { io } = require('socket.io-client')
 const parser = require('socket.io-msgpack-parser')
 
-const socket = io('http://localhost:8081', {
+const socket = io('http://localhost:6767', {
     parser,
     transports: ['websocket'],
 })

@@ -1,7 +1,7 @@
 const { Server } = require('socket.io')
 const parser = require('socket.io-msgpack-parser')
 
-const io = new Server(8081, {
+const io = new Server(6767, {
     cors: { origin: '*' },
     parser,
 })
@@ -18,13 +18,13 @@ function generateDaqPayload() {
     // Generate relative timestamps (25 samples, 1ms apart in nanoseconds)
     const relative_timestamps = Array.from(
         { length: 25 },
-        (_, i) => (timestamp + i) / 1000
+        (_, i) => (timestamp) / 1000 + i
     )
 
     return {
         timestamp: timestamp / 1000,
         payload: {
-            timestamp: timestamp,
+            timestamp: timestamp/1000,
             data: data,
             relative_timestamps: relative_timestamps,
             sample_rate: 1000,

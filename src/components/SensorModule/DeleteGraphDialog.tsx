@@ -9,20 +9,18 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface DeleteGraphDialogProps {
-  openDelete: boolean;
-  setOpenDelete: React.Dispatch<React.SetStateAction<boolean>>;
-  deleteGraph: boolean;
-  setDeleteGraph: React.Dispatch<React.SetStateAction<boolean>>;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onDelete: () => void;
 }
 
 const DeleteGraphDialog = ({
-  openDelete,
-  setOpenDelete,
-  deleteGraph,
-  setDeleteGraph,
+  open,
+  onOpenChange,
+  onDelete,
 }: DeleteGraphDialogProps) => {
   return (
-    <Dialog open={openDelete} onOpenChange={setOpenDelete}>
+    <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="w-[400px]">
         <DialogHeader>
           <DialogTitle className="text-red-600">Warning!</DialogTitle>
@@ -35,14 +33,15 @@ const DeleteGraphDialog = ({
             <Button variant="outline">Cancel</Button>
           </DialogClose>
 
-          <DialogClose asChild>
-            <Button
-              variant="destructive"
-              onClick={() => setDeleteGraph(true)}
-            >
-              Yes
-            </Button>
-          </DialogClose>
+          <Button
+            variant="destructive"
+            onClick={() => {
+              onDelete();
+              onOpenChange(false);
+            }}
+          >
+            Yes
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

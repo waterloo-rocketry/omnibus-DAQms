@@ -1,24 +1,19 @@
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import EditGraphDialog from '@/components/LineGraph/EditGraphDialog'
+import EditGraphDialog from '@/components/SensorModule/EditGraphDialog'
 
 describe('EditGraphDialog', () => {
-    const noop = () => {}
-
     const baseProps = {
-        openEdit: true,
-        setOpenEdit: noop,
-        currentTitle: 'Initial Title',
-        setGraphTitle: vi.fn(),
-        currentColor: 'black',
-        setTitleColor: vi.fn(),
-        currentOffset: 1.2,
-        setCurrentOffset: vi.fn(),
-        currentGraphType: 'Graph',
-        setCurrentGraphType: noop,
+        open: true,
+        onOpenChange: vi.fn(),
+        index: 0,
+        title: 'Initial Title',
+        titleColor: 'black',
+        offset: 1.2,
+        graphType: 'Graph',
         displayedHistory: '30s',
-        setDisplayedHistory: noop,
+        onEdit: vi.fn(),
     }
 
     it('shows current offset value in the input placeholder', () => {
@@ -29,8 +24,8 @@ describe('EditGraphDialog', () => {
     })
 
     it('updates graph title on save', async () => {
-        const setGraphTitle = vi.fn()
-        render(<EditGraphDialog {...baseProps} setGraphTitle={setGraphTitle} />)
+        const onEdit = vi.fn()
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
 
         const titleInput = screen.getByDisplayValue(
             'Initial Title'
@@ -41,35 +36,34 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setGraphTitle).toHaveBeenCalledWith('New Graph Name')
+            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
+                title: 'New Graph Name',
+            }))
         })
     })
 
     it('sets title color chosen under Title Color', async () => {
-        const setTitleColor = vi.fn()
-        render(<EditGraphDialog {...baseProps} setTitleColor={setTitleColor} />)
+        const onEdit = vi.fn()
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
 
-        // click the blue color button
-        const buttons = screen.getAllByRole('button')
-        const colorBtn = buttons.find((b) =>
-            b.getAttribute('style')?.includes('background-color: blue')
-        )
-        if (!colorBtn) throw new Error('color button not found')
+        const colorBtn = screen.getByTitle('Blue')
         await userEvent.click(colorBtn)
 
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setTitleColor).toHaveBeenCalled()
+            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
+                titleColor: 'text-blue-500',
+            }))
         })
     })
 
     it('accepts numeric offset on save', async () => {
-        const setCurrentOffset = vi.fn()
+        const onEdit = vi.fn()
         render(
             <EditGraphDialog
                 {...baseProps}
-                setCurrentOffset={setCurrentOffset}
+                onEdit={onEdit}
             />
         )
 
@@ -81,16 +75,18 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setCurrentOffset).toHaveBeenCalledWith(-3.4)
+            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
+                offset: -3.4,
+            }))
         })
     })
 
-    it('ignores invalid non-numeric input and falls back to 0', async () => {
-        const setCurrentOffset = vi.fn()
+    it('ignores invalid non-numeric input and falls back to current offset', async () => {
+        const onEdit = vi.fn()
         render(
             <EditGraphDialog
                 {...baseProps}
-                setCurrentOffset={setCurrentOffset}
+                onEdit={onEdit}
             />
         )
         const offsetInputs = screen.getAllByPlaceholderText('1.2')
@@ -100,7 +96,9 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(setCurrentOffset).toHaveBeenCalledWith(1.2)
+            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
+                offset: 1.2,
+            }))
         })
     })
 })

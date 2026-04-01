@@ -1,66 +1,51 @@
 import { it, expect, describe, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import EditGraphDropDown from '@/components/LineGraph/EditGraphDropDown'
+import EditGraphDropDown from '@/components/SensorModule/EditGraphDropDown'
 
 describe('EditGraphDropDown', () => {
-    const mockSetters = {
-        setGraphTitle: () => {},
-        setTitleColor: () => {},
-        setOffset: () => {},
-        setSetZeroPoint: () => {},
-        setGraphType: () => {},
-        setDisplayedHistory: () => {},
-        setDeleteGraph: () => {},
-    }
-
     const defaultProps = {
-        graphTitle: 'Test Graph',
+        index: 0,
+        title: 'Test Graph',
         titleColor: 'black',
         offset: 0,
-        setZeroPoint: false,
         graphType: 'Graph',
         displayedHistory: '30s',
-        deleteGraph: false,
-        ...mockSetters,
+        onEdit: vi.fn(),
+        onDelete: vi.fn(),
+        onSetZeroPoint: vi.fn(),
     }
 
-    it('increments offset by 0.1 when + button is pressed', async () => {
-        const setOffsetMock = vi.fn()
-        const { rerender } = render(
+    it('increments offset by 0.5 when + button is pressed', async () => {
+        const onEdit = vi.fn()
+        render(
             <EditGraphDropDown
                 {...defaultProps}
                 offset={0}
-                setOffset={setOffsetMock}
+                onEdit={onEdit}
             />
         )
 
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('+'))
 
-        expect(setOffsetMock).toHaveBeenCalledWith(expect.any(Function))
-        const updateFn = setOffsetMock.mock.calls[0][0]
-        expect(updateFn(0)).toBe(0.5)
-        expect(updateFn(2.5)).toBe(3.0)
+        expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.5 })
     })
 
     it('decrements offset by 0.5 when - button is pressed', async () => {
-        const setOffsetMock = vi.fn()
+        const onEdit = vi.fn()
         render(
             <EditGraphDropDown
                 {...defaultProps}
                 offset={0.5}
-                setOffset={setOffsetMock}
+                onEdit={onEdit}
             />
         )
 
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('–'))
 
-        expect(setOffsetMock).toHaveBeenCalledWith(expect.any(Function))
-        const updateFn = setOffsetMock.mock.calls[0][0]
-        expect(updateFn(0.5)).toBe(0.0)
-        expect(updateFn(2.5)).toBe(2.0)
+        expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.0 })
     })
 
     it('opens EditGraphDialog when Edit button is pressed', async () => {
@@ -69,7 +54,6 @@ describe('EditGraphDropDown', () => {
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('Edit'))
 
-        // EditGraphDialog opens with title
         await waitFor(() => {
             expect(screen.getByText(/Edit — Test Graph/)).toBeInTheDocument()
         })
@@ -81,7 +65,6 @@ describe('EditGraphDropDown', () => {
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('Delete'))
 
-        // DeleteGraphDialog appears - it should have a delete confirmation message
         await waitFor(() => {
             expect(screen.getByRole('dialog')).toBeInTheDocument()
         })

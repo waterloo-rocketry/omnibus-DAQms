@@ -11,53 +11,40 @@ import {
 } from '@/components/ui/dropdown-menu'
 import EditGraphDialog from './EditGraphDialog'
 import DeleteGraphDialog from './DeleteGraphDialog'
+import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
 
 interface EditGraphDropDownProps {
-    graphTitle: string
-    setGraphTitle: React.Dispatch<React.SetStateAction<string>>
+    index: number
+    title: string
     titleColor: string
-    setTitleColor: React.Dispatch<React.SetStateAction<string>>
     offset: number
-    setOffset: React.Dispatch<React.SetStateAction<number>>
-    setZeroPoint: boolean
-    setSetZeroPoint: React.Dispatch<React.SetStateAction<boolean>>
     graphType: string
-    setGraphType: React.Dispatch<React.SetStateAction<string>>
     displayedHistory: string
-    setDisplayedHistory: React.Dispatch<React.SetStateAction<string>>
-    deleteGraph: boolean
-    setDeleteGraph: React.Dispatch<React.SetStateAction<boolean>>
+    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
+    onDelete: () => void
+    onSetZeroPoint: () => void
 }
 
 export default function EditGraphDropDown({
-    graphTitle,
-    setGraphTitle,
+    index,
+    title,
     titleColor,
-    setTitleColor,
     offset,
-    setOffset,
-    setZeroPoint,
-    setSetZeroPoint,
     graphType,
-    setGraphType,
     displayedHistory,
-    setDisplayedHistory,
-    deleteGraph,
-    setDeleteGraph,
+    onEdit,
+    onDelete,
+    onSetZeroPoint,
 }: EditGraphDropDownProps) {
-  // saving values
-  // const [offset, setOffset] = useState(0.0);
-  // const [setZeroPoint, setSetZeroPoint] = useState(false);
-
     // dialog states (Edit and Delete)
     const [openEdit, setOpenEdit] = useState(false)
     const [openDelete, setOpenDelete] = useState(false)
 
     // format offset to 1 decimal
-    const formattedOffset = offset.toFixed(1) // UPDATE: is this needed
+    const formattedOffset = offset.toFixed(1)
 
     return (
-        <div className="flex justify-end w-full mt-2">
+        <div className="flex justify-end w-full">
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button
@@ -77,9 +64,7 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                setOffset((prev) =>
-                                    parseFloat((prev - 0.5).toFixed(1))
-                                )
+                                onEdit(index, { offset: parseFloat((offset - 0.5).toFixed(1)) })
                             }
                         >
                             –
@@ -93,9 +78,7 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                setOffset((prev) =>
-                                    parseFloat((prev + 0.5).toFixed(1))
-                                )
+                                onEdit(index, { offset: parseFloat((offset + 0.5).toFixed(1)) })
                             }
                         >
                             +
@@ -107,7 +90,7 @@ export default function EditGraphDropDown({
                     {/* set zero state option */}
                     <DropdownMenuItem
                         onSelect={() => {
-                            setSetZeroPoint(!setZeroPoint)
+                            onSetZeroPoint()
                         }}
                     >
                         Set Zero Point
@@ -137,27 +120,23 @@ export default function EditGraphDropDown({
 
             {/* edit component */}
             <EditGraphDialog
-                openEdit={openEdit}
-                setOpenEdit={setOpenEdit}
-                currentTitle={graphTitle}
-                setGraphTitle={setGraphTitle}
-                currentColor={titleColor}
-                setTitleColor={setTitleColor}
-                currentOffset={offset}
-                setCurrentOffset={setOffset}
-                currentGraphType={graphType}
-                setCurrentGraphType={setGraphType}
+                open={openEdit}
+                onOpenChange={setOpenEdit}
+                index={index}
+                title={title}
+                titleColor={titleColor}
+                offset={offset}
+                graphType={graphType}
                 displayedHistory={displayedHistory}
-                setDisplayedHistory={setDisplayedHistory}
-            ></EditGraphDialog>
+                onEdit={onEdit}
+            />
 
             {/* delete component */}
             <DeleteGraphDialog
-                openDelete={openDelete}
-                setOpenDelete={setOpenDelete}
-                deleteGraph={deleteGraph}
-                setDeleteGraph={setDeleteGraph}
-            ></DeleteGraphDialog>
+                open={openDelete}
+                onOpenChange={setOpenDelete}
+                onDelete={onDelete}
+            />
         </div>
     )
 }
