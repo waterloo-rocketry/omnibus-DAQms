@@ -9,7 +9,7 @@ import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
 /**
  * Configuration
  */
-const SOCKET_URL = 'http://localhost:8081'
+const SOCKET_URL = 'http://localhost:6767'
 
 /**
  * Omnibus Provider Component

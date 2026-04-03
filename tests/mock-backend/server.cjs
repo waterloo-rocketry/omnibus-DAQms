@@ -1,7 +1,7 @@
 const { Server } = require('socket.io')
 const parser = require('socket.io-msgpack-parser')
 
-const io = new Server(8081, {
+const io = new Server(6767, {
     cors: { origin: '*' },
     parser,
 })
@@ -15,7 +15,7 @@ function generateDaqPayload() {
         data[`Fake${i}`] = Array.from({ length: 25 }, () => Math.random())
     }
 
-    // Generate relative timestamps (25 samples, 1ms apart in nanoseconds)
+    // Generate relative timestamps (25 samples, 1ms apart, in seconds)
     const relative_timestamps = Array.from(
         { length: 25 },
         (_, i) => (timestamp + i) / 1000
@@ -24,7 +24,7 @@ function generateDaqPayload() {
     return {
         timestamp: timestamp / 1000,
         payload: {
-            timestamp: timestamp,
+            timestamp: timestamp/1000,
             data: data,
             relative_timestamps: relative_timestamps,
             sample_rate: 1000,
@@ -48,6 +48,6 @@ setInterval(() => {
     io.emit('DAQ/Fake', timestamp, payload)
 }, 25)
 
-console.log('Mock DAQ server running on port 8081 (msgpack parser)')
+console.log('Mock DAQ server running on port 6767 (msgpack parser)')
 console.log('Emitting "DAQ/Fake" events at 40 Hz (every 25ms)')
 console.log('Data format: 8 channels (Fake0-Fake7), 25 samples each')

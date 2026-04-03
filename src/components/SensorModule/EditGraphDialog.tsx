@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -17,75 +17,72 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
+import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
 
 interface EditGraphDialogProps {
-    openEdit: boolean
-    setOpenEdit: React.Dispatch<React.SetStateAction<boolean>>
-    currentTitle: string
-    setGraphTitle: React.Dispatch<React.SetStateAction<string>>
-    currentColor: string
-    setTitleColor: React.Dispatch<React.SetStateAction<string>>
-    currentOffset: number
-    setCurrentOffset: React.Dispatch<React.SetStateAction<number>>
-    currentGraphType: string
-    setCurrentGraphType: React.Dispatch<React.SetStateAction<string>>
+    open: boolean
+    onOpenChange: (open: boolean) => void
+    index: number
+    title: string
+    titleColor: string
+    offset: number
+    graphType: string
     displayedHistory: string
-    setDisplayedHistory: React.Dispatch<React.SetStateAction<string>>
+    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
 }
 
-const COLORS = ['black', 'green', 'red', 'blue']
-const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
+const TITLE_COLORS = [
+    { label: 'Black', tw: 'text-foreground', preview: 'black' },
+    { label: 'Green', tw: 'text-green-500', preview: 'green' },
+    { label: 'Red', tw: 'text-red-500', preview: 'red' },
+    { label: 'Blue', tw: 'text-blue-500', preview: 'blue' },
+]
+// const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
 
 export default function EditGraphDialog({
-    openEdit,
-    setOpenEdit,
-    currentTitle,
-    setGraphTitle,
-    currentColor,
-    setTitleColor,
-    currentOffset,
-    setCurrentOffset,
-    currentGraphType,
-    setCurrentGraphType,
+    open,
+    onOpenChange,
+    index,
+    title,
+    titleColor,
+    offset,
+    graphType,
     displayedHistory,
-    setDisplayedHistory,
+    onEdit,
 }: EditGraphDialogProps) {
-    const [name, setName] = useState(currentTitle)
-    const [color, setColor] = useState(currentColor)
-    // keep the input as a string so the user can type a lone '-' before it's a valid number
-    const [offsetInput, setOffsetInput] = useState(String(currentOffset))
-    const [graphType, setGraphType] = useState(currentGraphType)
+    const [name, setName] = useState(title)
+    const [color, setColor] = useState(titleColor)
+    const [offsetInput, setOffsetInput] = useState(String(offset))
+    const [localGraphType, setLocalGraphType] = useState(graphType)
     const [history, setHistory] = useState(displayedHistory)
 
-    // sync local state with props when they change
-    useEffect(() => {
-        setName(currentTitle)
-        setColor(currentColor)
-        setOffsetInput(String(currentOffset))
-        setGraphType(currentGraphType)
-        setHistory(displayedHistory)
-    }, [
-        currentTitle,
-        currentColor,
-        currentOffset,
-        currentGraphType,
-        displayedHistory,
-    ])
+    // Reset local form state when dialog opens
+    const handleOpenChange = (isOpen: boolean) => {
+        if (isOpen) {
+            setName(title)
+            setColor(titleColor)
+            setOffsetInput(String(offset))
+            setLocalGraphType(graphType)
+            setHistory(displayedHistory)
+        }
+        onOpenChange(isOpen)
+    }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
-        setGraphTitle(name)
-        setTitleColor(color)
         const parsed = parseFloat(offsetInput)
-        setCurrentOffset(Number.isNaN(parsed) ? currentOffset : parsed)
-        setCurrentGraphType(graphType)
-        setDisplayedHistory(history)
-        // close the Edit dialog
-        setOpenEdit(false)
+        onEdit(index, {
+            title: name,
+            titleColor: color,
+            offset: Number.isNaN(parsed) ? offset : parsed,
+            graphType: localGraphType,
+            displayedHistory: history,
+        })
+        onOpenChange(false)
     }
 
     return (
-        <Dialog open={openEdit} onOpenChange={setOpenEdit}>
+        <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogContent className="sm:max-w-[500px]">
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
@@ -104,32 +101,31 @@ export default function EditGraphDialog({
 
                         {/* ROW 2 */}
                         <div className="grid grid-cols-2 gap-6">
-                            {/* Column 1 */}
                             <div className="grid gap-3">
                                 <Label>Title Color</Label>
                                 <div className="flex gap-3 mt-1">
-                                    {COLORS.map((c) => (
+                                {TITLE_COLORS.map((c) => (
                                         <button
-                                            key={c}
+                                            key={c.tw}
                                             type="button"
-                                            onClick={() => setColor(c)}
+                                            onClick={() => setColor(c.tw)}
                                             className={`w-8 h-8 rounded-full border-2 ${
-                                                color === c ? 'border-black' : (
+                                                color === c.tw ? 'border-black' : (
                                                     'border-gray-300'
                                                 )
                                             }`}
-                                            style={{ backgroundColor: c }}
+                                            style={{ backgroundColor: c.preview }}
+                                            title={c.label}
                                         />
                                     ))}
                                 </div>
                             </div>
 
-                            {/* Column 2  */}
                             <div className="grid gap-3">
                                 <Label>Type</Label>
                                 <Select
-                                    value={graphType}
-                                    onValueChange={setGraphType}
+                                    value={localGraphType}
+                                    onValueChange={setLocalGraphType}
                                 >
                                     <SelectTrigger>
                                         <SelectValue placeholder="Select type" />
@@ -148,12 +144,11 @@ export default function EditGraphDialog({
 
                         {/* ROW 3 */}
                         <div className="grid grid-cols-2 gap-6">
-                            {/* Column 1 — Offset */}
                             <div className="grid gap-3">
                                 <Label>Offset</Label>
                                 <Input
                                     type="text"
-                                    placeholder={currentOffset.toString()}
+                                    placeholder={offset.toString()}
                                     inputMode="decimal"
                                     value={offsetInput}
                                     onChange={(e) =>
@@ -162,25 +157,24 @@ export default function EditGraphDialog({
                                 />
                             </div>
 
-                            {/* Column 2 */}
-                            <div className="grid gap-3">
-                                <Label>History</Label>
-                                <Select
-                                    value={history}
-                                    onValueChange={setHistory}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="History" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {HISTORY_OPTIONS.map((h) => (
-                                            <SelectItem key={h} value={h}>
-                                                {h}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            {/* <div className="grid gap-3"> */}
+                            {/*     <Label>History</Label> */}
+                            {/*     <Select */}
+                            {/*         value={history} */}
+                            {/*         onValueChange={setHistory} */}
+                            {/*     > */}
+                            {/*         <SelectTrigger> */}
+                            {/*             <SelectValue placeholder="History" /> */}
+                            {/*         </SelectTrigger> */}
+                            {/*         <SelectContent> */}
+                            {/*             {HISTORY_OPTIONS.map((h) => ( */}
+                            {/*                 <SelectItem key={h} value={h}> */}
+                            {/*                     {h} */}
+                            {/*                 </SelectItem> */}
+                            {/*             ))} */}
+                            {/*         </SelectContent> */}
+                            {/*     </Select> */}
+                            {/* </div> */}
                         </div>
                     </div>
 

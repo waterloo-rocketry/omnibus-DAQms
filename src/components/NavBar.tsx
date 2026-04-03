@@ -4,8 +4,8 @@ import {
     NavigationMenuList,
     NavigationMenuItem,
     NavigationMenuLink,
-    navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
+import { navigationMenuTriggerStyle } from '@/components/ui/navigation-menu'
 import { useOmnibusContext } from '@/hooks/useOmnibusContext'
 
 export function NavBar() {
