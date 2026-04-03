@@ -37,7 +37,7 @@ const TITLE_COLORS = [
     { label: 'Red', tw: 'text-red-500', preview: 'red' },
     { label: 'Blue', tw: 'text-blue-500', preview: 'blue' },
 ]
-const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
+// const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
 
 export default function EditGraphDialog({
     open,
@@ -157,24 +157,24 @@ export default function EditGraphDialog({
                                 />
                             </div>
 
-                            <div className="grid gap-3">
-                                <Label>History</Label>
-                                <Select
-                                    value={history}
-                                    onValueChange={setHistory}
-                                >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="History" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {HISTORY_OPTIONS.map((h) => (
-                                            <SelectItem key={h} value={h}>
-                                                {h}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectContent>
-                                </Select>
-                            </div>
+                            {/* <div className="grid gap-3"> */}
+                            {/*     <Label>History</Label> */}
+                            {/*     <Select */}
+                            {/*         value={history} */}
+                            {/*         onValueChange={setHistory} */}
+                            {/*     > */}
+                            {/*         <SelectTrigger> */}
+                            {/*             <SelectValue placeholder="History" /> */}
+                            {/*         </SelectTrigger> */}
+                            {/*         <SelectContent> */}
+                            {/*             {HISTORY_OPTIONS.map((h) => ( */}
+                            {/*                 <SelectItem key={h} value={h}> */}
+                            {/*                     {h} */}
+                            {/*                 </SelectItem> */}
+                            {/*             ))} */}
+                            {/*         </SelectContent> */}
+                            {/*     </Select> */}
+                            {/* </div> */}
                         </div>
                     </div>
 

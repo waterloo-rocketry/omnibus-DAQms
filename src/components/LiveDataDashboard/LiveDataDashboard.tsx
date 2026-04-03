@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react'
 import { SensorModule } from '../SensorModule'
-import { addPlot, removePlot } from './utils'
+import { addPlot, removePlot, createGraphConfig } from './utils'
 import type { GraphConfig, GraphConfigEditable } from './types'
 import { Button } from '@/components/ui/button'
 
@@ -12,10 +12,6 @@ const DEFAULT_GRAPH_CONFIGS: Omit<GraphConfig, 'id'>[] = [
     { channelName: 'Fake4', title: 'Battery (V)', titleColor: 'text-green-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
     { channelName: 'Fake5', title: 'Vibration (Hz)', titleColor: 'text-pink-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
 ]
-
-function createGraphConfig(config: Omit<GraphConfig, 'id'>): GraphConfig {
-    return { ...config, id: crypto.randomUUID() }
-}
 
 export const LiveDataDashboard = () => {
     const [graphConfigs, setGraphConfigs] = useState<GraphConfig[]>(() =>
