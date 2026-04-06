@@ -216,7 +216,7 @@ export const SensorModule = memo(function SensorModule({
                 <div className="grid grid-cols-[2fr_1fr] gap-4 items-start">
                     <h3
                         className={cn(
-                            'font-semibold text-sm leading-tight line-clamp-2',
+                            'font-semibold text-base leading-tight line-clamp-2',
                             titleColor
                         )}
                         title={displayTitle}
