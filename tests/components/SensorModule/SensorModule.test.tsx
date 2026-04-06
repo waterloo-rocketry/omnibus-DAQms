@@ -66,6 +66,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -85,6 +86,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 123456.789,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -101,6 +103,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -128,6 +131,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 1.0,
                 timestamp: now - 15000,
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -138,6 +142,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 99.0,
                 timestamp: now,
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -163,6 +168,7 @@ describe('SensorModule', () => {
                 useLastDatapointStore.getState().updateSeries('test-channel', {
                     value: (i + 1) * 10,
                     timestamp: now + i * 200,
+                    type: 'DAQ',
                 })
 
                 await waitFor(() => {
@@ -183,6 +189,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 100,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -199,6 +206,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 100,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -215,6 +223,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -229,6 +238,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -12.34,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -242,6 +252,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 0,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -256,6 +267,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 999999.99,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -270,6 +282,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -1234.56,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -284,6 +297,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 5000000,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -298,6 +312,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: NaN,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -311,6 +326,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: Infinity,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -340,6 +356,7 @@ describe('SensorModule', () => {
 
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now(),
+                type: 'DAQ',
                 value: 10,
             })
 
@@ -366,10 +383,12 @@ describe('SensorModule', () => {
 
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now(),
+                type: 'DAQ',
                 value: 10,
             })
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now() + 100,
+                type: 'DAQ',
                 value: 30,
             })
 

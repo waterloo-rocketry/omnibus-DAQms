@@ -7,6 +7,7 @@ import { subscribeWithSelector } from 'zustand/middleware'
 export interface LatestDataPoint {
     value: number
     timestamp: number // Unix timestamp in milliseconds (from backend)
+    type: string // Message type, e.g. 'DAQ', 'RLCS'
 }
 
 /**
