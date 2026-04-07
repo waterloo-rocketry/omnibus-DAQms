@@ -14,11 +14,13 @@ import { ConnectionStatus } from './ConnectionStatus'
 import { MainMenuFooter } from './MainMenuFooter'
 import { AddDataDialog } from './AddDataDialog'
 import { EditDashboardDialog } from './EditDashboardDialog'
+import { ClearDashboardDialog } from './ClearDashboardDialog'
 
 export function MainMenu() {
     const addDataOpen = useDashboardStore((s) => s.addDataOpen)
     const setAddDataOpen = useDashboardStore((s) => s.setAddDataOpen)
     const [editDashboardOpen, setEditDashboardOpen] = useState(false)
+    const [clearDashboardOpen, setClearDashboardOpen] = useState(false)
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
@@ -61,7 +63,7 @@ export function MainMenu() {
                         <DropdownMenuItem
                             className="cursor-pointer py-2 text-sm"
                             variant="destructive"
-                            onSelect={() => {}}
+                            onSelect={() => setClearDashboardOpen(true)}
                         >
                             <Trash2 />
                             Clear
@@ -75,6 +77,10 @@ export function MainMenu() {
             <EditDashboardDialog
                 open={editDashboardOpen}
                 onOpenChange={setEditDashboardOpen}
+            />
+            <ClearDashboardDialog
+                open={clearDashboardOpen}
+                onOpenChange={setClearDashboardOpen}
             />
         </div>
     )
