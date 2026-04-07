@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ClearDashboardDialog } from '@/components/MainMenu/ClearDashboardDialog'
 import { useDashboardStore } from '@/store/dashboardStore'
-import { createGraphConfig } from '@/components/LiveDataDashboard/utils'
+import { createGraphConfig } from '@/store/dashboardStore/utils'
 
 describe('ClearDashboardDialog', () => {
     beforeEach(() => {
