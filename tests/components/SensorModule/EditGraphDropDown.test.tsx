@@ -19,11 +19,7 @@ describe('EditGraphDropDown', () => {
     it('increments offset by 0.5 when + button is pressed', async () => {
         const onEdit = vi.fn()
         render(
-            <EditGraphDropDown
-                {...defaultProps}
-                offset={0}
-                onEdit={onEdit}
-            />
+            <EditGraphDropDown {...defaultProps} offset={0} onEdit={onEdit} />
         )
 
         await userEvent.click(screen.getByLabelText('Open menu'))
@@ -35,11 +31,7 @@ describe('EditGraphDropDown', () => {
     it('decrements offset by 0.5 when - button is pressed', async () => {
         const onEdit = vi.fn()
         render(
-            <EditGraphDropDown
-                {...defaultProps}
-                offset={0.5}
-                onEdit={onEdit}
-            />
+            <EditGraphDropDown {...defaultProps} offset={0.5} onEdit={onEdit} />
         )
 
         await userEvent.click(screen.getByLabelText('Open menu'))

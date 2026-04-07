@@ -64,7 +64,11 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                onEdit(index, { offset: parseFloat((offset - 0.5).toFixed(1)) })
+                                onEdit(index, {
+                                    offset: parseFloat(
+                                        (offset - 0.5).toFixed(1)
+                                    ),
+                                })
                             }
                         >
                             –
@@ -78,7 +82,11 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                onEdit(index, { offset: parseFloat((offset + 0.5).toFixed(1)) })
+                                onEdit(index, {
+                                    offset: parseFloat(
+                                        (offset + 0.5).toFixed(1)
+                                    ),
+                                })
                             }
                         >
                             +

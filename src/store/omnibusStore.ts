@@ -32,5 +32,5 @@ export const useLastDatapointStore = create<OmnibusStore>()(
             set((state) => ({
                 series: { ...state.series, ...updates },
             })),
-    })),
+    }))
 )

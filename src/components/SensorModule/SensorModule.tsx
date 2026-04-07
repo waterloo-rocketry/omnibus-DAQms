@@ -139,7 +139,8 @@ export const SensorModule = memo(function SensorModule({
     const [data, setData] = useState<DataPoint[]>([])
     const prevChannelRef = useRef(channelName)
     const lastTimestampRef = useRef<number | null>(null)
-    const timeWindowSeconds = timeWindowSecondsOverride ?? parseDisplayedHistory(displayedHistory)
+    const timeWindowSeconds =
+        timeWindowSecondsOverride ?? parseDisplayedHistory(displayedHistory)
 
     useEffect(() => {
         if (prevChannelRef.current !== channelName) {
@@ -153,15 +154,27 @@ export const SensorModule = memo(function SensorModule({
             (newDataPoint: LatestDataPoint | undefined) => {
                 if (newDataPoint === undefined) return
 
-                if (!shouldAddPoint(newDataPoint.timestamp, lastTimestampRef.current, minUpdateIntervalMs)) {
+                if (
+                    !shouldAddPoint(
+                        newDataPoint.timestamp,
+                        lastTimestampRef.current,
+                        minUpdateIntervalMs
+                    )
+                ) {
                     return
                 }
                 lastTimestampRef.current = newDataPoint.timestamp
 
-                const cutoffTime = newDataPoint.timestamp - timeWindowSeconds * 1000
+                const cutoffTime =
+                    newDataPoint.timestamp - timeWindowSeconds * 1000
                 setData((prev) =>
-                    [...filterStaleData(prev, cutoffTime), { timestamp: newDataPoint.timestamp, value: newDataPoint.value }]
-                        .slice(-maxDataPoints)
+                    [
+                        ...filterStaleData(prev, cutoffTime),
+                        {
+                            timestamp: newDataPoint.timestamp,
+                            value: newDataPoint.value,
+                        },
+                    ].slice(-maxDataPoints)
                 )
             }
         )

@@ -24,7 +24,7 @@ function generateDaqPayload() {
     return {
         timestamp: timestamp / 1000,
         payload: {
-            timestamp: timestamp/1000,
+            timestamp: timestamp / 1000,
             data: data,
             relative_timestamps: relative_timestamps,
             sample_rate: 1000,

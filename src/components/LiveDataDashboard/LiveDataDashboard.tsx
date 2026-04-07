@@ -5,12 +5,54 @@ import type { GraphConfig, GraphConfigEditable } from './types'
 import { Button } from '@/components/ui/button'
 
 const DEFAULT_GRAPH_CONFIGS: Omit<GraphConfig, 'id'>[] = [
-    { channelName: 'Fake0', title: 'Ox Fill (psi)', titleColor: 'text-teal-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
-    { channelName: 'Fake1', title: 'Chamber Temp (°C)', titleColor: 'text-orange-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
-    { channelName: 'Fake2', title: 'Tank Pressure (bar)', titleColor: 'text-blue-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
-    { channelName: 'Fake3', title: 'Flow Rate (L/s)', titleColor: 'text-purple-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
-    { channelName: 'Fake4', title: 'Battery (V)', titleColor: 'text-green-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
-    { channelName: 'Fake5', title: 'Vibration (Hz)', titleColor: 'text-pink-500', offset: 0, graphType: 'Graph', displayedHistory: '30s' },
+    {
+        channelName: 'Fake0',
+        title: 'Ox Fill (psi)',
+        titleColor: 'text-teal-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
+    {
+        channelName: 'Fake1',
+        title: 'Chamber Temp (°C)',
+        titleColor: 'text-orange-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
+    {
+        channelName: 'Fake2',
+        title: 'Tank Pressure (bar)',
+        titleColor: 'text-blue-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
+    {
+        channelName: 'Fake3',
+        title: 'Flow Rate (L/s)',
+        titleColor: 'text-purple-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
+    {
+        channelName: 'Fake4',
+        title: 'Battery (V)',
+        titleColor: 'text-green-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
+    {
+        channelName: 'Fake5',
+        title: 'Vibration (Hz)',
+        titleColor: 'text-pink-500',
+        offset: 0,
+        graphType: 'Graph',
+        displayedHistory: '30s',
+    },
 ]
 
 export const LiveDataDashboard = () => {
@@ -19,34 +61,41 @@ export const LiveDataDashboard = () => {
     )
 
     const addGraph = useCallback((config: Omit<GraphConfig, 'id'>) => {
-        setGraphConfigs((current) => addPlot(createGraphConfig(config), current))
+        setGraphConfigs((current) =>
+            addPlot(createGraphConfig(config), current)
+        )
     }, [])
 
     const deleteGraph = useCallback((id: string) => {
         setGraphConfigs((current) => removePlot(id, current))
     }, [])
 
-    const editGraphProps = useCallback((index: number, changes: Partial<GraphConfigEditable>) => {
-        setGraphConfigs((current) => {
-            const updated = [...current]
-            updated[index] = { ...updated[index], ...changes }
-            return updated
-        })
-    }, [])
+    const editGraphProps = useCallback(
+        (index: number, changes: Partial<GraphConfigEditable>) => {
+            setGraphConfigs((current) => {
+                const updated = [...current]
+                updated[index] = { ...updated[index], ...changes }
+                return updated
+            })
+        },
+        []
+    )
 
     return (
         <div className="space-y-4">
             <div className="flex justify-end">
                 <Button
                     variant="outline"
-                    onClick={() => addGraph({
-                        channelName: `Fake${graphConfigs.length}`,
-                        title: `Sensor ${graphConfigs.length}`,
-                        titleColor: 'text-teal-500',
-                        offset: 0,
-                        graphType: 'Graph',
-                        displayedHistory: '30s',
-                    })}
+                    onClick={() =>
+                        addGraph({
+                            channelName: `Fake${graphConfigs.length}`,
+                            title: `Sensor ${graphConfigs.length}`,
+                            titleColor: 'text-teal-500',
+                            offset: 0,
+                            graphType: 'Graph',
+                            displayedHistory: '30s',
+                        })
+                    }
                 >
                     + Add Graph
                 </Button>

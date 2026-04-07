@@ -36,9 +36,12 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
-                title: 'New Graph Name',
-            }))
+            expect(onEdit).toHaveBeenCalledWith(
+                0,
+                expect.objectContaining({
+                    title: 'New Graph Name',
+                })
+            )
         })
     })
 
@@ -52,20 +55,18 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
-                titleColor: 'text-blue-500',
-            }))
+            expect(onEdit).toHaveBeenCalledWith(
+                0,
+                expect.objectContaining({
+                    titleColor: 'text-blue-500',
+                })
+            )
         })
     })
 
     it('accepts numeric offset on save', async () => {
         const onEdit = vi.fn()
-        render(
-            <EditGraphDialog
-                {...baseProps}
-                onEdit={onEdit}
-            />
-        )
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
 
         const offsetInputs = screen.getAllByPlaceholderText('1.2')
         const offsetInput = offsetInputs[0] as HTMLInputElement
@@ -75,20 +76,18 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
-                offset: -3.4,
-            }))
+            expect(onEdit).toHaveBeenCalledWith(
+                0,
+                expect.objectContaining({
+                    offset: -3.4,
+                })
+            )
         })
     })
 
     it('ignores invalid non-numeric input and falls back to current offset', async () => {
         const onEdit = vi.fn()
-        render(
-            <EditGraphDialog
-                {...baseProps}
-                onEdit={onEdit}
-            />
-        )
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
         const offsetInputs = screen.getAllByPlaceholderText('1.2')
         const offsetInput = offsetInputs[0] as HTMLInputElement
         await userEvent.clear(offsetInput)
@@ -96,9 +95,12 @@ describe('EditGraphDialog', () => {
         await userEvent.click(screen.getByText('Save changes'))
 
         await waitFor(() => {
-            expect(onEdit).toHaveBeenCalledWith(0, expect.objectContaining({
-                offset: 1.2,
-            }))
+            expect(onEdit).toHaveBeenCalledWith(
+                0,
+                expect.objectContaining({
+                    offset: 1.2,
+                })
+            )
         })
     })
 })

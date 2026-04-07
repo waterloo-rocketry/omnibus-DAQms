@@ -24,9 +24,7 @@ socket.onAny((event, timestamp, payload) => {
         console.log(`Channel: ${event}`)
         console.log(`Timestamp: ${timestamp}`)
         console.log(`Sample Rate: ${payload.sample_rate}`)
-        console.log(
-            `Message Format Version: ${payload.message_format_version}`
-        )
+        console.log(`Message Format Version: ${payload.message_format_version}`)
         console.log(`Channels: ${Object.keys(payload.data).join(', ')}`)
         console.log(`Samples per channel: ${payload.data.Fake0.length}`)
         console.log(
