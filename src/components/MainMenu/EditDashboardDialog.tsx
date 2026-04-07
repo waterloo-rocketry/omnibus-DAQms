@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
     DndContext,
     closestCenter,
@@ -43,10 +43,11 @@ export function EditDashboardDialog({
     open,
     onOpenChange,
 }: EditDashboardDialogProps) {
-    const graphConfigs = useDashboardStore((s) => s.graphConfigs)
-    const setGraphConfigs = useDashboardStore((s) => s.setGraphConfigs)
-
-    const [workingCopy, setWorkingCopy] = useState<WorkingGraphConfig[]>([])
+    const [workingCopy, setWorkingCopy] = useState<WorkingGraphConfig[]>(
+        useDashboardStore
+            .getState()
+            .graphConfigs.map((c) => ({ ...c, markedForDeletion: false }))
+    )
     const [deleteMode, setDeleteMode] = useState(false)
     const [preDeleteSnapshot, setPreDeleteSnapshot] = useState<
         WorkingGraphConfig[] | null
@@ -61,17 +62,18 @@ export function EditDashboardDialog({
             coordinateGetter: sortableKeyboardCoordinates,
         })
     )
+    const onOpen = () =>
+        setWorkingCopy(
+            useDashboardStore
+                .getState()
+                .graphConfigs.map((c) => ({ ...c, markedForDeletion: false }))
+        )
 
-    useEffect(() => {
-        if (open) {
-            setWorkingCopy(
-                graphConfigs.map((c) => ({ ...c, markedForDeletion: false }))
-            )
-            setDeleteMode(false)
-            setPreDeleteSnapshot(null)
-            setEditDialogTarget(null)
-        }
-    }, [open, graphConfigs])
+    const onClose = () => {
+        setDeleteMode(false)
+        setPreDeleteSnapshot(null)
+        setEditDialogTarget(null)
+    }
 
     const handleOpenChange = (isOpen: boolean) => {
         if (deleteMode && !isOpen) return
@@ -125,12 +127,13 @@ export function EditDashboardDialog({
     }
 
     const handleEditDialogSave = (
-        index: number,
+        id: string,
         changes: Partial<GraphConfigEditable>
     ) => {
         setWorkingCopy((prev) => {
             const next = [...prev]
-            next[index] = { ...next[index], ...changes }
+            const targetIndex = next.findIndex((c) => c.id === id)
+            next[targetIndex] = { ...next[targetIndex], ...changes }
             return next
         })
     }
@@ -155,7 +158,7 @@ export function EditDashboardDialog({
         const final = workingCopy
             .filter((c) => !c.markedForDeletion)
             .map(({ markedForDeletion: _, ...config }) => config)
-        setGraphConfigs(final)
+        useDashboardStore.getState().setGraphConfigs(final)
         onOpenChange(false)
     }
 
@@ -167,6 +170,8 @@ export function EditDashboardDialog({
             <DialogContent
                 className="sm:max-w-[700px] max-h-[85dvh] grid grid-rows-[auto_auto_1fr_auto]"
                 showCloseButton={!deleteMode}
+                onOpenAutoFocus={onOpen}
+                onCloseAutoFocus={onClose}
             >
                 <DialogHeader>
                     <DialogTitle>Edit Dashboard</DialogTitle>
@@ -260,7 +265,7 @@ export function EditDashboardDialog({
                     <EditGraphDialog
                         open={true}
                         onOpenChange={() => setEditDialogTarget(null)}
-                        index={editDialogTarget.index}
+                        id={editTarget.id}
                         title={editTarget.title}
                         titleColor={editTarget.titleColor}
                         offset={editTarget.offset}
