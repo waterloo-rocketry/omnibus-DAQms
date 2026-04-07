@@ -1,8 +1,5 @@
 import { create } from 'zustand'
-import type {
-    GraphConfig,
-    GraphConfigEditable,
-} from './types'
+import type { GraphConfig, GraphConfigEditable } from './types'
 import { createGraphConfig } from './utils'
 
 export const DEFAULT_TITLE_COLOR = 'text-foreground'

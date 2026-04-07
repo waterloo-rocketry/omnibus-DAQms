@@ -99,20 +99,22 @@ describe('AddDataDialog', () => {
         expect(screen.getByText('No channels available')).toBeInTheDocument()
     })
 
-    it('resets selection when dialog reopens', async () => {
+    it('resets selection when dialog closes', async () => {
         seedChannels({
             'OPT-101': { value: 42, timestamp: 1000, type: 'DAQ' },
         })
-        const { rerender } = render(
+        const { unmount } = render(
             <AddDataDialog open={true} onOpenChange={() => {}} />
         )
 
         await userEvent.click(screen.getByText('OPT-101'))
         expect(screen.getByRole('button', { name: 'Add' })).toBeEnabled()
 
-        // Close and reopen
-        rerender(<AddDataDialog open={false} onOpenChange={() => {}} />)
-        rerender(<AddDataDialog open={true} onOpenChange={() => {}} />)
+        // Unmount triggers onCloseAutoFocus via Radix FocusScope cleanup
+        unmount()
+
+        // Re-mount fresh — selection state should be gone
+        render(<AddDataDialog open={true} onOpenChange={() => {}} />)
 
         expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
     })

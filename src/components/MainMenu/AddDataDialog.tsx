@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -23,13 +23,10 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
     const series = useLastDatapointStore((s) => s.series)
     const addGraphs = useDashboardStore((s) => s.addGraphs)
 
-    useEffect(() => {
-        if (open) setSelected(new Set())
-    }, [open])
-
-    const channels = useMemo(() => Object.entries(series).sort(([a], [b]) =>
-        a.localeCompare(b)
-    ), [series])
+    const channels = useMemo(
+        () => Object.entries(series).sort(([a], [b]) => a.localeCompare(b)),
+        [series]
+    )
 
     const toggle = (name: string, checked: boolean | 'indeterminate') => {
         setSelected((prev) => {
@@ -55,7 +52,10 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent
+                className="sm:max-w-[500px]"
+                onCloseAutoFocus={() => setSelected(new Set())}
+            >
                 <DialogHeader>
                     <DialogTitle>Add Data</DialogTitle>
                     <DialogDescription>
