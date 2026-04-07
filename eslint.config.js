@@ -23,10 +23,10 @@ export default defineConfig([
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {
-                    argsIgnorePattern: '_',
-                    varsIgnorePattern: '_',
-                    caughtErrorsIgnorePattern: '_',
-                    destructuredArrayIgnorePattern: '_',
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                    destructuredArrayIgnorePattern: '^_',
                 },
             ],
         },
