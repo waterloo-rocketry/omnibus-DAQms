@@ -103,19 +103,13 @@ describe('AddDataDialog', () => {
         seedChannels({
             'OPT-101': { value: 42, timestamp: 1000, type: 'DAQ' },
         })
-        const { unmount } = render(
+        const { rerender } = render(
             <AddDataDialog open={true} onOpenChange={() => {}} />
         )
-
         await userEvent.click(screen.getByText('OPT-101'))
         expect(screen.getByRole('button', { name: 'Add' })).toBeEnabled()
-
-        // Unmount triggers onCloseAutoFocus via Radix FocusScope cleanup
-        unmount()
-
-        // Re-mount fresh — selection state should be gone
-        render(<AddDataDialog open={true} onOpenChange={() => {}} />)
-
+        rerender(<AddDataDialog open={false} onOpenChange={() => {}} />)
+        rerender(<AddDataDialog open={true} onOpenChange={() => {}} />)
         expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled()
     })
 

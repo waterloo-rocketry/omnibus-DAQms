@@ -54,7 +54,7 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogContent
                 className="sm:max-w-[500px]"
-                onCloseAutoFocus={() => setSelected(new Set())}
+                onOpenAutoFocus={() => setSelected(new Set())}
             >
                 <DialogHeader>
                     <DialogTitle>Add Data</DialogTitle>
