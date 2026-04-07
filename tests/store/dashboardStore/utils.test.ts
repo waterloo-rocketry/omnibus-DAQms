@@ -3,8 +3,8 @@ import {
     addPlot,
     removePlot,
     createGraphConfig,
-} from '@/components/LiveDataDashboard/utils'
-import type { GraphConfig } from '@/components/LiveDataDashboard/types'
+} from '@/store/dashboardStore/utils'
+import type { GraphConfig } from '@/store/dashboardStore/types'
 
 function makeConfig(overrides: Partial<GraphConfig> = {}): GraphConfig {
     return {

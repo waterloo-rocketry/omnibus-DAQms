@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import EditGraphDialog from './EditGraphDialog'
 import DeleteGraphDialog from './DeleteGraphDialog'
-import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
+import type { GraphConfigEditable } from '@/store/dashboardStore/types'
 
 interface EditGraphDropDownProps {
     id: string

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -22,6 +22,10 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
     const [selected, setSelected] = useState<Set<string>>(new Set())
     const series = useLastDatapointStore((s) => s.series)
     const addGraphs = useDashboardStore((s) => s.addGraphs)
+
+    useEffect(() => {
+        if (open) setSelected(new Set())
+    }, [open])
 
     const channels = useMemo(() => Object.entries(series).sort(([a], [b]) =>
         a.localeCompare(b)
@@ -51,7 +55,7 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[500px]" onCloseAutoFocus={() => setSelected(new Set())}>
+            <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Add Data</DialogTitle>
                     <DialogDescription>

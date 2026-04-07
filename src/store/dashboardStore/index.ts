@@ -2,8 +2,8 @@ import { create } from 'zustand'
 import type {
     GraphConfig,
     GraphConfigEditable,
-} from '@/components/LiveDataDashboard/types'
-import { createGraphConfig } from '@/components/LiveDataDashboard/utils'
+} from './types'
+import { createGraphConfig } from './utils'
 
 export const DEFAULT_TITLE_COLOR = 'text-foreground'
 

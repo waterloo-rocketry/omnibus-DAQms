@@ -17,7 +17,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
+import type { GraphConfigEditable } from '@/store/dashboardStore/types'
 
 interface EditGraphDialogProps {
     open: boolean

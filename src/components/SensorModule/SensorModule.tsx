@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from './D3Chart'
 import EditGraphDropDown from './EditGraphDropDown'
 import type { DataPoint } from '@/types/omnibus'
-import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
+import type { GraphConfigEditable } from '@/store/dashboardStore/types'
 import {
     useLastDatapointStore,
     type LatestDataPoint,
