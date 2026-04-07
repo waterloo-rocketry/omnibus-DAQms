@@ -124,7 +124,7 @@ describe('EditDashboardDialog', () => {
         )
         render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
-        await userEvent.click(screen.getByTitle('Green'))
+        await userEvent.click(screen.getByRole('button', { name: 'Green color' }))
         await userEvent.click(screen.getByText('Apply'))
 
         expect(useDashboardStore.getState().graphConfigs[0].titleColor).toBe(

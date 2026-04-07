@@ -116,13 +116,14 @@ export function EditDashboardRow({
                 value={title}
                 onChange={(e) => onTitleChange(index, e.target.value)}
                 className="h-8 text-sm min-w-0 flex-1"
+                aria-label={`Module ${index + 1} title`}
             />
 
             <Select
                 value={graphType}
                 onValueChange={(v) => onGraphTypeChange(index, v)}
             >
-                <SelectTrigger size="sm" className="w-24 shrink-0">
+                <SelectTrigger size="sm" className="w-24 shrink-0" aria-label={`Module ${index + 1} graph type`}>
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -143,7 +144,8 @@ export function EditDashboardRow({
                             :   'border-muted'
                         }`}
                         style={{ backgroundColor: c.preview }}
-                        title={c.label}
+                        aria-label={`${c.label} color`}
+                        aria-pressed={titleColor === c.tw}
                     />
                 ))}
             </div>
