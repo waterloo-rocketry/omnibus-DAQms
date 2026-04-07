@@ -95,9 +95,15 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
 
                 <DialogFooter>
                     <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
+                        <Button variant="outline" className="cursor-pointer">
+                            Cancel
+                        </Button>
                     </DialogClose>
-                    <Button disabled={selected.size === 0} onClick={handleAdd}>
+                    <Button
+                        className="cursor-pointer"
+                        disabled={selected.size === 0}
+                        onClick={handleAdd}
+                    >
                         Add
                     </Button>
                 </DialogFooter>

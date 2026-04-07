@@ -50,6 +50,7 @@ export default function EditGraphDropDown({
                     <Button
                         variant="outline"
                         size="icon-sm"
+                        className="cursor-pointer"
                         aria-label="Open menu"
                     >
                         <MoreHorizontal />
@@ -63,6 +64,7 @@ export default function EditGraphDropDown({
                         <Button
                             size="sm"
                             variant="secondary"
+                            className="cursor-pointer"
                             onClick={() =>
                                 onEdit(id, {
                                     offset: parseFloat(
@@ -81,6 +83,7 @@ export default function EditGraphDropDown({
                         <Button
                             size="sm"
                             variant="secondary"
+                            className="cursor-pointer"
                             onClick={() =>
                                 onEdit(id, {
                                     offset: parseFloat(

@@ -104,7 +104,7 @@ export default function EditGraphDialog({
                                             key={c.tw}
                                             type="button"
                                             onClick={() => setColor(c.tw)}
-                                            className={`w-8 h-8 rounded-full border-2 ${
+                                            className={`w-8 h-8 rounded-full border-2 cursor-pointer ${
                                                 color === c.tw ?
                                                     'border-black'
                                                 :   'border-gray-300'
@@ -177,9 +177,16 @@ export default function EditGraphDialog({
 
                     <DialogFooter className="mt-6">
                         <DialogClose asChild>
-                            <Button variant="outline">Cancel</Button>
+                            <Button
+                                variant="outline"
+                                className="cursor-pointer"
+                            >
+                                Cancel
+                            </Button>
                         </DialogClose>
-                        <Button type="submit">Save changes</Button>
+                        <Button type="submit" className="cursor-pointer">
+                            Save changes
+                        </Button>
                     </DialogFooter>
                 </form>
             </DialogContent>
