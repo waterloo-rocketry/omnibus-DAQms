@@ -14,7 +14,6 @@ const defaultProps = {
     displayedHistory: '30s',
     id: 'test-id',
     onDelete: vi.fn(),
-    onDeleteId: 'test-id',
     onEdit: vi.fn(),
 }
 

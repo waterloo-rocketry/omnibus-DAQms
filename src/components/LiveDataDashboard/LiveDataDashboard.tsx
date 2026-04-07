@@ -43,7 +43,6 @@ export const LiveDataDashboard = () => {
                         graphType={config.graphType}
                         displayedHistory={config.displayedHistory}
                         onDelete={deleteGraph}
-                        onDeleteId={config.id}
                         onEdit={editGraphProps}
                     />
                 ))}

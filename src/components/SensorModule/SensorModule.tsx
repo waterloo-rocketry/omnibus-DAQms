@@ -33,7 +33,6 @@ interface SensorModuleProps {
 
     // Callbacks
     onDelete: (id: string) => void
-    onDeleteId: string
     onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
 
@@ -133,7 +132,6 @@ export const SensorModule = memo(function SensorModule({
     fixedDomain,
     domainTickCount = 4,
     onDelete,
-    onDeleteId,
     onEdit,
 }: SensorModuleProps) {
     const [data, setData] = useState<DataPoint[]>([])
@@ -199,8 +197,8 @@ export const SensorModule = memo(function SensorModule({
     const displayTitle = title || channelName
 
     const handleDelete = useCallback(() => {
-        onDelete(onDeleteId)
-    }, [onDelete, onDeleteId])
+        onDelete(id)
+    }, [onDelete, id])
 
     const handleSetZeroPoint = () => {
         if (data.length === 0) return
