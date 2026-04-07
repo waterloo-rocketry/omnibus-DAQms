@@ -6,9 +6,7 @@ import { useDashboardStore } from '@/store/dashboardStore'
 import type { GraphConfig } from '@/components/LiveDataDashboard/types'
 import { createGraphConfig } from '@/components/LiveDataDashboard/utils'
 
-const makeConfigs = (
-    overrides: Partial<GraphConfig>[]
-): GraphConfig[] =>
+const makeConfigs = (overrides: Partial<GraphConfig>[]): GraphConfig[] =>
     overrides.map((o) =>
         createGraphConfig({
             channelName: o.channelName ?? 'ch',
@@ -40,38 +38,27 @@ describe('EditDashboardDialog', () => {
                 { title: 'Flow Rate' },
             ])
         )
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         expect(screen.getByDisplayValue('Ox Fill')).toBeInTheDocument()
-        expect(
-            screen.getByDisplayValue('Chamber Temp')
-        ).toBeInTheDocument()
-        expect(
-            screen.getByDisplayValue('Flow Rate')
-        ).toBeInTheDocument()
+        expect(screen.getByDisplayValue('Chamber Temp')).toBeInTheDocument()
+        expect(screen.getByDisplayValue('Flow Rate')).toBeInTheDocument()
     })
 
     it('inline title edit updates on Apply', async () => {
         const configs = makeConfigs([{ title: 'Old Title' }])
         seedStore(configs)
         const onOpenChange = (() => {}) as (open: boolean) => void
-        render(
-            <EditDashboardDialog
-                open={true}
-                onOpenChange={onOpenChange}
-            />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={onOpenChange} />)
 
         const input = screen.getByDisplayValue('Old Title')
         await userEvent.clear(input)
         await userEvent.type(input, 'New Title')
         await userEvent.click(screen.getByText('Apply'))
 
-        expect(
-            useDashboardStore.getState().graphConfigs[0].title
-        ).toBe('New Title')
+        expect(useDashboardStore.getState().graphConfigs[0].title).toBe(
+            'New Title'
+        )
     })
 
     it('Apply commits all changes at once', async () => {
@@ -80,9 +67,7 @@ describe('EditDashboardDialog', () => {
             { title: 'B', graphType: 'Graph' },
         ])
         seedStore(configs)
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         const inputA = screen.getByDisplayValue('A')
         await userEvent.clear(inputA)
@@ -95,14 +80,9 @@ describe('EditDashboardDialog', () => {
     })
 
     it('Apply removes items marked for deletion', async () => {
-        const configs = makeConfigs([
-            { title: 'Keep' },
-            { title: 'Delete Me' },
-        ])
+        const configs = makeConfigs([{ title: 'Keep' }, { title: 'Delete Me' }])
         seedStore(configs)
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         // Enter delete mode, mark second item
         await userEvent.click(screen.getByText('Delete Modules...'))
@@ -132,48 +112,78 @@ describe('EditDashboardDialog', () => {
         await userEvent.type(input, 'Changed')
 
         // Close and reopen
-        rerender(
-            <EditDashboardDialog open={false} onOpenChange={() => {}} />
-        )
-        rerender(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        rerender(<EditDashboardDialog open={false} onOpenChange={() => {}} />)
+        rerender(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
-        expect(
-            screen.getByDisplayValue('Original')
-        ).toBeInTheDocument()
+        expect(screen.getByDisplayValue('Original')).toBeInTheDocument()
+    })
+
+    it('color change updates on Apply', async () => {
+        seedStore(
+            makeConfigs([{ title: 'Colored', titleColor: 'text-foreground' }])
+        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
+
+        await userEvent.click(screen.getByTitle('Green'))
+        await userEvent.click(screen.getByText('Apply'))
+
+        expect(useDashboardStore.getState().graphConfigs[0].titleColor).toBe(
+            'text-green-500'
+        )
     })
 
     it('Edit button opens EditGraphDialog', async () => {
         seedStore(makeConfigs([{ title: 'My Graph' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Edit'))
 
         await waitFor(() => {
-            expect(
-                screen.getByText(/Edit — My Graph/)
-            ).toBeInTheDocument()
+            expect(screen.getByText(/Edit — My Graph/)).toBeInTheDocument()
         })
+    })
+
+    it('EditGraphDialog save updates working copy on Apply', async () => {
+        seedStore(makeConfigs([{ title: 'Before Edit', offset: 0 }]))
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
+
+        // Open the full edit dialog
+        await userEvent.click(screen.getByText('Edit'))
+        await waitFor(() => {
+            expect(screen.getByText(/Edit — Before Edit/)).toBeInTheDocument()
+        })
+
+        // The nested EditGraphDialog has its own title input — find it
+        // inside the dialog that contains "Save changes"
+        const inputs = screen.getAllByDisplayValue('Before Edit')
+        // The second one is inside the nested EditGraphDialog
+        const nestedInput = inputs[inputs.length - 1]
+        await userEvent.clear(nestedInput)
+        await userEvent.type(nestedInput, 'After Edit')
+        await userEvent.click(screen.getByText('Save changes'))
+
+        // Back in the edit dashboard dialog, apply
+        await waitFor(() => {
+            expect(screen.getByDisplayValue('After Edit')).toBeInTheDocument()
+        })
+        await userEvent.click(screen.getByText('Apply'))
+
+        expect(useDashboardStore.getState().graphConfigs[0].title).toBe(
+            'After Edit'
+        )
     })
 
     // --- Delete Mode ---
 
     it('"Delete Modules..." enters delete mode', async () => {
         seedStore(makeConfigs([{ title: 'Test' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
 
         // Edit controls gone, trash icon appears
         expect(screen.queryByDisplayValue('Test')).not.toBeInTheDocument()
-        expect(
-            screen.getByLabelText('Mark for deletion')
-        ).toBeInTheDocument()
+        expect(screen.getByLabelText('Mark for deletion')).toBeInTheDocument()
         // Cancel and Done buttons appear
         expect(screen.getByText('Cancel')).toBeInTheDocument()
         expect(screen.getByText('Done')).toBeInTheDocument()
@@ -181,52 +191,34 @@ describe('EditDashboardDialog', () => {
 
     it('clicking trash marks item and shows deletion message', async () => {
         seedStore(makeConfigs([{ title: 'Doomed' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
-        await userEvent.click(
-            screen.getByLabelText('Mark for deletion')
-        )
+        await userEvent.click(screen.getByLabelText('Mark for deletion'))
 
         expect(
             screen.getByText('This module will be deleted.')
         ).toBeInTheDocument()
-        expect(
-            screen.getByLabelText('Revert deletion')
-        ).toBeInTheDocument()
+        expect(screen.getByLabelText('Revert deletion')).toBeInTheDocument()
     })
 
     it('revert button un-marks deletion', async () => {
         seedStore(makeConfigs([{ title: 'Saved' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
-        await userEvent.click(
-            screen.getByLabelText('Mark for deletion')
-        )
-        await userEvent.click(
-            screen.getByLabelText('Revert deletion')
-        )
+        await userEvent.click(screen.getByLabelText('Mark for deletion'))
+        await userEvent.click(screen.getByLabelText('Revert deletion'))
 
         expect(
             screen.queryByText('This module will be deleted.')
         ).not.toBeInTheDocument()
-        expect(
-            screen.getByLabelText('Mark for deletion')
-        ).toBeInTheDocument()
+        expect(screen.getByLabelText('Mark for deletion')).toBeInTheDocument()
     })
 
     it('Cancel reverts all deletion marks', async () => {
-        seedStore(
-            makeConfigs([{ title: 'A' }, { title: 'B' }])
-        )
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        seedStore(makeConfigs([{ title: 'A' }, { title: 'B' }]))
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
         const trashButtons = screen.getAllByLabelText('Mark for deletion')
@@ -242,14 +234,10 @@ describe('EditDashboardDialog', () => {
 
     it('Done preserves marks and returns to normal mode', async () => {
         seedStore(makeConfigs([{ title: 'Marked' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
-        await userEvent.click(
-            screen.getByLabelText('Mark for deletion')
-        )
+        await userEvent.click(screen.getByLabelText('Mark for deletion'))
         await userEvent.click(screen.getByText('Done'))
 
         // Still marked, shows deletion message in normal mode
@@ -262,9 +250,7 @@ describe('EditDashboardDialog', () => {
 
     it('Apply button is hidden in delete mode', async () => {
         seedStore(makeConfigs([{ title: 'Test' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         expect(screen.getByText('Apply')).toBeInTheDocument()
         await userEvent.click(screen.getByText('Delete Modules...'))
@@ -274,30 +260,20 @@ describe('EditDashboardDialog', () => {
     // --- Edge Cases ---
 
     it('empty dashboard shows "No modules to edit."', () => {
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
-        expect(
-            screen.getByText('No modules to edit.')
-        ).toBeInTheDocument()
+        expect(screen.getByText('No modules to edit.')).toBeInTheDocument()
     })
 
     it('all items deleted then Apply writes empty array', async () => {
         seedStore(makeConfigs([{ title: 'Only One' }]))
-        render(
-            <EditDashboardDialog open={true} onOpenChange={() => {}} />
-        )
+        render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(screen.getByText('Delete Modules...'))
-        await userEvent.click(
-            screen.getByLabelText('Mark for deletion')
-        )
+        await userEvent.click(screen.getByLabelText('Mark for deletion'))
         await userEvent.click(screen.getByText('Done'))
         await userEvent.click(screen.getByText('Apply'))
 
-        expect(
-            useDashboardStore.getState().graphConfigs
-        ).toHaveLength(0)
+        expect(useDashboardStore.getState().graphConfigs).toHaveLength(0)
     })
 })

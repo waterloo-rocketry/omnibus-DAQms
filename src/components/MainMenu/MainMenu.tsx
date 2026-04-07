@@ -71,10 +71,7 @@ export function MainMenu() {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <AddDataDialog
-                open={addDataOpen}
-                onOpenChange={setAddDataOpen}
-            />
+            <AddDataDialog open={addDataOpen} onOpenChange={setAddDataOpen} />
             <EditDashboardDialog
                 open={editDashboardOpen}
                 onOpenChange={setEditDashboardOpen}

@@ -23,7 +23,10 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useDashboardStore } from '@/store/dashboardStore'
-import type { GraphConfig, GraphConfigEditable } from '@/components/LiveDataDashboard/types'
+import type {
+    GraphConfig,
+    GraphConfigEditable,
+} from '@/components/LiveDataDashboard/types'
 import EditGraphDialog from '@/components/SensorModule/EditGraphDialog'
 import { EditDashboardRow } from './EditDashboardRow'
 
@@ -170,7 +173,7 @@ export function EditDashboardDialog({
                 </DialogHeader>
 
                 <div className="flex gap-2">
-                    {deleteMode ? (
+                    {deleteMode ?
                         <>
                             <Button
                                 variant="outline"
@@ -188,8 +191,7 @@ export function EditDashboardDialog({
                                 Done
                             </Button>
                         </>
-                    ) : (
-                        <Button
+                    :   <Button
                             variant="outline"
                             size="sm"
                             className="cursor-pointer"
@@ -198,16 +200,15 @@ export function EditDashboardDialog({
                         >
                             Delete Modules...
                         </Button>
-                    )}
+                    }
                 </div>
 
                 <div className="min-h-0 overflow-y-auto border rounded-md">
-                    {workingCopy.length === 0 ? (
+                    {workingCopy.length === 0 ?
                         <p className="text-sm text-muted-foreground p-4">
                             No modules to edit.
                         </p>
-                    ) : (
-                        <DndContext
+                    :   <DndContext
                             sensors={sensors}
                             collisionDetection={closestCenter}
                             onDragEnd={handleDragEnd}
@@ -233,9 +234,7 @@ export function EditDashboardDialog({
                                             handleGraphTypeChange
                                         }
                                         onColorChange={handleColorChange}
-                                        onToggleDeletion={
-                                            handleToggleDeletion
-                                        }
+                                        onToggleDeletion={handleToggleDeletion}
                                         onOpenEditDialog={(i) =>
                                             setEditDialogTarget({ index: i })
                                         }
@@ -243,7 +242,7 @@ export function EditDashboardDialog({
                                 ))}
                             </SortableContext>
                         </DndContext>
-                    )}
+                    }
                 </div>
 
                 {!deleteMode && (

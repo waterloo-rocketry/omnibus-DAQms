@@ -100,7 +100,9 @@ describe('MainMenu', () => {
 
         await waitFor(() => {
             expect(
-                screen.getByText('Edit Dashboard', { selector: '[data-slot="dialog-title"]' })
+                screen.getByText('Edit Dashboard', {
+                    selector: '[data-slot="dialog-title"]',
+                })
             ).toBeInTheDocument()
         })
     })
