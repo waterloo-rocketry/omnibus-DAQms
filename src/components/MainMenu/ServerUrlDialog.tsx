@@ -6,6 +6,7 @@ import {
     DialogTitle,
     DialogFooter,
     DialogClose,
+    DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -42,6 +43,9 @@ export function ServerUrlDialog({ open, onOpenChange }: ServerUrlDialogProps) {
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Server Connection</DialogTitle>
+                        <DialogDescription>
+                            Configure the WebSocket server URL
+                        </DialogDescription>
                     </DialogHeader>
 
                     <div className="grid gap-3 mt-4">
