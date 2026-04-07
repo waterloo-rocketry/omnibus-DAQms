@@ -5,6 +5,7 @@ import {
     DialogTitle,
     DialogFooter,
     DialogClose,
+    DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useDashboardStore } from '@/store/dashboardStore'
@@ -34,10 +35,10 @@ export function ClearDashboardDialog({
                     </DialogTitle>
                 </DialogHeader>
 
-                <p className="text-sm text-muted-foreground">
+                <DialogDescription>
                     Are you sure? This will remove all graphs from the
                     dashboard.
-                </p>
+                </DialogDescription>
 
                 <DialogFooter>
                     <DialogClose asChild>
