@@ -5,5 +5,3 @@
     },
     "include": ["tests/**/*.ts", "tests/**/*.tsx", "tests/**/*.d.ts"]
 }
-
-

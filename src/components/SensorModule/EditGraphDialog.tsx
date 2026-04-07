@@ -104,17 +104,19 @@ export default function EditGraphDialog({
                             <div className="grid gap-3">
                                 <Label>Title Color</Label>
                                 <div className="flex gap-3 mt-1">
-                                {TITLE_COLORS.map((c) => (
+                                    {TITLE_COLORS.map((c) => (
                                         <button
                                             key={c.tw}
                                             type="button"
                                             onClick={() => setColor(c.tw)}
                                             className={`w-8 h-8 rounded-full border-2 ${
-                                                color === c.tw ? 'border-black' : (
-                                                    'border-gray-300'
-                                                )
+                                                color === c.tw ?
+                                                    'border-black'
+                                                :   'border-gray-300'
                                             }`}
-                                            style={{ backgroundColor: c.preview }}
+                                            style={{
+                                                backgroundColor: c.preview,
+                                            }}
                                             title={c.label}
                                         />
                                     ))}

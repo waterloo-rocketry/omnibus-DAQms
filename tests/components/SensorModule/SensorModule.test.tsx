@@ -26,12 +26,7 @@ describe('SensorModule', () => {
 
     describe('Title Display', () => {
         it('renders title correctly', () => {
-            render(
-                <SensorModule
-                    {...defaultProps}
-                    title="Ox Fill (psi)"
-                />
-            )
+            render(<SensorModule {...defaultProps} title="Ox Fill (psi)" />)
 
             expect(screen.getByText('Ox Fill (psi)')).toBeInTheDocument()
         })
@@ -57,9 +52,7 @@ describe('SensorModule', () => {
 
         it('truncates long titles with ellipsis', () => {
             const longTitle = 'A'.repeat(100)
-            render(
-                <SensorModule {...defaultProps} title={longTitle} />
-            )
+            render(<SensorModule {...defaultProps} title={longTitle} />)
 
             const title = screen.getByTitle(longTitle)
             expect(title).toHaveClass('line-clamp-2')
@@ -103,9 +96,7 @@ describe('SensorModule', () => {
 
     describe('Rate Calculation', () => {
         it('does not display rate with insufficient data', async () => {
-            const { container } = render(
-                <SensorModule {...defaultProps} />
-            )
+            const { container } = render(<SensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
@@ -135,7 +126,7 @@ describe('SensorModule', () => {
 
             // Point outside the 10s window (15s ago)
             useLastDatapointStore.getState().updateSeries('test-channel', {
-                value: 1.00,
+                value: 1.0,
                 timestamp: now - 15000,
             })
 
@@ -145,7 +136,7 @@ describe('SensorModule', () => {
 
             // Point inside the window (now) — should evict the old one
             useLastDatapointStore.getState().updateSeries('test-channel', {
-                value: 99.00,
+                value: 99.0,
                 timestamp: now,
             })
 
@@ -202,10 +193,7 @@ describe('SensorModule', () => {
 
         it('respects custom minUpdateIntervalMs prop', async () => {
             render(
-                <SensorModule
-                    {...defaultProps}
-                    minUpdateIntervalMs={1000}
-                />
+                <SensorModule {...defaultProps} minUpdateIntervalMs={1000} />
             )
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
@@ -342,7 +330,13 @@ describe('SensorModule', () => {
 
         it('shifts displayed data when offset is changed via dropdown', async () => {
             const onEdit = vi.fn()
-            render(<SensorModule {...defaultProps} channelName="Fake0" onEdit={onEdit} />)
+            render(
+                <SensorModule
+                    {...defaultProps}
+                    channelName="Fake0"
+                    onEdit={onEdit}
+                />
+            )
 
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now(),
