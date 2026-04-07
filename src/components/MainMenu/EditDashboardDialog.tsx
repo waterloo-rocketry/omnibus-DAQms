@@ -26,7 +26,7 @@ import { useDashboardStore } from '@/store/dashboardStore'
 import type {
     GraphConfig,
     GraphConfigEditable,
-} from '@/components/LiveDataDashboard/types'
+} from '@/store/dashboardStore/types'
 import EditGraphDialog from '@/components/SensorModule/EditGraphDialog'
 import { EditDashboardRow } from './EditDashboardRow'
 

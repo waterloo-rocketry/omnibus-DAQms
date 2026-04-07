@@ -3,8 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { EditDashboardDialog } from '@/components/MainMenu/EditDashboardDialog'
 import { useDashboardStore } from '@/store/dashboardStore'
-import type { GraphConfig } from '@/components/LiveDataDashboard/types'
-import { createGraphConfig } from '@/components/LiveDataDashboard/utils'
+import type { GraphConfig } from '@/store/dashboardStore/types'
+import { createGraphConfig } from '@/store/dashboardStore/utils'
 
 const makeConfigs = (overrides: Partial<GraphConfig>[]): GraphConfig[] =>
     overrides.map((o) =>

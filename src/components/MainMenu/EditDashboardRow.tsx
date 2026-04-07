@@ -10,7 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select'
-import { TITLE_COLORS } from '@/components/LiveDataDashboard/types'
+import { TITLE_COLORS } from '@/store/dashboardStore/types'
 
 interface EditDashboardRowProps {
     id: string
