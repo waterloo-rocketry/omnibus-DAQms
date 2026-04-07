@@ -3,7 +3,10 @@ import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from './D3Chart'
 import EditGraphDropDown from './EditGraphDropDown'
 import type { DataPoint } from '@/types/omnibus'
-import type { GraphConfigEditable } from '@/store/dashboardStore/types'
+import type {
+    GraphConfigEditable,
+    TitleColor,
+} from '@/store/dashboardStore/types'
 import {
     useLastDatapointStore,
     type LatestDataPoint,
@@ -11,11 +14,18 @@ import {
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
 
+const TITLE_COLOR_CLASS: Record<TitleColor, string> = {
+    black: 'text-foreground',
+    green: 'text-green-500',
+    red: 'text-red-500',
+    blue: 'text-blue-500',
+}
+
 interface SensorModuleProps {
     // Identity & config (from GraphConfig)
     channelName: string
     title: string
-    titleColor: string
+    titleColor: TitleColor
     offset: number
     graphType: string
     displayedHistory: string
@@ -118,7 +128,7 @@ function shouldAddPoint(
 export const SensorModule = memo(function SensorModule({
     channelName,
     title,
-    titleColor = 'text-teal-500',
+    titleColor = 'black',
     offset = 0,
     graphType = 'Graph',
     displayedHistory = '30s',
@@ -215,7 +225,7 @@ export const SensorModule = memo(function SensorModule({
                     <h3
                         className={cn(
                             'font-semibold text-base leading-tight line-clamp-2',
-                            titleColor
+                            TITLE_COLOR_CLASS[titleColor]
                         )}
                         title={displayTitle}
                     >

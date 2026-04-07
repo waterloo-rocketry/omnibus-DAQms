@@ -2,7 +2,9 @@ import { create } from 'zustand'
 import type { GraphConfig, GraphConfigEditable } from './types'
 import { createGraphConfig } from './utils'
 
-export const DEFAULT_TITLE_COLOR = 'text-foreground'
+import type { TitleColor } from './types'
+
+export const DEFAULT_TITLE_COLOR: TitleColor = 'black'
 
 interface DashboardStore {
     graphConfigs: GraphConfig[]

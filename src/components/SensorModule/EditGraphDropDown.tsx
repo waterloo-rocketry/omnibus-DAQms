@@ -11,12 +11,15 @@ import {
 } from '@/components/ui/dropdown-menu'
 import EditGraphDialog from './EditGraphDialog'
 import DeleteGraphDialog from './DeleteGraphDialog'
-import type { GraphConfigEditable } from '@/store/dashboardStore/types'
+import type {
+    GraphConfigEditable,
+    TitleColor,
+} from '@/store/dashboardStore/types'
 
 interface EditGraphDropDownProps {
     id: string
     title: string
-    titleColor: string
+    titleColor: TitleColor
     offset: number
     graphType: string
     displayedHistory: string

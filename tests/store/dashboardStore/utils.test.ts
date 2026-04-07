@@ -11,7 +11,7 @@ function makeConfig(overrides: Partial<GraphConfig> = {}): GraphConfig {
         id: overrides.id ?? crypto.randomUUID(),
         channelName: overrides.channelName ?? 'Test0',
         title: overrides.title ?? 'Test Plot',
-        titleColor: overrides.titleColor ?? 'text-teal-500',
+        titleColor: overrides.titleColor ?? 'black',
         offset: overrides.offset ?? 0,
         graphType: overrides.graphType ?? 'Graph',
         displayedHistory: overrides.displayedHistory ?? '30s',
@@ -105,7 +105,7 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const input = {
                 channelName: 'Sensor0',
                 title: 'Temperature',
-                titleColor: 'text-red-500',
+                titleColor: 'red' as const,
                 offset: 0,
                 graphType: 'Graph' as const,
                 displayedHistory: '30s' as const,
@@ -122,7 +122,7 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const input = {
                 channelName: 'Sensor0',
                 title: 'Temperature',
-                titleColor: 'text-foreground',
+                titleColor: 'black' as const,
                 offset: 0,
                 graphType: 'Graph' as const,
                 displayedHistory: '1min' as const,
@@ -136,7 +136,7 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const input = {
                 channelName: 'Pressure1',
                 title: 'Chamber Pressure',
-                titleColor: 'text-blue-500',
+                titleColor: 'blue' as const,
                 offset: 3.5,
                 graphType: 'Graph' as const,
                 displayedHistory: '5min' as const,
@@ -144,7 +144,7 @@ describe('arbitrarily remove and add plots to dashboard', () => {
             const result = createGraphConfig(input)
             expect(result.channelName).toBe('Pressure1')
             expect(result.title).toBe('Chamber Pressure')
-            expect(result.titleColor).toBe('text-blue-500')
+            expect(result.titleColor).toBe('blue')
             expect(result.offset).toBe(3.5)
             expect(result.graphType).toBe('Graph')
             expect(result.displayedHistory).toBe('5min')

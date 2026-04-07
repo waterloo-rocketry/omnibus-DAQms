@@ -11,7 +11,7 @@ const makeConfigs = (overrides: Partial<GraphConfig>[]): GraphConfig[] =>
         createGraphConfig({
             channelName: o.channelName ?? 'ch',
             title: o.title ?? 'Untitled',
-            titleColor: o.titleColor ?? 'text-foreground',
+            titleColor: o.titleColor ?? 'black',
             offset: o.offset ?? 0,
             graphType: o.graphType ?? 'Graph',
             displayedHistory: o.displayedHistory ?? '30s',
@@ -119,9 +119,7 @@ describe('EditDashboardDialog', () => {
     })
 
     it('color change updates on Apply', async () => {
-        seedStore(
-            makeConfigs([{ title: 'Colored', titleColor: 'text-foreground' }])
-        )
+        seedStore(makeConfigs([{ title: 'Colored', titleColor: 'black' }]))
         render(<EditDashboardDialog open={true} onOpenChange={() => {}} />)
 
         await userEvent.click(
@@ -130,7 +128,7 @@ describe('EditDashboardDialog', () => {
         await userEvent.click(screen.getByText('Apply'))
 
         expect(useDashboardStore.getState().graphConfigs[0].titleColor).toBe(
-            'text-green-500'
+            'green'
         )
     })
 

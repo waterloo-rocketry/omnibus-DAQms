@@ -7,7 +7,7 @@ describe('EditGraphDropDown', () => {
     const defaultProps = {
         id: 'test-id',
         title: 'Test Graph',
-        titleColor: 'black',
+        titleColor: 'black' as const,
         offset: 0,
         graphType: 'Graph',
         displayedHistory: '30s',

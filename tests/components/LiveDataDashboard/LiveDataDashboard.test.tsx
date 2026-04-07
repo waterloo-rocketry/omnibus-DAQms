@@ -33,7 +33,7 @@ describe('LiveDataDashboard', () => {
             {
                 channelName: 'Ch1',
                 title: 'Ox Fill (psi)',
-                titleColor: 'text-foreground',
+                titleColor: 'black',
                 offset: 0,
                 graphType: 'Graph',
                 displayedHistory: '30s',
@@ -41,7 +41,7 @@ describe('LiveDataDashboard', () => {
             {
                 channelName: 'Ch2',
                 title: 'Chamber Temp (°C)',
-                titleColor: 'text-foreground',
+                titleColor: 'black',
                 offset: 0,
                 graphType: 'Graph',
                 displayedHistory: '30s',
