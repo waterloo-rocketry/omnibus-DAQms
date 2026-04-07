@@ -7,7 +7,7 @@ describe('EditGraphDialog', () => {
     const baseProps = {
         open: true,
         onOpenChange: vi.fn(),
-        index: 0,
+        id: 'test-id',
         title: 'Initial Title',
         titleColor: 'black',
         offset: 1.2,
@@ -37,7 +37,7 @@ describe('EditGraphDialog', () => {
 
         await waitFor(() => {
             expect(onEdit).toHaveBeenCalledWith(
-                0,
+                'test-id',
                 expect.objectContaining({
                     title: 'New Graph Name',
                 })
@@ -56,7 +56,7 @@ describe('EditGraphDialog', () => {
 
         await waitFor(() => {
             expect(onEdit).toHaveBeenCalledWith(
-                0,
+                'test-id',
                 expect.objectContaining({
                     titleColor: 'text-blue-500',
                 })
@@ -77,7 +77,7 @@ describe('EditGraphDialog', () => {
 
         await waitFor(() => {
             expect(onEdit).toHaveBeenCalledWith(
-                0,
+                'test-id',
                 expect.objectContaining({
                     offset: -3.4,
                 })
@@ -96,7 +96,7 @@ describe('EditGraphDialog', () => {
 
         await waitFor(() => {
             expect(onEdit).toHaveBeenCalledWith(
-                0,
+                'test-id',
                 expect.objectContaining({
                     offset: 1.2,
                 })

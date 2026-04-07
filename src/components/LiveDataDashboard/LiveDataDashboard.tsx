@@ -32,10 +32,10 @@ export const LiveDataDashboard = () => {
     return (
         <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-4">
-                {graphConfigs.map((config, index) => (
+                {graphConfigs.map((config) => (
                     <SensorModule
                         key={config.id}
-                        index={index}
+                        id={config.id}
                         channelName={config.channelName}
                         title={config.title}
                         titleColor={config.titleColor}

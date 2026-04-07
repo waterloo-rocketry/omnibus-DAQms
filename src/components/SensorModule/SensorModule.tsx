@@ -19,7 +19,7 @@ interface SensorModuleProps {
     offset: number
     graphType: string
     displayedHistory: string
-    index: number
+    id: string
 
     // Chart display props
     maxDataPoints?: number
@@ -34,7 +34,7 @@ interface SensorModuleProps {
     // Callbacks
     onDelete: (id: string) => void
     onDeleteId: string
-    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
+    onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
 
 const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
@@ -123,7 +123,7 @@ export const SensorModule = memo(function SensorModule({
     offset = 0,
     graphType = 'Graph',
     displayedHistory = '30s',
-    index,
+    id,
     maxDataPoints = 100,
     timeWindowSeconds: timeWindowSecondsOverride,
     minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS,
@@ -206,7 +206,7 @@ export const SensorModule = memo(function SensorModule({
         if (data.length === 0) return
         const values = data.map((d) => d.value)
         const avg = values.reduce((a, b) => a + b, 0) / values.length
-        onEdit(index, { offset: parseFloat((-avg).toFixed(2)) })
+        onEdit(id, { offset: parseFloat((-avg).toFixed(2)) })
     }
 
     return (
@@ -264,7 +264,7 @@ export const SensorModule = memo(function SensorModule({
 
                 {/* EditGraphDropDown in bottom-right corner */}
                 <EditGraphDropDown
-                    index={index}
+                    id={id}
                     title={title}
                     titleColor={titleColor}
                     offset={offset}

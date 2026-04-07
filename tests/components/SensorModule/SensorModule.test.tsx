@@ -12,7 +12,7 @@ const defaultProps = {
     offset: 0,
     graphType: 'Graph',
     displayedHistory: '30s',
-    index: 0,
+    id: 'test-id',
     onDelete: vi.fn(),
     onDeleteId: 'test-id',
     onEdit: vi.fn(),
@@ -367,7 +367,7 @@ describe('SensorModule', () => {
             await userEvent.click(screen.getByLabelText('Open menu'))
             await userEvent.click(screen.getByText('+'))
 
-            expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.5 })
+            expect(onEdit).toHaveBeenCalledWith('test-id', { offset: 0.5 })
         })
 
         it('calculates zero point and calls onEdit with offset', async () => {
@@ -400,7 +400,7 @@ describe('SensorModule', () => {
             await userEvent.click(screen.getByText('Set Zero Point'))
 
             // Average of 10 and 30 is 20, so offset = -20
-            expect(onEdit).toHaveBeenCalledWith(0, { offset: -20 })
+            expect(onEdit).toHaveBeenCalledWith('test-id', { offset: -20 })
         })
     })
 })

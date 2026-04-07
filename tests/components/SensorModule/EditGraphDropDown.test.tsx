@@ -5,7 +5,7 @@ import EditGraphDropDown from '@/components/SensorModule/EditGraphDropDown'
 
 describe('EditGraphDropDown', () => {
     const defaultProps = {
-        index: 0,
+        id: 'test-id',
         title: 'Test Graph',
         titleColor: 'black',
         offset: 0,
@@ -25,7 +25,7 @@ describe('EditGraphDropDown', () => {
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('+'))
 
-        expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.5 })
+        expect(onEdit).toHaveBeenCalledWith('test-id', { offset: 0.5 })
     })
 
     it('decrements offset by 0.5 when - button is pressed', async () => {
@@ -37,7 +37,7 @@ describe('EditGraphDropDown', () => {
         await userEvent.click(screen.getByLabelText('Open menu'))
         await userEvent.click(screen.getByText('–'))
 
-        expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.0 })
+        expect(onEdit).toHaveBeenCalledWith('test-id', { offset: 0.0 })
     })
 
     it('opens EditGraphDialog when Edit button is pressed', async () => {

@@ -4,6 +4,7 @@ import {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogFooter,
     DialogClose,
 } from '@/components/ui/dialog'
@@ -59,6 +60,9 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
                     <DialogTitle>Add Data</DialogTitle>
+                    <DialogDescription>
+                        Select channels to add to the dashboard.
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="max-h-[400px] overflow-y-auto border rounded-md">

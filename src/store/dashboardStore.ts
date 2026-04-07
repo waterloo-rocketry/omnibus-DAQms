@@ -13,10 +13,7 @@ interface DashboardStore {
     setAddDataOpen: (open: boolean) => void
     addGraphs: (configs: Omit<GraphConfig, 'id'>[]) => void
     deleteGraph: (id: string) => void
-    editGraphProps: (
-        index: number,
-        changes: Partial<GraphConfigEditable>
-    ) => void
+    editGraphProps: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
 
 export const useDashboardStore = create<DashboardStore>()((set) => ({
@@ -37,10 +34,12 @@ export const useDashboardStore = create<DashboardStore>()((set) => ({
             graphConfigs: state.graphConfigs.filter((c) => c.id !== id),
         })),
 
-    editGraphProps: (index, changes) =>
+    editGraphProps: (id, changes) =>
         set((state) => {
+            const i = state.graphConfigs.findIndex((g) => g.id === id)
+            if (i === -1) return state
             const updated = [...state.graphConfigs]
-            updated[index] = { ...updated[index], ...changes }
+            updated[i] = { ...updated[i], ...changes }
             return { graphConfigs: updated }
         }),
 }))

@@ -14,19 +14,19 @@ import DeleteGraphDialog from './DeleteGraphDialog'
 import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
 
 interface EditGraphDropDownProps {
-    index: number
+    id: string
     title: string
     titleColor: string
     offset: number
     graphType: string
     displayedHistory: string
-    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
+    onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
     onDelete: () => void
     onSetZeroPoint: () => void
 }
 
 export default function EditGraphDropDown({
-    index,
+    id,
     title,
     titleColor,
     offset,
@@ -64,7 +64,7 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                onEdit(index, {
+                                onEdit(id, {
                                     offset: parseFloat(
                                         (offset - 0.5).toFixed(1)
                                     ),
@@ -82,7 +82,7 @@ export default function EditGraphDropDown({
                             size="sm"
                             variant="secondary"
                             onClick={() =>
-                                onEdit(index, {
+                                onEdit(id, {
                                     offset: parseFloat(
                                         (offset + 0.5).toFixed(1)
                                     ),
@@ -130,7 +130,7 @@ export default function EditGraphDropDown({
             <EditGraphDialog
                 open={openEdit}
                 onOpenChange={setOpenEdit}
-                index={index}
+                id={id}
                 title={title}
                 titleColor={titleColor}
                 offset={offset}

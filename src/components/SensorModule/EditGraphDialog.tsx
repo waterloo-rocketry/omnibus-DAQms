@@ -22,13 +22,13 @@ import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
 interface EditGraphDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
-    index: number
+    id: string
     title: string
     titleColor: string
     offset: number
     graphType: string
     displayedHistory: string
-    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
+    onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
 
 const TITLE_COLORS = [
@@ -42,7 +42,7 @@ const TITLE_COLORS = [
 export default function EditGraphDialog({
     open,
     onOpenChange,
-    index,
+    id,
     title,
     titleColor,
     offset,
@@ -71,7 +71,7 @@ export default function EditGraphDialog({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         const parsed = parseFloat(offsetInput)
-        onEdit(index, {
+        onEdit(id, {
             title: name,
             titleColor: color,
             offset: Number.isNaN(parsed) ? offset : parsed,
