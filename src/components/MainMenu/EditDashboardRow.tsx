@@ -123,7 +123,11 @@ export function EditDashboardRow({
                 value={graphType}
                 onValueChange={(v) => onGraphTypeChange(index, v)}
             >
-                <SelectTrigger size="sm" className="w-24 shrink-0" aria-label={`Module ${index + 1} graph type`}>
+                <SelectTrigger
+                    size="sm"
+                    className="w-24 shrink-0"
+                    aria-label={`Module ${index + 1} graph type`}
+                >
                     <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
