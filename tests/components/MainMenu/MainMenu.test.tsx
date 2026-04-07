@@ -1,39 +1,33 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { describe, it, expect, beforeEach } from 'vitest'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MainMenu } from '@/components/MainMenu'
 import { useDashboardStore } from '@/store/dashboardStore'
-
-const mockUseOmnibusContext = vi.fn()
-
-vi.mock('@/hooks/useOmnibusContext', () => ({
-    useOmnibusContext: () => mockUseOmnibusContext(),
-}))
+import {
+    renderWithOmnibus,
+    disconnectedFixture,
+    errorFixture,
+    connectingFixture,
+} from 'tests/fixtures/omnibusContext'
 
 describe('MainMenu', () => {
     beforeEach(() => {
-        mockUseOmnibusContext.mockReturnValue({
-            connectionStatus: 'connected',
-            error: null,
-            serverUrl: 'http://localhost:6767',
-            setServerUrl: vi.fn(),
-        })
         useDashboardStore.setState({ addDataOpen: false })
     })
 
     it('renders the floating control bar with menu button', () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         expect(screen.getByLabelText('Open main menu')).toBeInTheDocument()
     })
 
     it('shows connection status text and dot', () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         expect(screen.getByText('Connected')).toBeInTheDocument()
         expect(screen.getByTitle('Connected')).toBeInTheDocument()
     })
 
     it('opens menu on click and shows all items', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
 
         expect(screen.getByText('Add Item')).toBeInTheDocument()
@@ -42,7 +36,7 @@ describe('MainMenu', () => {
     })
 
     it('shows footer with app name and build hash', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
 
         expect(screen.getByText('DAQms')).toBeInTheDocument()
@@ -50,7 +44,7 @@ describe('MainMenu', () => {
     })
 
     it('renders build hash as a link to GitHub', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
 
         const link = screen.getByRole('link', { name: /Build/ })
@@ -64,7 +58,7 @@ describe('MainMenu', () => {
     })
 
     it('applies destructive variant to Clear item', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
 
         const clearItem = screen
@@ -74,7 +68,7 @@ describe('MainMenu', () => {
     })
 
     it('closes menu on Escape', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         expect(screen.getByText('Add Item')).toBeInTheDocument()
 
@@ -86,7 +80,7 @@ describe('MainMenu', () => {
     })
 
     it('Add Item opens the Add Data dialog', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Add Item'))
 
@@ -96,7 +90,7 @@ describe('MainMenu', () => {
     })
 
     it('Edit Dashboard opens the Edit Dashboard dialog', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Edit Dashboard'))
 
@@ -110,46 +104,28 @@ describe('MainMenu', () => {
     })
 
     it('Clear is clickable without errors', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Clear'))
     })
 
     it('reflects error connection status', () => {
-        mockUseOmnibusContext.mockReturnValue({
-            connectionStatus: 'error',
-            error: 'Connection failed',
-            serverUrl: 'http://localhost:6767',
-            setServerUrl: vi.fn(),
-        })
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />, errorFixture)
         expect(screen.getByText('Error')).toBeInTheDocument()
     })
 
     it('reflects disconnected connection status', () => {
-        mockUseOmnibusContext.mockReturnValue({
-            connectionStatus: 'disconnected',
-            error: null,
-            serverUrl: 'http://localhost:6767',
-            setServerUrl: vi.fn(),
-        })
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />, disconnectedFixture)
         expect(screen.getByText('Disconnected')).toBeInTheDocument()
     })
 
     it('reflects connecting status', () => {
-        mockUseOmnibusContext.mockReturnValue({
-            connectionStatus: 'connecting',
-            error: null,
-            serverUrl: 'http://localhost:6767',
-            setServerUrl: vi.fn(),
-        })
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />, connectingFixture)
         expect(screen.getByText('Connecting')).toBeInTheDocument()
     })
 
     it('shows copyright in footer', async () => {
-        render(<MainMenu />)
+        renderWithOmnibus(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
 
         expect(screen.getByText(/Waterloo Rocketry/)).toBeInTheDocument()
