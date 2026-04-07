@@ -20,6 +20,7 @@ import {
     DialogHeader,
     DialogTitle,
     DialogFooter,
+    DialogDescription,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { useDashboardStore } from '@/store/dashboardStore'
@@ -175,6 +176,9 @@ export function EditDashboardDialog({
             >
                 <DialogHeader>
                     <DialogTitle>Edit Dashboard</DialogTitle>
+                    <DialogDescription>
+                        Reorder or delete graphs in the dashboard
+                    </DialogDescription>
                 </DialogHeader>
 
                 <div className="flex gap-2">
