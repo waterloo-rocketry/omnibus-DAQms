@@ -30,11 +30,14 @@ const DeleteGraphDialog = ({
 
                 <DialogFooter className="flex justify-end gap-2">
                     <DialogClose asChild>
-                        <Button variant="outline">Cancel</Button>
+                        <Button variant="outline" className="cursor-pointer">
+                            Cancel
+                        </Button>
                     </DialogClose>
 
                     <Button
                         variant="destructive"
+                        className="cursor-pointer"
                         onClick={() => {
                             onDelete()
                             onOpenChange(false)
