@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Ellipsis, Pencil, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,10 +13,12 @@ import { useDashboardStore } from '@/store/dashboardStore'
 import { ConnectionStatus } from './ConnectionStatus'
 import { MainMenuFooter } from './MainMenuFooter'
 import { AddDataDialog } from './AddDataDialog'
+import { EditDashboardDialog } from './EditDashboardDialog'
 
 export function MainMenu() {
     const addDataOpen = useDashboardStore((s) => s.addDataOpen)
     const setAddDataOpen = useDashboardStore((s) => s.setAddDataOpen)
+    const [editDashboardOpen, setEditDashboardOpen] = useState(false)
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
@@ -48,7 +51,7 @@ export function MainMenu() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                                 className="cursor-pointer py-2 text-sm"
-                                onSelect={() => {}}
+                                onSelect={() => setEditDashboardOpen(true)}
                             >
                                 <Pencil />
                                 Edit Dashboard
@@ -69,6 +72,10 @@ export function MainMenu() {
                 </DropdownMenu>
             </div>
             <AddDataDialog open={addDataOpen} onOpenChange={setAddDataOpen} />
+            <EditDashboardDialog
+                open={editDashboardOpen}
+                onOpenChange={setEditDashboardOpen}
+            />
         </div>
     )
 }

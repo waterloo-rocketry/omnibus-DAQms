@@ -93,11 +93,22 @@ describe('MainMenu', () => {
         })
     })
 
-    it('Edit Dashboard and Clear are clickable without errors', async () => {
+    it('Edit Dashboard opens the Edit Dashboard dialog', async () => {
         render(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Edit Dashboard'))
 
+        await waitFor(() => {
+            expect(
+                screen.getByText('Edit Dashboard', {
+                    selector: '[data-slot="dialog-title"]',
+                })
+            ).toBeInTheDocument()
+        })
+    })
+
+    it('Clear is clickable without errors', async () => {
+        render(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Clear'))
     })

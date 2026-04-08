@@ -9,6 +9,7 @@ interface DashboardStore {
     addDataOpen: boolean
     setAddDataOpen: (open: boolean) => void
     addGraphs: (configs: Omit<GraphConfig, 'id'>[]) => void
+    setGraphConfigs: (configs: GraphConfig[]) => void
     deleteGraph: (id: string) => void
     editGraphProps: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
@@ -25,6 +26,8 @@ export const useDashboardStore = create<DashboardStore>()((set) => ({
                 ...configs.map(createGraphConfig),
             ],
         })),
+
+    setGraphConfigs: (configs) => set({ graphConfigs: configs }),
 
     deleteGraph: (id) =>
         set((state) => ({
