@@ -12,9 +12,8 @@ const defaultProps = {
     offset: 0,
     graphType: 'Graph',
     displayedHistory: '30s',
-    index: 0,
+    id: 'test-id',
     onDelete: vi.fn(),
-    onDeleteId: 'test-id',
     onEdit: vi.fn(),
 }
 
@@ -66,6 +65,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -85,6 +85,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 123456.789,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -101,6 +102,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -128,6 +130,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 1.0,
                 timestamp: now - 15000,
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -138,6 +141,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 99.0,
                 timestamp: now,
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -163,6 +167,7 @@ describe('SensorModule', () => {
                 useLastDatapointStore.getState().updateSeries('test-channel', {
                     value: (i + 1) * 10,
                     timestamp: now + i * 200,
+                    type: 'DAQ',
                 })
 
                 await waitFor(() => {
@@ -183,6 +188,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 100,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -199,6 +205,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 100,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -215,6 +222,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -229,6 +237,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -12.34,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -242,6 +251,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 0,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -256,6 +266,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 999999.99,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -270,6 +281,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -1234.56,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -284,6 +296,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 5000000,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -298,6 +311,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: NaN,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -311,6 +325,7 @@ describe('SensorModule', () => {
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: Infinity,
                 timestamp: Date.now(),
+                type: 'DAQ',
             })
 
             await waitFor(() => {
@@ -340,6 +355,7 @@ describe('SensorModule', () => {
 
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now(),
+                type: 'DAQ',
                 value: 10,
             })
 
@@ -350,7 +366,7 @@ describe('SensorModule', () => {
             await userEvent.click(screen.getByLabelText('Open menu'))
             await userEvent.click(screen.getByText('+'))
 
-            expect(onEdit).toHaveBeenCalledWith(0, { offset: 0.5 })
+            expect(onEdit).toHaveBeenCalledWith('test-id', { offset: 0.5 })
         })
 
         it('calculates zero point and calls onEdit with offset', async () => {
@@ -366,10 +382,12 @@ describe('SensorModule', () => {
 
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now(),
+                type: 'DAQ',
                 value: 10,
             })
             useLastDatapointStore.getState().updateSeries('Fake0', {
                 timestamp: Date.now() + 100,
+                type: 'DAQ',
                 value: 30,
             })
 
@@ -381,7 +399,7 @@ describe('SensorModule', () => {
             await userEvent.click(screen.getByText('Set Zero Point'))
 
             // Average of 10 and 30 is 20, so offset = -20
-            expect(onEdit).toHaveBeenCalledWith(0, { offset: -20 })
+            expect(onEdit).toHaveBeenCalledWith('test-id', { offset: -20 })
         })
     })
 })

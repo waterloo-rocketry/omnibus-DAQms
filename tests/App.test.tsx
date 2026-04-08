@@ -18,6 +18,6 @@ describe('App', () => {
     it('renders the dashboard and main menu', () => {
         render(<App />)
         expect(screen.getByLabelText('Open main menu')).toBeInTheDocument()
-        expect(screen.getByText('+ Add Graph')).toBeInTheDocument()
+        expect(screen.getByText('Welcome to DAQms')).toBeInTheDocument()
     })
 })

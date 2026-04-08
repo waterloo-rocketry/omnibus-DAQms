@@ -33,7 +33,7 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             // Collect averaged values with message-level timestamp (seconds → ms) for all sensors
             const updates: Record<
                 string,
-                { value: number; timestamp: number }
+                { value: number; timestamp: number; type: string }
             > = {}
 
             // Cast entries to the expected type since omnibus-ts Zod v4 inference
@@ -53,6 +53,7 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
                 updates[sensorName] = {
                     value: averageValue,
                     timestamp,
+                    type: 'DAQ',
                 }
             })
 

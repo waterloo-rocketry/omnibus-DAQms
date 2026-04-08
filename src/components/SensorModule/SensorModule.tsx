@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from './D3Chart'
 import EditGraphDropDown from './EditGraphDropDown'
 import type { DataPoint } from '@/types/omnibus'
-import type { GraphConfigEditable } from '@/components/LiveDataDashboard/types'
+import type { GraphConfigEditable } from '@/store/dashboardStore/types'
 import {
     useLastDatapointStore,
     type LatestDataPoint,
@@ -19,7 +19,7 @@ interface SensorModuleProps {
     offset: number
     graphType: string
     displayedHistory: string
-    index: number
+    id: string
 
     // Chart display props
     maxDataPoints?: number
@@ -33,8 +33,7 @@ interface SensorModuleProps {
 
     // Callbacks
     onDelete: (id: string) => void
-    onDeleteId: string
-    onEdit: (index: number, changes: Partial<GraphConfigEditable>) => void
+    onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
 
 const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
@@ -123,7 +122,7 @@ export const SensorModule = memo(function SensorModule({
     offset = 0,
     graphType = 'Graph',
     displayedHistory = '30s',
-    index,
+    id,
     maxDataPoints = 100,
     timeWindowSeconds: timeWindowSecondsOverride,
     minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS,
@@ -133,7 +132,6 @@ export const SensorModule = memo(function SensorModule({
     fixedDomain,
     domainTickCount = 4,
     onDelete,
-    onDeleteId,
     onEdit,
 }: SensorModuleProps) {
     const [data, setData] = useState<DataPoint[]>([])
@@ -199,14 +197,14 @@ export const SensorModule = memo(function SensorModule({
     const displayTitle = title || channelName
 
     const handleDelete = useCallback(() => {
-        onDelete(onDeleteId)
-    }, [onDelete, onDeleteId])
+        onDelete(id)
+    }, [onDelete, id])
 
     const handleSetZeroPoint = () => {
         if (data.length === 0) return
         const values = data.map((d) => d.value)
         const avg = values.reduce((a, b) => a + b, 0) / values.length
-        onEdit(index, { offset: parseFloat((-avg).toFixed(2)) })
+        onEdit(id, { offset: parseFloat((-avg).toFixed(2)) })
     }
 
     return (
@@ -264,7 +262,7 @@ export const SensorModule = memo(function SensorModule({
 
                 {/* EditGraphDropDown in bottom-right corner */}
                 <EditGraphDropDown
-                    index={index}
+                    id={id}
                     title={title}
                     titleColor={titleColor}
                     offset={offset}

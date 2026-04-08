@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MainMenu } from '@/components/MainMenu'
+import { useDashboardStore } from '@/store/dashboardStore'
 
 const mockUseOmnibusContext = vi.fn()
 
@@ -15,6 +16,7 @@ describe('MainMenu', () => {
             connectionStatus: 'connected',
             error: null,
         })
+        useDashboardStore.setState({ addDataOpen: false })
     })
 
     it('renders the floating control bar with menu button', () => {
@@ -81,12 +83,18 @@ describe('MainMenu', () => {
         })
     })
 
-    it('menu items are clickable without errors', async () => {
+    it('Add Item opens the Add Data dialog', async () => {
         render(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
-
         await userEvent.click(screen.getByText('Add Item'))
-        // Menu closes after item click — reopen to click next
+
+        await waitFor(() => {
+            expect(screen.getByText('Add Data')).toBeInTheDocument()
+        })
+    })
+
+    it('Edit Dashboard and Clear are clickable without errors', async () => {
+        render(<MainMenu />)
         await userEvent.click(screen.getByLabelText('Open main menu'))
         await userEvent.click(screen.getByText('Edit Dashboard'))
 
