@@ -20,11 +20,11 @@ interface EditDashboardRowProps {
     graphType: string
     markedForDeletion: boolean
     deleteMode: boolean
-    onTitleChange: (index: number, title: string) => void
-    onGraphTypeChange: (index: number, graphType: string) => void
-    onColorChange: (index: number, color: string) => void
-    onToggleDeletion: (index: number) => void
-    onOpenEditDialog: (index: number) => void
+    onTitleChange: (id: string, title: string) => void
+    onGraphTypeChange: (id: string, graphType: string) => void
+    onColorChange: (id: string, color: string) => void
+    onToggleDeletion: (id: string) => void
+    onOpenEditDialog: (id: string) => void
 }
 
 export function EditDashboardRow({
@@ -74,7 +74,7 @@ export function EditDashboardRow({
                     variant="ghost"
                     size="icon-sm"
                     className="cursor-pointer shrink-0"
-                    onClick={() => onToggleDeletion(index)}
+                    onClick={() => onToggleDeletion(id)}
                     aria-label="Revert deletion"
                 >
                     <Undo2 />
@@ -96,7 +96,7 @@ export function EditDashboardRow({
                     variant="ghost"
                     size="icon-sm"
                     className="cursor-pointer shrink-0 text-destructive hover:text-destructive"
-                    onClick={() => onToggleDeletion(index)}
+                    onClick={() => onToggleDeletion(id)}
                     aria-label="Mark for deletion"
                 >
                     <Trash2 />
@@ -114,14 +114,14 @@ export function EditDashboardRow({
         >
             <Input
                 value={title}
-                onChange={(e) => onTitleChange(index, e.target.value)}
+                onChange={(e) => onTitleChange(id, e.target.value)}
                 className="h-8 text-sm min-w-0 flex-1"
                 aria-label={`Module ${index + 1} title`}
             />
 
             <Select
                 value={graphType}
-                onValueChange={(v) => onGraphTypeChange(index, v)}
+                onValueChange={(v) => onGraphTypeChange(id, v)}
             >
                 <SelectTrigger
                     size="sm"
@@ -141,7 +141,7 @@ export function EditDashboardRow({
                     <button
                         key={c.tw}
                         type="button"
-                        onClick={() => onColorChange(index, c.tw)}
+                        onClick={() => onColorChange(id, c.tw)}
                         className={`size-5 rounded-full border-2 cursor-pointer ${
                             titleColor === c.tw ?
                                 'border-foreground'
@@ -158,7 +158,7 @@ export function EditDashboardRow({
                 variant="outline"
                 size="sm"
                 className="cursor-pointer shrink-0"
-                onClick={() => onOpenEditDialog(index)}
+                onClick={() => onOpenEditDialog(id)}
             >
                 Edit
                 <ArrowRight className="size-3" />

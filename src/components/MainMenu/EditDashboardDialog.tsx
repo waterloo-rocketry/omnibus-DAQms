@@ -44,7 +44,7 @@ export function EditDashboardDialog({
     open,
     onOpenChange,
 }: EditDashboardDialogProps) {
-    const [workingCopy, setWorkingCopy] = useState<WorkingGraphConfig[]>(
+    const [workingCopy, setWorkingCopy] = useState<WorkingGraphConfig[]>(() =>
         useDashboardStore
             .getState()
             .graphConfigs.map((c) => ({ ...c, markedForDeletion: false }))
@@ -54,7 +54,7 @@ export function EditDashboardDialog({
         WorkingGraphConfig[] | null
     >(null)
     const [editDialogTarget, setEditDialogTarget] = useState<{
-        index: number
+        id: string
     } | null>(null)
 
     const sensors = useSensors(
@@ -87,44 +87,39 @@ export function EditDashboardDialog({
             setWorkingCopy((prev) => {
                 const oldIndex = prev.findIndex((c) => c.id === active.id)
                 const newIndex = prev.findIndex((c) => c.id === over.id)
+                if (oldIndex < 0 || newIndex < 0 || oldIndex === newIndex)
+                    return prev
                 return arrayMove(prev, oldIndex, newIndex)
             })
         }
     }
 
-    const handleTitleChange = (index: number, title: string) => {
-        setWorkingCopy((prev) => {
-            const next = [...prev]
-            next[index] = { ...next[index], title }
-            return next
-        })
+    const handleTitleChange = (id: string, title: string) => {
+        setWorkingCopy((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, title } : c))
+        )
     }
 
-    const handleGraphTypeChange = (index: number, graphType: string) => {
-        setWorkingCopy((prev) => {
-            const next = [...prev]
-            next[index] = { ...next[index], graphType }
-            return next
-        })
+    const handleGraphTypeChange = (id: string, graphType: string) => {
+        setWorkingCopy((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, graphType } : c))
+        )
     }
 
-    const handleColorChange = (index: number, titleColor: string) => {
-        setWorkingCopy((prev) => {
-            const next = [...prev]
-            next[index] = { ...next[index], titleColor }
-            return next
-        })
+    const handleColorChange = (id: string, titleColor: string) => {
+        setWorkingCopy((prev) =>
+            prev.map((c) => (c.id === id ? { ...c, titleColor } : c))
+        )
     }
 
-    const handleToggleDeletion = (index: number) => {
-        setWorkingCopy((prev) => {
-            const next = [...prev]
-            next[index] = {
-                ...next[index],
-                markedForDeletion: !next[index].markedForDeletion,
-            }
-            return next
-        })
+    const handleToggleDeletion = (id: string) => {
+        setWorkingCopy((prev) =>
+            prev.map((c) =>
+                c.id === id ?
+                    { ...c, markedForDeletion: !c.markedForDeletion }
+                :   c
+            )
+        )
     }
 
     const handleEditDialogSave = (
@@ -132,8 +127,9 @@ export function EditDashboardDialog({
         changes: Partial<GraphConfigEditable>
     ) => {
         setWorkingCopy((prev) => {
+            const targetIndex = prev.findIndex((c) => c.id === id)
+            if (targetIndex === -1) return prev
             const next = [...prev]
-            const targetIndex = next.findIndex((c) => c.id === id)
             next[targetIndex] = { ...next[targetIndex], ...changes }
             return next
         })
@@ -164,7 +160,9 @@ export function EditDashboardDialog({
     }
 
     const editTarget =
-        editDialogTarget !== null ? workingCopy[editDialogTarget.index] : null
+        editDialogTarget !== null ?
+            workingCopy.find((item) => item.id === editDialogTarget.id)
+        :   null
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -221,6 +219,7 @@ export function EditDashboardDialog({
                             sensors={sensors}
                             collisionDetection={closestCenter}
                             onDragEnd={handleDragEnd}
+                            autoScroll={{ threshold: { x: 0, y: 0.2 } }}
                         >
                             <SortableContext
                                 items={workingCopy.map((c) => c.id)}
@@ -244,8 +243,8 @@ export function EditDashboardDialog({
                                         }
                                         onColorChange={handleColorChange}
                                         onToggleDeletion={handleToggleDeletion}
-                                        onOpenEditDialog={(i) =>
-                                            setEditDialogTarget({ index: i })
+                                        onOpenEditDialog={(id) =>
+                                            setEditDialogTarget({ id })
                                         }
                                     />
                                 ))}
