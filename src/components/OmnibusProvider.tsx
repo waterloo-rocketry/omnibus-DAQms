@@ -6,10 +6,7 @@ import { useLastDatapointStore } from '../store/omnibusStore'
 import { OmnibusContext } from '../context/OmnibusContext'
 import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
 
-/**
- * Configuration
- */
-const SOCKET_URL = 'http://localhost:6767'
+const DEFAULT_SERVER_URL = 'http://localhost:6767'
 
 /**
  * Omnibus Provider Component
@@ -20,6 +17,7 @@ const SOCKET_URL = 'http://localhost:6767'
 const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
+    const [serverUrl, setServerUrl] = useState(DEFAULT_SERVER_URL)
     const [connectionStatus, setConnectionStatus] =
         useState<ConnectionStatus>('connecting')
     const [error, setError] = useState<string | null>(null)
@@ -64,8 +62,11 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
     )
 
     useEffect(() => {
+        setConnectionStatus('connecting')
+        setError(null)
+
         const comm = communicator({
-            serverURL: SOCKET_URL,
+            serverURL: serverUrl,
         })
         commRef.current = comm
 
@@ -93,11 +94,13 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
             comm.disconnect()
             commRef.current = null
         }
-    }, [parseMessage])
+    }, [parseMessage, serverUrl])
 
     const value: OmnibusContextValue = {
         connectionStatus,
         error,
+        serverUrl,
+        setServerUrl,
     }
 
     return (

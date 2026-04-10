@@ -15,17 +15,19 @@ import { MainMenuFooter } from './MainMenuFooter'
 import { AddDataDialog } from './AddDataDialog'
 import { EditDashboardDialog } from './EditDashboardDialog'
 import { ClearDashboardDialog } from './ClearDashboardDialog'
+import { ServerUrlDialog } from './ServerUrlDialog'
 
 export function MainMenu() {
     const addDataOpen = useDashboardStore((s) => s.addDataOpen)
     const setAddDataOpen = useDashboardStore((s) => s.setAddDataOpen)
     const [editDashboardOpen, setEditDashboardOpen] = useState(false)
     const [clearDashboardOpen, setClearDashboardOpen] = useState(false)
+    const [serverUrlOpen, setServerUrlOpen] = useState(false)
 
     return (
         <div className="fixed bottom-6 right-6 z-50">
             <div className="flex items-center rounded-lg border bg-popover shadow-lg">
-                <ConnectionStatus />
+                <ConnectionStatus onClick={() => setServerUrlOpen(true)} />
                 <div className="h-10 w-px bg-border" />
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -81,6 +83,10 @@ export function MainMenu() {
             <ClearDashboardDialog
                 open={clearDashboardOpen}
                 onOpenChange={setClearDashboardOpen}
+            />
+            <ServerUrlDialog
+                open={serverUrlOpen}
+                onOpenChange={setServerUrlOpen}
             />
         </div>
     )

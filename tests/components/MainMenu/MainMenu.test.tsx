@@ -15,6 +15,8 @@ describe('MainMenu', () => {
         mockUseOmnibusContext.mockReturnValue({
             connectionStatus: 'connected',
             error: null,
+            serverUrl: 'http://localhost:6767',
+            setServerUrl: vi.fn(),
         })
         useDashboardStore.setState({ addDataOpen: false })
     })
@@ -117,6 +119,8 @@ describe('MainMenu', () => {
         mockUseOmnibusContext.mockReturnValue({
             connectionStatus: 'error',
             error: 'Connection failed',
+            serverUrl: 'http://localhost:6767',
+            setServerUrl: vi.fn(),
         })
         render(<MainMenu />)
         expect(screen.getByText('Error')).toBeInTheDocument()
@@ -126,6 +130,8 @@ describe('MainMenu', () => {
         mockUseOmnibusContext.mockReturnValue({
             connectionStatus: 'disconnected',
             error: null,
+            serverUrl: 'http://localhost:6767',
+            setServerUrl: vi.fn(),
         })
         render(<MainMenu />)
         expect(screen.getByText('Disconnected')).toBeInTheDocument()
@@ -135,6 +141,8 @@ describe('MainMenu', () => {
         mockUseOmnibusContext.mockReturnValue({
             connectionStatus: 'connecting',
             error: null,
+            serverUrl: 'http://localhost:6767',
+            setServerUrl: vi.fn(),
         })
         render(<MainMenu />)
         expect(screen.getByText('Connecting')).toBeInTheDocument()

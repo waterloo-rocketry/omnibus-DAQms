@@ -8,6 +8,8 @@ import type { ConnectionStatus } from '@waterloorocketry/omnibus-ts'
 export interface OmnibusContextValue {
     connectionStatus: ConnectionStatus
     error: string | null
+    serverUrl: string
+    setServerUrl: (url: string) => void
 }
 
 export const OmnibusContext = createContext<OmnibusContextValue | undefined>(
