@@ -5,13 +5,15 @@ import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 import { execSync } from 'child_process'
 
-const commitHash = (() => {
-    try {
-        return execSync('git rev-parse --short HEAD').toString().trim()
-    } catch {
-        return 'unknown'
-    }
-})()
+const commitHash =
+    process.env.VITE_COMMIT_HASH ||
+    (() => {
+        try {
+            return execSync('git rev-parse --short HEAD').toString().trim()
+        } catch {
+            return 'unknown'
+        }
+    })()
 
 // https://vite.dev/config/
 export default defineConfig({
