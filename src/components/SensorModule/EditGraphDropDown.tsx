@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -12,6 +12,7 @@ import {
 import EditGraphDialog from './EditGraphDialog'
 import DeleteGraphDialog from './DeleteGraphDialog'
 import type { GraphConfigEditable } from '@/store/dashboardStore/types'
+import { Input } from '../ui/input'
 
 interface EditGraphDropDownProps {
     id: string
@@ -40,8 +41,11 @@ export default function EditGraphDropDown({
     const [openEdit, setOpenEdit] = useState(false)
     const [openDelete, setOpenDelete] = useState(false)
 
-    // format offset to 1 decimal
-    const formattedOffset = offset.toFixed(1)
+    const [offsetInput, setOffsetInput] = useState(String(offset))
+
+    useEffect(() => {
+        setOffsetInput(String(offset.toFixed(1)))
+    }, [offset])
 
     return (
         <div className="flex justify-end w-full">
@@ -76,9 +80,27 @@ export default function EditGraphDropDown({
                             –
                         </Button>
 
-                        <span className="text-md w-12 text-center">
-                            {formattedOffset}
-                        </span>
+                        <div className="grid gap-3 px-1">
+                            <Input
+                                aria-label="Offset"
+                                type="text"
+                                inputMode="decimal"
+                                placeholder={offset.toString()}
+                                value={offsetInput}
+                                onChange={(e) => setOffsetInput(e.target.value)}
+                                onBlur={() => {
+                                    const parsed = parseFloat(offsetInput)
+
+                                    if (!Number.isNaN(parsed)) {
+                                        onEdit(id, { offset: parsed })
+                                    } else {
+                                        setOffsetInput(
+                                            String(offset.toFixed(1))
+                                        ) // reset to last valid value
+                                    }
+                                }}
+                            />
+                        </div>
 
                         <Button
                             size="sm"
