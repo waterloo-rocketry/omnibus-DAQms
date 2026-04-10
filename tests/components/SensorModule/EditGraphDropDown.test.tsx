@@ -63,7 +63,7 @@ describe('EditGraphDropDown', () => {
     })
 
     it('ignores invalid non-numeric input and falls back to current offset', async () => {
-        render(<EditGraphDropDown  {...defaultProps} offset={0.9} />)
+        render(<EditGraphDropDown {...defaultProps} offset={0.9} />)
 
         await userEvent.click(screen.getByLabelText('Open menu'))
         const input = screen.getByRole('textbox') as HTMLInputElement

@@ -82,6 +82,7 @@ export default function EditGraphDropDown({
 
                         <div className="grid gap-3 px-1">
                             <Input
+                                aria-label="Offset"
                                 type="text"
                                 inputMode="decimal"
                                 placeholder={offset.toString()}
