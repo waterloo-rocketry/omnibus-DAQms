@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -22,11 +22,7 @@ export function ServerUrlDialog({ open, onOpenChange }: ServerUrlDialogProps) {
     const { serverUrl, setServerUrl } = useOmnibusContext()
     const [inputValue, setInputValue] = useState(serverUrl)
 
-    useEffect(() => {
-        if (open) {
-            setInputValue(serverUrl)
-        }
-    }, [open, serverUrl])
+    const onOpen = () => setInputValue(serverUrl)
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -39,7 +35,10 @@ export function ServerUrlDialog({ open, onOpenChange }: ServerUrlDialogProps) {
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="sm:max-w-[450px]">
+            <DialogContent
+                className="sm:max-w-[450px]"
+                onOpenAutoFocus={onOpen}
+            >
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Server Connection</DialogTitle>
