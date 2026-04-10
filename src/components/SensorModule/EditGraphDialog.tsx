@@ -51,16 +51,12 @@ export default function EditGraphDialog({
     const [localGraphType, setLocalGraphType] = useState(graphType)
     const [history, setHistory] = useState(displayedHistory)
 
-    // Reset local form state when dialog opens
-    const handleOpenChange = (isOpen: boolean) => {
-        if (isOpen) {
-            setName(title)
-            setColor(titleColor)
-            setOffsetInput(String(offset))
-            setLocalGraphType(graphType)
-            setHistory(displayedHistory)
-        }
-        onOpenChange(isOpen)
+    const onOpen = () => {
+        setName(title)
+        setColor(titleColor)
+        setOffsetInput(String(offset))
+        setLocalGraphType(graphType)
+        setHistory(displayedHistory)
     }
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -77,8 +73,11 @@ export default function EditGraphDialog({
     }
 
     return (
-        <Dialog open={open} onOpenChange={handleOpenChange}>
-            <DialogContent className="sm:max-w-[500px]">
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent
+                className="sm:max-w-[500px]"
+                onOpenAutoFocus={onOpen}
+            >
                 <form onSubmit={handleSubmit}>
                     <DialogHeader>
                         <DialogTitle>Edit — {name || 'Graph'}</DialogTitle>
