@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import {
     Dialog,
     DialogContent,
@@ -50,10 +50,6 @@ export default function EditGraphDialog({
     const [offsetInput, setOffsetInput] = useState(String(offset))
     const [localGraphType, setLocalGraphType] = useState(graphType)
     const [history, setHistory] = useState(displayedHistory)
-
-    useEffect(() => {
-        setOffsetInput(String(offset))
-    }, [offset])
 
     // Reset local form state when dialog opens
     const handleOpenChange = (isOpen: boolean) => {
