@@ -23,7 +23,7 @@ describe('ClearDashboardDialog', () => {
                 createGraphConfig({
                     channelName: 'ch1',
                     title: 'Test',
-                    titleColor: 'text-foreground',
+                    titleColor: 'black',
                     offset: 0,
                     graphType: 'Graph',
                     displayedHistory: '30s',
@@ -44,7 +44,7 @@ describe('ClearDashboardDialog', () => {
                 createGraphConfig({
                     channelName: 'ch1',
                     title: 'Test',
-                    titleColor: 'text-foreground',
+                    titleColor: 'black',
                     offset: 0,
                     graphType: 'Graph',
                     displayedHistory: '30s',

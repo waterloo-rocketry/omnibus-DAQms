@@ -27,6 +27,7 @@ import { useDashboardStore } from '@/store/dashboardStore'
 import type {
     GraphConfig,
     GraphConfigEditable,
+    TitleColor,
 } from '@/store/dashboardStore/types'
 import EditGraphDialog from '@/components/SensorModule/EditGraphDialog'
 import { EditDashboardRow } from './EditDashboardRow'
@@ -106,7 +107,7 @@ export function EditDashboardDialog({
         )
     }
 
-    const handleColorChange = (id: string, titleColor: string) => {
+    const handleColorChange = (id: string, titleColor: TitleColor) => {
         setWorkingCopy((prev) =>
             prev.map((c) => (c.id === id ? { ...c, titleColor } : c))
         )

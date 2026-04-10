@@ -11,18 +11,19 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { TITLE_COLORS } from '@/store/dashboardStore/types'
+import type { TitleColor } from '@/store/dashboardStore/types'
 
 interface EditDashboardRowProps {
     id: string
     index: number
     title: string
-    titleColor: string
+    titleColor: TitleColor
     graphType: string
     markedForDeletion: boolean
     deleteMode: boolean
     onTitleChange: (id: string, title: string) => void
     onGraphTypeChange: (id: string, graphType: string) => void
-    onColorChange: (id: string, color: string) => void
+    onColorChange: (id: string, color: TitleColor) => void
     onToggleDeletion: (id: string) => void
     onOpenEditDialog: (id: string) => void
 }
@@ -139,17 +140,17 @@ export function EditDashboardRow({
             <div className="flex gap-1 shrink-0">
                 {TITLE_COLORS.map((c) => (
                     <button
-                        key={c.tw}
+                        key={c.value}
                         type="button"
-                        onClick={() => onColorChange(id, c.tw)}
+                        onClick={() => onColorChange(id, c.value)}
                         className={`size-5 rounded-full border-2 cursor-pointer ${
-                            titleColor === c.tw ?
+                            titleColor === c.value ?
                                 'border-foreground'
                             :   'border-muted'
                         }`}
                         style={{ backgroundColor: c.preview }}
                         aria-label={`${c.label} color`}
-                        aria-pressed={titleColor === c.tw}
+                        aria-pressed={titleColor === c.value}
                     />
                 ))}
             </div>

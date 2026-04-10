@@ -8,7 +8,7 @@ import { vi } from 'vitest'
 const defaultProps = {
     channelName: 'test-channel',
     title: 'test-channel',
-    titleColor: 'text-teal-500',
+    titleColor: 'black' as const,
     offset: 0,
     graphType: 'Graph',
     displayedHistory: '30s',
@@ -41,7 +41,7 @@ describe('SensorModule', () => {
                 <SensorModule
                     {...defaultProps}
                     title="Test Sensor"
-                    titleColor="text-blue-500"
+                    titleColor="blue"
                 />
             )
 

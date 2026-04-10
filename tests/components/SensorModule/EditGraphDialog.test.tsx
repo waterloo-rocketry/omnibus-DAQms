@@ -9,7 +9,7 @@ describe('EditGraphDialog', () => {
         onOpenChange: vi.fn(),
         id: 'test-id',
         title: 'Initial Title',
-        titleColor: 'black',
+        titleColor: 'black' as const,
         offset: 1.2,
         graphType: 'Graph',
         displayedHistory: '30s',
@@ -58,7 +58,7 @@ describe('EditGraphDialog', () => {
             expect(onEdit).toHaveBeenCalledWith(
                 'test-id',
                 expect.objectContaining({
-                    titleColor: 'text-blue-500',
+                    titleColor: 'blue',
                 })
             )
         })

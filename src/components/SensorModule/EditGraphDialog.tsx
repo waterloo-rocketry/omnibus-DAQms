@@ -18,14 +18,17 @@ import {
     SelectValue,
 } from '@/components/ui/select'
 import { TITLE_COLORS } from '@/store/dashboardStore/types'
-import type { GraphConfigEditable } from '@/store/dashboardStore/types'
+import type {
+    GraphConfigEditable,
+    TitleColor,
+} from '@/store/dashboardStore/types'
 
 interface EditGraphDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
     id: string
     title: string
-    titleColor: string
+    titleColor: TitleColor
     offset: number
     graphType: string
     displayedHistory: string
@@ -101,11 +104,11 @@ export default function EditGraphDialog({
                                 <div className="flex gap-3 mt-1">
                                     {TITLE_COLORS.map((c) => (
                                         <button
-                                            key={c.tw}
+                                            key={c.value}
                                             type="button"
-                                            onClick={() => setColor(c.tw)}
+                                            onClick={() => setColor(c.value)}
                                             className={`w-8 h-8 rounded-full border-2 cursor-pointer ${
-                                                color === c.tw ?
+                                                color === c.value ?
                                                     'border-black'
                                                 :   'border-gray-300'
                                             }`}
