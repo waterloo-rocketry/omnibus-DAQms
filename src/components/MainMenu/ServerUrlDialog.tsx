@@ -27,9 +27,8 @@ export function ServerUrlDialog({ open, onOpenChange }: ServerUrlDialogProps) {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
         const trimmed = inputValue.trim()
-        if (trimmed) {
-            setServerUrl(trimmed)
-        }
+        if (!trimmed) return
+        setServerUrl(trimmed)
         onOpenChange(false)
     }
 
@@ -67,7 +66,11 @@ export function ServerUrlDialog({ open, onOpenChange }: ServerUrlDialogProps) {
                                 Cancel
                             </Button>
                         </DialogClose>
-                        <Button type="submit" className="cursor-pointer">
+                        <Button
+                            type="submit"
+                            className="cursor-pointer"
+                            disabled={!inputValue.trim()}
+                        >
                             Connect
                         </Button>
                     </DialogFooter>
