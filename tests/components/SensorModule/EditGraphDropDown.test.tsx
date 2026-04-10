@@ -1,5 +1,5 @@
 import { it, expect, describe, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import EditGraphDropDown from '@/components/SensorModule/EditGraphDropDown'
 
@@ -38,6 +38,40 @@ describe('EditGraphDropDown', () => {
         await userEvent.click(screen.getByText('–'))
 
         expect(onEdit).toHaveBeenCalledWith('test-id', { offset: 0.0 })
+    })
+
+    it('displays current offset', async () => {
+        render(<EditGraphDropDown {...defaultProps} offset={2.4} />)
+
+        await userEvent.click(screen.getByLabelText('Open menu'))
+        const input = screen.getByRole('textbox') as HTMLInputElement
+
+        expect(input).toHaveValue('2.4')
+    })
+
+    it('accepts numeric offset value', async () => {
+        const onEdit = vi.fn()
+        render(<EditGraphDropDown {...defaultProps} onEdit={onEdit} />)
+
+        await userEvent.click(screen.getByLabelText('Open menu'))
+        const input = screen.getByRole('textbox') as HTMLInputElement
+        await userEvent.clear(input)
+        await userEvent.type(input, '-5.1')
+        fireEvent.blur(input)
+
+        expect(onEdit).toHaveBeenCalledWith('test-id', { offset: -5.1 })
+    })
+
+    it('ignores invalid non-numeric input and falls back to current offset', async () => {
+        render(<EditGraphDropDown  {...defaultProps} offset={0.9} />)
+
+        await userEvent.click(screen.getByLabelText('Open menu'))
+        const input = screen.getByRole('textbox') as HTMLInputElement
+        await userEvent.clear(input)
+        await userEvent.type(input, 'abc')
+        fireEvent.blur(input)
+
+        expect(input).toHaveValue('0.9')
     })
 
     it('opens EditGraphDialog when Edit button is pressed', async () => {
