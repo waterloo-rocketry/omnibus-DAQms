@@ -1,18 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { ServerUrlDialog } from '@/components/MainMenu/ServerUrlDialog'
+import { renderWithOmnibus } from 'tests/fixtures/omnibusContext'
 
 const mockSetServerUrl = vi.fn()
-
-vi.mock('@/hooks/useOmnibusContext', () => ({
-    useOmnibusContext: () => ({
-        connectionStatus: 'connected',
-        error: null,
-        serverUrl: 'http://localhost:6767',
-        setServerUrl: mockSetServerUrl,
-    }),
-}))
 
 describe('ServerUrlDialog', () => {
     beforeEach(() => {
@@ -20,7 +12,10 @@ describe('ServerUrlDialog', () => {
     })
 
     it('renders with current URL pre-filled', () => {
-        render(<ServerUrlDialog open={true} onOpenChange={() => {}} />)
+        renderWithOmnibus(
+            <ServerUrlDialog open={true} onOpenChange={() => {}} />,
+            { setServerUrl: mockSetServerUrl }
+        )
 
         expect(
             screen.getByDisplayValue('http://localhost:6767')
@@ -28,8 +23,10 @@ describe('ServerUrlDialog', () => {
     })
 
     it('typing new URL and clicking Connect calls setServerUrl', async () => {
-        const onOpenChange = vi.fn()
-        render(<ServerUrlDialog open={true} onOpenChange={onOpenChange} />)
+        renderWithOmnibus(
+            <ServerUrlDialog open={true} onOpenChange={() => {}} />,
+            { setServerUrl: mockSetServerUrl }
+        )
 
         const input = screen.getByDisplayValue('http://localhost:6767')
         await userEvent.clear(input)
@@ -43,7 +40,10 @@ describe('ServerUrlDialog', () => {
 
     it('dialog closes after Connect', async () => {
         const onOpenChange = vi.fn()
-        render(<ServerUrlDialog open={true} onOpenChange={onOpenChange} />)
+        renderWithOmnibus(
+            <ServerUrlDialog open={true} onOpenChange={onOpenChange} />,
+            { setServerUrl: mockSetServerUrl }
+        )
 
         await userEvent.click(screen.getByText('Connect'))
 
@@ -52,7 +52,10 @@ describe('ServerUrlDialog', () => {
 
     it('Cancel closes without changing URL', async () => {
         const onOpenChange = vi.fn()
-        render(<ServerUrlDialog open={true} onOpenChange={onOpenChange} />)
+        renderWithOmnibus(
+            <ServerUrlDialog open={true} onOpenChange={onOpenChange} />,
+            { setServerUrl: mockSetServerUrl }
+        )
 
         const input = screen.getByDisplayValue('http://localhost:6767')
         await userEvent.clear(input)
@@ -63,7 +66,10 @@ describe('ServerUrlDialog', () => {
     })
 
     it('submits on Enter key', async () => {
-        render(<ServerUrlDialog open={true} onOpenChange={() => {}} />)
+        renderWithOmnibus(
+            <ServerUrlDialog open={true} onOpenChange={() => {}} />,
+            { setServerUrl: mockSetServerUrl }
+        )
 
         const input = screen.getByDisplayValue('http://localhost:6767')
         await userEvent.clear(input)
