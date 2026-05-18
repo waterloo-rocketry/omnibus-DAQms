@@ -21,4 +21,5 @@ if (!Element.prototype.releasePointerCapture) {
 
 afterEach(() => {
     cleanup()
+    localStorage.clear()
 })
