@@ -71,7 +71,10 @@ describe('dashboard store — localStorage persistence', () => {
         })
         useDashboardStore.setState({ graphConfigs: [config] })
 
-        const saved = getSavedState()!.graphConfigs[0] as Record<string, unknown>
+        const saved = getSavedState()!.graphConfigs[0] as Record<
+            string,
+            unknown
+        >
         expect(saved.channelName).toBe('Pressure1')
         expect(saved.title).toBe('Chamber Pressure')
         expect(saved.titleColor).toBe('text-blue-500')
