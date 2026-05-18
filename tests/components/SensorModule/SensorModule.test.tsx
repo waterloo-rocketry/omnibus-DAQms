@@ -334,6 +334,71 @@ describe('SensorModule', () => {
         })
     })
 
+    describe('Number Mode', () => {
+        it('hides the chart when graphType is Number', () => {
+            const { container } = render(
+                <SensorModule {...defaultProps} graphType="Number" />
+            )
+            // The graph layout has a min-h-[150px] chart container; Number mode omits it
+            expect(
+                container.querySelector('.min-h-\\[150px\\]')
+            ).not.toBeInTheDocument()
+        })
+
+        it('does not show the rate indicator when graphType is Number', async () => {
+            render(
+                <SensorModule
+                    {...defaultProps}
+                    graphType="Number"
+                    minUpdateIntervalMs={0}
+                />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 10,
+                timestamp: Date.now(),
+                type: 'DAQ',
+            })
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 20,
+                timestamp: Date.now() + 1000,
+                type: 'DAQ',
+            })
+
+            await waitFor(() => {
+                expect(screen.getByTitle('20')).toBeInTheDocument()
+            })
+
+            expect(screen.queryByText(/\/s/)).not.toBeInTheDocument()
+        })
+
+        it('still shows title and value when graphType is Number', async () => {
+            render(
+                <SensorModule
+                    {...defaultProps}
+                    graphType="Number"
+                    title="Tank Heating"
+                />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 1,
+                timestamp: Date.now(),
+                type: 'DAQ',
+            })
+
+            expect(screen.getByText('Tank Heating')).toBeInTheDocument()
+            await waitFor(() => {
+                expect(screen.getByText('1.00')).toBeInTheDocument()
+            })
+        })
+
+        it('shows -- when no data and graphType is Number', () => {
+            render(<SensorModule {...defaultProps} graphType="Number" />)
+            expect(screen.getByText('--')).toBeInTheDocument()
+        })
+    })
+
     describe('EditGraphDropDown Integration', () => {
         it("opens the Edit dropdown when '...' is pressed", async () => {
             render(<SensorModule {...defaultProps} channelName="Fake0" />)
