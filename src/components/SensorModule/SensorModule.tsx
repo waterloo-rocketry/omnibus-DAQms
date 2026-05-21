@@ -10,6 +10,7 @@ import {
 } from '@/store/omnibusStore'
 import { cn } from '@/lib/utils'
 import { useState } from 'react'
+import { zeroPointRegistry } from '@/store/dashboardStore/ZeroPointRegistry'
 
 interface SensorModuleProps {
     // Identity & config (from GraphConfig)
@@ -200,12 +201,16 @@ export const SensorModule = memo(function SensorModule({
         onDelete(id)
     }, [onDelete, id])
 
-    const handleSetZeroPoint = () => {
+    const handleSetZeroPoint = useCallback(() => {
         if (data.length === 0) return
         const values = data.map((d) => d.value)
         const avg = values.reduce((a, b) => a + b, 0) / values.length
         onEdit(id, { offset: parseFloat((-avg).toFixed(2)) })
-    }
+    }, [data, onEdit, id])
+
+    useEffect(() => {
+        zeroPointRegistry.register(handleSetZeroPoint)
+    }, [handleSetZeroPoint])
 
     return (
         <Card className="h-full">

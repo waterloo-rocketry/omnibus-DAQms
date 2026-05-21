@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ellipsis, Pencil, Plus, Trash2 } from 'lucide-react'
+import { Ellipsis, Pencil, Plus, Trash2, Zap } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
     DropdownMenu,
@@ -10,6 +10,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useDashboardStore } from '@/store/dashboardStore'
+import { zeroPointRegistry } from '@/store/dashboardStore/ZeroPointRegistry'
 import { ConnectionStatus } from './ConnectionStatus'
 import { MainMenuFooter } from './MainMenuFooter'
 import { AddDataDialog } from './AddDataDialog'
@@ -59,6 +60,13 @@ export function MainMenu() {
                             >
                                 <Pencil />
                                 Edit Dashboard
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                                className="cursor-pointer py-2 text-sm"
+                                onSelect={() => zeroPointRegistry.runAll()}
+                            >
+                                <Zap />
+                                Set Zero Point (All Graphs)
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />

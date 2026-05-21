@@ -1,0 +1,14 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Mock DAQ Backend Server",
+  "main": "server.cjs",
+  "scripts": {
+    "start": "node server.cjs"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^4.8.1",
+    "socket.io-msgpack-parser": "^3.0.2"
+  }
+}
