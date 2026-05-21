@@ -6,7 +6,7 @@ import { useLastDatapointStore } from '../store/omnibusStore'
 import { OmnibusContext } from '../context/OmnibusContext'
 import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
 
-const DEFAULT_SERVER_URL = 'http://localhost:6767'
+const DEFAULT_SERVER_URL = 'http://DAQ.local:6767'
 
 /**
  * Omnibus Provider Component
