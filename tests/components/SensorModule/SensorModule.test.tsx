@@ -397,6 +397,55 @@ describe('SensorModule', () => {
             render(<SensorModule {...defaultProps} graphType="Number" />)
             expect(screen.getByText('--')).toBeInTheDocument()
         })
+
+        it('renders the value with text-center class when graphType is Number', async () => {
+            render(
+                <SensorModule {...defaultProps} graphType="Number" />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 24.13,
+                timestamp: Date.now(),
+                type: 'DAQ',
+            })
+
+            await waitFor(() => {
+                const valueEl = screen.getByTitle('24.13')
+                expect(valueEl).toHaveClass('text-center')
+            })
+        })
+
+        it('renders -- with text-center class when there is no data', () => {
+            const { getByText } = render(
+                <SensorModule {...defaultProps} graphType="Number" />
+            )
+            expect(getByText('--')).toHaveClass('text-center')
+        })
+
+        it('does not share a container with the title in Number mode', async () => {
+            render(
+                <SensorModule
+                    {...defaultProps}
+                    graphType="Number"
+                    title="Tank Heating"
+                />
+            )
+
+            useLastDatapointStore.getState().updateSeries('test-channel', {
+                value: 24.13,
+                timestamp: Date.now(),
+                type: 'DAQ',
+            })
+
+            await waitFor(() => {
+                const title = screen.getByText('Tank Heating')
+                const value = screen.getByTitle('24.13')
+                // Title is a direct child of CardContent; value is its own div sibling
+                // They must not be wrapped together in a shared inner container
+                expect(title.parentElement).toBe(value.parentElement)
+                expect(title.nextElementSibling).toBe(value)
+            })
+        })
     })
 
     describe('EditGraphDropDown Integration', () => {

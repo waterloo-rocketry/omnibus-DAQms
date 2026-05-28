@@ -213,33 +213,28 @@ export const SensorModule = memo(function SensorModule({
         <Card className={isNumber ? 'self-start w-full' : 'h-full'}>
             {
                 isNumber ?
-                    // Compact horizontal strip: identical heading, no chart or rate
-                    <CardContent className="grid grid-rows-[auto_auto] p-4 gap-2">
-                        {/* Header: same layout as graph mode */}
-                        <div className="grid grid-cols-[2fr_1fr] gap-4 items-start">
-                            <h3
-                                className={cn(
-                                    'font-semibold text-base leading-tight line-clamp-2',
-                                    titleColor
-                                )}
-                                title={displayTitle}
-                            >
-                                {displayTitle}
-                            </h3>
-                            <div className="grid grid-rows-[auto] gap-0.5 justify-end text-right">
-                                <div
-                                    className="text-4xl font-bold tabular-nums text-foreground"
-                                    title={
-                                        currentValue !== null ?
-                                            currentValue.toString()
-                                        :   'No data'
-                                    }
-                                >
-                                    {currentValue !== null ?
-                                        formatValue(currentValue)
-                                    :   '--'}
-                                </div>
-                            </div>
+                    // Compact horizontal strip: title top-left, number centred, dropdown bottom
+                    <CardContent className="flex flex-col py-1 px-4 gap-2">
+                        <h3
+                            className={cn(
+                                'font-semibold text-base leading-tight line-clamp-2',
+                                titleColor
+                            )}
+                            title={displayTitle}
+                        >
+                            {displayTitle}
+                        </h3>
+                        <div
+                            className="text-5xl font-bold tabular-nums text-foreground text-center w-full"
+                            title={
+                                currentValue !== null ?
+                                    currentValue.toString()
+                                :   'No data'
+                            }
+                        >
+                            {currentValue !== null ?
+                                formatValue(currentValue)
+                            :   '--'}
                         </div>
                         <EditGraphDropDown
                             id={id}
