@@ -207,24 +207,25 @@ export const SensorModule = memo(function SensorModule({
         onEdit(id, { offset: parseFloat((-avg).toFixed(2)) })
     }
 
-    return (
-        <Card className="h-full">
-            <CardContent className="grid grid-rows-[auto_auto_1fr_auto] h-full p-4 gap-2">
-                {/* Header: Title and Value on same row */}
-                <div className="grid grid-cols-[2fr_1fr] gap-4 items-start">
-                    <h3
-                        className={cn(
-                            'font-semibold text-base leading-tight line-clamp-2',
-                            titleColor
-                        )}
-                        title={displayTitle}
-                    >
-                        {displayTitle}
-                    </h3>
+    const isNumber = graphType === 'Number'
 
-                    <div className="grid grid-rows-[auto] gap-0.5 justify-end text-right">
+    return (
+        <Card className={isNumber ? 'self-start w-full' : 'h-full'}>
+            {
+                isNumber ?
+                    // Compact horizontal strip: title top-left, number centred, dropdown bottom
+                    <CardContent className="flex flex-col py-1 px-4 gap-2">
+                        <h3
+                            className={cn(
+                                'font-semibold text-base leading-tight line-clamp-2',
+                                titleColor
+                            )}
+                            title={displayTitle}
+                        >
+                            {displayTitle}
+                        </h3>
                         <div
-                            className="text-4xl font-bold tabular-nums text-foreground"
+                            className="text-5xl font-bold tabular-nums text-foreground text-center w-full"
                             title={
                                 currentValue !== null ?
                                     currentValue.toString()
@@ -235,44 +236,85 @@ export const SensorModule = memo(function SensorModule({
                                 formatValue(currentValue)
                             :   '--'}
                         </div>
-                    </div>
-                </div>
+                        <EditGraphDropDown
+                            id={id}
+                            title={title}
+                            titleColor={titleColor}
+                            offset={offset}
+                            graphType={graphType}
+                            displayedHistory={displayedHistory}
+                            onEdit={onEdit}
+                            onDelete={handleDelete}
+                            onSetZeroPoint={handleSetZeroPoint}
+                        />
+                    </CardContent>
+                    // Full graph layout: title + value + rate + chart
+                :   <CardContent className="grid grid-rows-[auto_auto_1fr_auto] h-full p-4 gap-2">
+                        {/* Header: Title and Value on same row */}
+                        <div className="grid grid-cols-[2fr_1fr] gap-4 items-start">
+                            <h3
+                                className={cn(
+                                    'font-semibold text-base leading-tight line-clamp-2',
+                                    titleColor
+                                )}
+                                title={displayTitle}
+                            >
+                                {displayTitle}
+                            </h3>
 
-                {/* Rate indicator */}
-                <div className="min-h-[28px] flex items-center">
-                    {rate !== null && (
-                        <div className="bg-background/80 px-2 py-1 rounded text-xs font-mono border w-fit">
-                            {rate >= 0 ? '+' : ''}
-                            {rate.toFixed(3)}/s
+                            <div className="grid grid-rows-[auto] gap-0.5 justify-end text-right">
+                                <div
+                                    className="text-4xl font-bold tabular-nums text-foreground"
+                                    title={
+                                        currentValue !== null ?
+                                            currentValue.toString()
+                                        :   'No data'
+                                    }
+                                >
+                                    {currentValue !== null ?
+                                        formatValue(currentValue)
+                                    :   '--'}
+                                </div>
+                            </div>
                         </div>
-                    )}
-                </div>
 
-                {/* Chart area */}
-                <div className="min-h-[150px]">
-                    <D3Chart
-                        data={dataWithOffset}
-                        strokeColor={strokeColor}
-                        strokeWidth={strokeWidth}
-                        rangeTickCount={rangeTickCount}
-                        fixedDomain={fixedDomain}
-                        domainTickCount={domainTickCount}
-                    />
-                </div>
+                        {/* Rate indicator */}
+                        <div className="min-h-[28px] flex items-center">
+                            {rate !== null && (
+                                <div className="bg-background/80 px-2 py-1 rounded text-xs font-mono border w-fit">
+                                    {rate >= 0 ? '+' : ''}
+                                    {rate.toFixed(3)}/s
+                                </div>
+                            )}
+                        </div>
 
-                {/* EditGraphDropDown in bottom-right corner */}
-                <EditGraphDropDown
-                    id={id}
-                    title={title}
-                    titleColor={titleColor}
-                    offset={offset}
-                    graphType={graphType}
-                    displayedHistory={displayedHistory}
-                    onEdit={onEdit}
-                    onDelete={handleDelete}
-                    onSetZeroPoint={handleSetZeroPoint}
-                />
-            </CardContent>
+                        {/* Chart area */}
+                        <div className="min-h-[150px]">
+                            <D3Chart
+                                data={dataWithOffset}
+                                strokeColor={strokeColor}
+                                strokeWidth={strokeWidth}
+                                rangeTickCount={rangeTickCount}
+                                fixedDomain={fixedDomain}
+                                domainTickCount={domainTickCount}
+                            />
+                        </div>
+
+                        {/* EditGraphDropDown in bottom-right corner */}
+                        <EditGraphDropDown
+                            id={id}
+                            title={title}
+                            titleColor={titleColor}
+                            offset={offset}
+                            graphType={graphType}
+                            displayedHistory={displayedHistory}
+                            onEdit={onEdit}
+                            onDelete={handleDelete}
+                            onSetZeroPoint={handleSetZeroPoint}
+                        />
+                    </CardContent>
+
+            }
         </Card>
     )
 })
