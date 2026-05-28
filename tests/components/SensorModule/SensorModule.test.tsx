@@ -399,9 +399,7 @@ describe('SensorModule', () => {
         })
 
         it('renders the value with text-center class when graphType is Number', async () => {
-            render(
-                <SensorModule {...defaultProps} graphType="Number" />
-            )
+            render(<SensorModule {...defaultProps} graphType="Number" />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 24.13,
