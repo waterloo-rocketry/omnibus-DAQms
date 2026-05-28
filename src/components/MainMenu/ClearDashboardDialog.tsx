@@ -19,10 +19,10 @@ export function ClearDashboardDialog({
     open,
     onOpenChange,
 }: ClearDashboardDialogProps) {
-    const setGraphConfigs = useDashboardStore((s) => s.setGraphConfigs)
+    const clearDashboard = useDashboardStore((s) => s.clearDashboard)
 
     const handleClear = () => {
-        setGraphConfigs([])
+        clearDashboard()
         onOpenChange(false)
     }
 
