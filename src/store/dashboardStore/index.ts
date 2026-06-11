@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type { GraphConfig, GraphConfigEditable } from './types'
 import { createGraphConfig } from './utils'
+import { useGraphDataStore } from '@/store/graphDataStore'
 
 export const DASHBOARD_STORAGE_KEY = 'omnibus-dashboard'
 export const DEFAULT_TITLE_COLOR = 'text-foreground'
@@ -15,6 +16,7 @@ interface DashboardStore {
     deleteGraph: (id: string) => void
     editGraphProps: (id: string, changes: Partial<GraphConfigEditable>) => void
     clearDashboard: () => void
+    setZeroPointAll: () => void
 }
 
 export const useDashboardStore = create<DashboardStore>()(
@@ -52,6 +54,23 @@ export const useDashboardStore = create<DashboardStore>()(
             clearDashboard: () => {
                 set({ graphConfigs: [] })
                 useDashboardStore.persist.clearStorage()
+            },
+
+            setZeroPointAll: () => {
+                const graphData = useGraphDataStore.getState().data
+                set((state) => ({
+                    graphConfigs: state.graphConfigs.map((config) => {
+                        const data = graphData[config.id] ?? []
+                        if (data.length === 0) return config
+                        const values = data.map((d) => d.value)
+                        const avg =
+                            values.reduce((a, b) => a + b, 0) / values.length
+                        return {
+                            ...config,
+                            offset: parseFloat((-avg).toFixed(2)),
+                        }
+                    }),
+                }))
             },
         }),
         {
