@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useEffect, useCallback } from 'react'
+import { memo, useMemo, useRef, useEffect, useCallback, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from './D3Chart'
 import EditGraphDropDown from './EditGraphDropDown'
@@ -134,7 +134,7 @@ export const SensorModule = memo(function SensorModule({
     onDelete,
     onEdit,
 }: SensorModuleProps) {
-    const data = useGraphDataStore((s) => s.data[id] ?? [])
+    const [data, setData] = useState<DataPoint[]>([])
     const prevChannelRef = useRef(channelName)
     const lastTimestampRef = useRef<number | null>(null)
     const timeWindowSeconds =
@@ -148,6 +148,7 @@ export const SensorModule = memo(function SensorModule({
 
     useEffect(() => {
         if (prevChannelRef.current !== channelName) {
+            setData([])
             useGraphDataStore.getState().setData(id, [])
             lastTimestampRef.current = null
         }
@@ -171,16 +172,17 @@ export const SensorModule = memo(function SensorModule({
 
                 const cutoffTime =
                     newDataPoint.timestamp - timeWindowSeconds * 1000
-                const { data: storeData, setData } =
-                    useGraphDataStore.getState()
-                const prev = storeData[id] ?? []
-                setData(id, [
+                const prev =
+                    useGraphDataStore.getState().data[id] ?? []
+                const newData = [
                     ...filterStaleData(prev, cutoffTime),
                     {
                         timestamp: newDataPoint.timestamp,
                         value: newDataPoint.value,
                     },
-                ].slice(-maxDataPoints))
+                ].slice(-maxDataPoints)
+                useGraphDataStore.getState().setData(id, newData)
+                setData(newData)
             }
         )
         return unsubscribe

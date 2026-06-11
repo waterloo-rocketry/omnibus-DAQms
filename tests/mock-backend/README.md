@@ -9,7 +9,7 @@ A Node.js SocketIO server that emits DAQ/Fake test data for frontend development
 npm install
 
 # Start the server
-npm start
+node server.cjs
 ```
 
 ## Technical Details
