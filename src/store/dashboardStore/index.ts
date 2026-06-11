@@ -57,14 +57,12 @@ export const useDashboardStore = create<DashboardStore>()(
             },
 
             setZeroPointAll: () => {
-                const graphData = useGraphDataStore.getState().data
+                const averages =
+                    useGraphDataStore.getState().getAllGraphAverages()
                 set((state) => ({
                     graphConfigs: state.graphConfigs.map((config) => {
-                        const data = graphData[config.id] ?? []
-                        if (data.length === 0) return config
-                        const values = data.map((d) => d.value)
-                        const avg =
-                            values.reduce((a, b) => a + b, 0) / values.length
+                        const avg = averages[config.id]
+                        if (avg === undefined) return config
                         return {
                             ...config,
                             offset: parseFloat((-avg).toFixed(2)),
