@@ -32,6 +32,7 @@ describe('MainMenu', () => {
 
         expect(screen.getByText('Add Item')).toBeInTheDocument()
         expect(screen.getByText('Edit Dashboard')).toBeInTheDocument()
+        expect(screen.getByText('Set Zero Point All')).toBeInTheDocument()
         expect(screen.getByText('Clear')).toBeInTheDocument()
     })
 

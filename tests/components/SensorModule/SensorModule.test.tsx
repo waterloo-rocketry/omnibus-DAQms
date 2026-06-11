@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SensorModule } from '@/components/SensorModule'
 import { useLastDatapointStore } from '@/store/omnibusStore'
+// import { useGraphDataStore } from '@/store/graphDataStore'
 import { vi } from 'vitest'
 
 const defaultProps = {
@@ -20,6 +21,7 @@ const defaultProps = {
 describe('SensorModule', () => {
     beforeEach(() => {
         useLastDatapointStore.setState({ series: {} })
+        // useGraphDataStore.setState({ data: {} })
         vi.clearAllMocks()
     })
 
