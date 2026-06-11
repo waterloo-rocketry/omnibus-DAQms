@@ -1,7 +1,9 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { GraphConfig, GraphConfigEditable } from './types'
 import { createGraphConfig } from './utils'
 
+export const DASHBOARD_STORAGE_KEY = 'omnibus-dashboard'
 export const DEFAULT_TITLE_COLOR = 'text-foreground'
 
 interface DashboardStore {
@@ -12,34 +14,50 @@ interface DashboardStore {
     setGraphConfigs: (configs: GraphConfig[]) => void
     deleteGraph: (id: string) => void
     editGraphProps: (id: string, changes: Partial<GraphConfigEditable>) => void
+    clearDashboard: () => void
 }
 
-export const useDashboardStore = create<DashboardStore>()((set) => ({
-    graphConfigs: [],
-    addDataOpen: false,
-    setAddDataOpen: (open) => set({ addDataOpen: open }),
+export const useDashboardStore = create<DashboardStore>()(
+    persist(
+        (set) => ({
+            graphConfigs: [],
+            addDataOpen: false,
 
-    addGraphs: (configs) =>
-        set((state) => ({
-            graphConfigs: [
-                ...state.graphConfigs,
-                ...configs.map(createGraphConfig),
-            ],
-        })),
+            setAddDataOpen: (open) => set({ addDataOpen: open }),
 
-    setGraphConfigs: (configs) => set({ graphConfigs: configs }),
+            addGraphs: (configs) =>
+                set((state) => ({
+                    graphConfigs: [
+                        ...state.graphConfigs,
+                        ...configs.map(createGraphConfig),
+                    ],
+                })),
 
-    deleteGraph: (id) =>
-        set((state) => ({
-            graphConfigs: state.graphConfigs.filter((c) => c.id !== id),
-        })),
+            setGraphConfigs: (configs) => set({ graphConfigs: configs }),
 
-    editGraphProps: (id, changes) =>
-        set((state) => {
-            const i = state.graphConfigs.findIndex((g) => g.id === id)
-            if (i === -1) return state
-            const updated = [...state.graphConfigs]
-            updated[i] = { ...updated[i], ...changes }
-            return { graphConfigs: updated }
+            deleteGraph: (id) =>
+                set((state) => ({
+                    graphConfigs: state.graphConfigs.filter((c) => c.id !== id),
+                })),
+
+            editGraphProps: (id, changes) =>
+                set((state) => {
+                    const i = state.graphConfigs.findIndex((g) => g.id === id)
+                    if (i === -1) return state
+                    const updated = [...state.graphConfigs]
+                    updated[i] = { ...updated[i], ...changes }
+                    return { graphConfigs: updated }
+                }),
+
+            clearDashboard: () => {
+                set({ graphConfigs: [] })
+                useDashboardStore.persist.clearStorage()
+            },
         }),
-}))
+        {
+            name: DASHBOARD_STORAGE_KEY,
+            // Only persist layout data; addDataOpen is transient UI state
+            partialize: (state) => ({ graphConfigs: state.graphConfigs }),
+        }
+    )
+)
