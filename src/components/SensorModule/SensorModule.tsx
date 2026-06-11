@@ -8,8 +8,8 @@ import {
     useLastDatapointStore,
     type LatestDataPoint,
 } from '@/store/omnibusStore'
+import { useGraphDataStore } from '@/store/graphDataStore'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
 
 interface SensorModuleProps {
     // Identity & config (from GraphConfig)
@@ -134,15 +134,21 @@ export const SensorModule = memo(function SensorModule({
     onDelete,
     onEdit,
 }: SensorModuleProps) {
-    const [data, setData] = useState<DataPoint[]>([])
+    const data = useGraphDataStore((s) => s.data[id] ?? [])
     const prevChannelRef = useRef(channelName)
     const lastTimestampRef = useRef<number | null>(null)
     const timeWindowSeconds =
         timeWindowSecondsOverride ?? parseDisplayedHistory(displayedHistory)
 
     useEffect(() => {
+        return () => {
+            useGraphDataStore.getState().removeData(id)
+        }
+    }, [id])
+
+    useEffect(() => {
         if (prevChannelRef.current !== channelName) {
-            setData([])
+            useGraphDataStore.getState().setData(id, [])
             lastTimestampRef.current = null
         }
         prevChannelRef.current = channelName
@@ -165,19 +171,20 @@ export const SensorModule = memo(function SensorModule({
 
                 const cutoffTime =
                     newDataPoint.timestamp - timeWindowSeconds * 1000
-                setData((prev) =>
-                    [
-                        ...filterStaleData(prev, cutoffTime),
-                        {
-                            timestamp: newDataPoint.timestamp,
-                            value: newDataPoint.value,
-                        },
-                    ].slice(-maxDataPoints)
-                )
+                const { data: storeData, setData } =
+                    useGraphDataStore.getState()
+                const prev = storeData[id] ?? []
+                setData(id, [
+                    ...filterStaleData(prev, cutoffTime),
+                    {
+                        timestamp: newDataPoint.timestamp,
+                        value: newDataPoint.value,
+                    },
+                ].slice(-maxDataPoints))
             }
         )
         return unsubscribe
-    }, [channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
+    }, [id, channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
 
     const dataWithOffset = useMemo(() => {
         if (offset === 0) return data
