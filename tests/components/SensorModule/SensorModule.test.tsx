@@ -1,10 +1,26 @@
 import { describe, it, expect, beforeEach } from 'vitest'
+import type { ComponentProps } from 'react'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SensorModule } from '@/components/SensorModule'
 import { useLastDatapointStore } from '@/store/omnibusStore'
-// import { useGraphDataStore } from '@/store/graphDataStore'
+import { useGraphDataStore } from '@/store/graphDataStore'
 import { vi } from 'vitest'
+
+// SensorModule now accumulates points into graphDataStore and receives the
+// data to display via a `data` prop (the dashboard subscribes to the store and
+// feeds it back). This harness mirrors that wiring so store updates re-render
+// the module, just like LiveDataDashboard does.
+type SensorModuleHarnessProps = Omit<ComponentProps<typeof SensorModule>, 'data'>
+
+// Stable reference so the selector doesn't return a fresh array each render.
+const EMPTY_DATA: ComponentProps<typeof SensorModule>['data'] = []
+
+function TestSensorModule(props: SensorModuleHarnessProps) {
+    const dataMap = useGraphDataStore((s) => s.data)
+    const data = dataMap[props.id] ?? EMPTY_DATA
+    return <SensorModule {...props} data={data} />
+}
 
 const defaultProps = {
     channelName: 'test-channel',
@@ -21,26 +37,26 @@ const defaultProps = {
 describe('SensorModule', () => {
     beforeEach(() => {
         useLastDatapointStore.setState({ series: {} })
-        // useGraphDataStore.setState({ data: {} })
+        useGraphDataStore.setState({ data: {} })
         vi.clearAllMocks()
     })
 
     describe('Title Display', () => {
         it('renders title correctly', () => {
-            render(<SensorModule {...defaultProps} title="Ox Fill (psi)" />)
+            render(<TestSensorModule {...defaultProps} title="Ox Fill (psi)" />)
 
             expect(screen.getByText('Ox Fill (psi)')).toBeInTheDocument()
         })
 
         it('falls back to channelName when title is empty', () => {
-            render(<SensorModule {...defaultProps} title="" />)
+            render(<TestSensorModule {...defaultProps} title="" />)
 
             expect(screen.getByText('test-channel')).toBeInTheDocument()
         })
 
         it('applies custom title color', () => {
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     title="Test Sensor"
                     titleColor="text-blue-500"
@@ -53,7 +69,7 @@ describe('SensorModule', () => {
 
         it('truncates long titles with ellipsis', () => {
             const longTitle = 'A'.repeat(100)
-            render(<SensorModule {...defaultProps} title={longTitle} />)
+            render(<TestSensorModule {...defaultProps} title={longTitle} />)
 
             const title = screen.getByTitle(longTitle)
             expect(title).toHaveClass('line-clamp-2')
@@ -62,7 +78,7 @@ describe('SensorModule', () => {
 
     describe('Value Display', () => {
         it('displays current value with 2 decimal places', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
@@ -76,13 +92,13 @@ describe('SensorModule', () => {
         })
 
         it('displays -- when no data available', () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             expect(screen.getByText('--')).toBeInTheDocument()
         })
 
         it('truncates value to 6 characters when too long', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 123456.789,
@@ -99,7 +115,7 @@ describe('SensorModule', () => {
 
     describe('Rate Calculation', () => {
         it('does not display rate with insufficient data', async () => {
-            const { container } = render(<SensorModule {...defaultProps} />)
+            const { container } = render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
@@ -121,7 +137,7 @@ describe('SensorModule', () => {
             const now = Date.now()
 
             const { container } = render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     timeWindowSeconds={10}
                     minUpdateIntervalMs={0}
@@ -158,7 +174,7 @@ describe('SensorModule', () => {
             const now = Date.now()
 
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     maxDataPoints={3}
                     minUpdateIntervalMs={0}
@@ -185,7 +201,7 @@ describe('SensorModule', () => {
 
     describe('Time-bound Filtering', () => {
         it('accepts first data point immediately', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 100,
@@ -201,7 +217,7 @@ describe('SensorModule', () => {
 
         it('respects custom minUpdateIntervalMs prop', async () => {
             render(
-                <SensorModule {...defaultProps} minUpdateIntervalMs={1000} />
+                <TestSensorModule {...defaultProps} minUpdateIntervalMs={1000} />
             )
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
@@ -219,7 +235,7 @@ describe('SensorModule', () => {
 
     describe('Value Formatting', () => {
         it('formats values with exactly 2 decimal places', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45,
@@ -234,7 +250,7 @@ describe('SensorModule', () => {
         })
 
         it('handles negative values correctly', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -12.34,
@@ -248,7 +264,7 @@ describe('SensorModule', () => {
         })
 
         it('handles zero correctly', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 0,
@@ -263,7 +279,7 @@ describe('SensorModule', () => {
         })
 
         it('handles very large numbers', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 999999.99,
@@ -278,7 +294,7 @@ describe('SensorModule', () => {
         })
 
         it('handles large negative numbers without incorrect truncation', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: -1234.56,
@@ -293,7 +309,7 @@ describe('SensorModule', () => {
         })
 
         it('uses exponential notation for very large positive numbers', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 5000000,
@@ -308,7 +324,7 @@ describe('SensorModule', () => {
         })
 
         it('displays --- for NaN values', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: NaN,
@@ -322,7 +338,7 @@ describe('SensorModule', () => {
         })
 
         it('displays --- for Infinity values', async () => {
-            render(<SensorModule {...defaultProps} />)
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: Infinity,
@@ -339,7 +355,7 @@ describe('SensorModule', () => {
     describe('Number Mode', () => {
         it('hides the chart when graphType is Number', () => {
             const { container } = render(
-                <SensorModule {...defaultProps} graphType="Number" />
+                <TestSensorModule {...defaultProps} graphType="Number" />
             )
             // The graph layout has a min-h-[150px] chart container; Number mode omits it
             expect(
@@ -349,7 +365,7 @@ describe('SensorModule', () => {
 
         it('does not show the rate indicator when graphType is Number', async () => {
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     graphType="Number"
                     minUpdateIntervalMs={0}
@@ -376,7 +392,7 @@ describe('SensorModule', () => {
 
         it('still shows title and value when graphType is Number', async () => {
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     graphType="Number"
                     title="Tank Heating"
@@ -396,12 +412,12 @@ describe('SensorModule', () => {
         })
 
         it('shows -- when no data and graphType is Number', () => {
-            render(<SensorModule {...defaultProps} graphType="Number" />)
+            render(<TestSensorModule {...defaultProps} graphType="Number" />)
             expect(screen.getByText('--')).toBeInTheDocument()
         })
 
         it('renders the value with text-center class when graphType is Number', async () => {
-            render(<SensorModule {...defaultProps} graphType="Number" />)
+            render(<TestSensorModule {...defaultProps} graphType="Number" />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 24.13,
@@ -417,14 +433,14 @@ describe('SensorModule', () => {
 
         it('renders -- with text-center class when there is no data', () => {
             const { getByText } = render(
-                <SensorModule {...defaultProps} graphType="Number" />
+                <TestSensorModule {...defaultProps} graphType="Number" />
             )
             expect(getByText('--')).toHaveClass('text-center')
         })
 
         it('does not share a container with the title in Number mode', async () => {
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     graphType="Number"
                     title="Tank Heating"
@@ -450,7 +466,7 @@ describe('SensorModule', () => {
 
     describe('EditGraphDropDown Integration', () => {
         it("opens the Edit dropdown when '...' is pressed", async () => {
-            render(<SensorModule {...defaultProps} channelName="Fake0" />)
+            render(<TestSensorModule {...defaultProps} channelName="Fake0" />)
 
             await userEvent.click(screen.getByLabelText('Open menu'))
 
@@ -460,7 +476,7 @@ describe('SensorModule', () => {
         it('shifts displayed data when offset is changed via dropdown', async () => {
             const onEdit = vi.fn()
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     channelName="Fake0"
                     onEdit={onEdit}
@@ -486,7 +502,7 @@ describe('SensorModule', () => {
         it('calculates zero point and calls onEdit with offset', async () => {
             const onEdit = vi.fn()
             render(
-                <SensorModule
+                <TestSensorModule
                     {...defaultProps}
                     channelName="Fake0"
                     minUpdateIntervalMs={0}
