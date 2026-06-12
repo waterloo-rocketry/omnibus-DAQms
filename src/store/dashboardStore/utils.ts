@@ -1,4 +1,5 @@
 import type { GraphConfig } from './types'
+import { v4 as uuidv4 } from 'uuid'
 
 // Function to add plots to dashboard
 export const addPlot = (
@@ -19,5 +20,5 @@ export const removePlot = (
 export function createGraphConfig(
     config: Omit<GraphConfig, 'id'>
 ): GraphConfig {
-    return { ...config, id: crypto.randomUUID() }
+    return { ...config, id: uuidv4() }
 }
