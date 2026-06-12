@@ -11,7 +11,10 @@ import { vi } from 'vitest'
 // data to display via a `data` prop (the dashboard subscribes to the store and
 // feeds it back). This harness mirrors that wiring so store updates re-render
 // the module, just like LiveDataDashboard does.
-type SensorModuleHarnessProps = Omit<ComponentProps<typeof SensorModule>, 'data'>
+type SensorModuleHarnessProps = Omit<
+    ComponentProps<typeof SensorModule>,
+    'data'
+>
 
 // Stable reference so the selector doesn't return a fresh array each render.
 const EMPTY_DATA: ComponentProps<typeof SensorModule>['data'] = []
@@ -217,7 +220,10 @@ describe('SensorModule', () => {
 
         it('respects custom minUpdateIntervalMs prop', async () => {
             render(
-                <TestSensorModule {...defaultProps} minUpdateIntervalMs={1000} />
+                <TestSensorModule
+                    {...defaultProps}
+                    minUpdateIntervalMs={1000}
+                />
             )
 
             useLastDatapointStore.getState().updateSeries('test-channel', {

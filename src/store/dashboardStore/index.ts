@@ -57,8 +57,9 @@ export const useDashboardStore = create<DashboardStore>()(
             },
 
             setZeroPointAll: () => {
-                const averages =
-                    useGraphDataStore.getState().getAllGraphAverages()
+                const averages = useGraphDataStore
+                    .getState()
+                    .getAllGraphAverages()
                 set((state) => ({
                     graphConfigs: state.graphConfigs.map((config) => {
                         const avg = averages[config.id]

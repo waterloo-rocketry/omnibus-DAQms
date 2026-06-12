@@ -33,7 +33,7 @@ export const LiveDataDashboard = () => {
     const deleteGraph = useDashboardStore((s) => s.deleteGraph)
     const deleteGraphData = useGraphDataStore((s) => s.removeData)
     const graphData = useGraphDataStore((s) => s.data)
-    
+
     const onDelete = (id: string) => {
         deleteGraph(id)
         deleteGraphData(id)
