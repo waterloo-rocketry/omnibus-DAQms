@@ -16,6 +16,7 @@ import { AddDataDialog } from './AddDataDialog'
 import { EditDashboardDialog } from './EditDashboardDialog'
 import { ClearDashboardDialog } from './ClearDashboardDialog'
 import { ServerUrlDialog } from './ServerUrlDialog'
+import { SetZeroPointAll } from './SetZeroPointAll'
 
 export function MainMenu() {
     const addDataOpen = useDashboardStore((s) => s.addDataOpen)
@@ -60,6 +61,7 @@ export function MainMenu() {
                                 <Pencil />
                                 Edit Dashboard
                             </DropdownMenuItem>
+                            <SetZeroPointAll />
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

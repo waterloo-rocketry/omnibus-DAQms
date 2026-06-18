@@ -8,8 +8,8 @@ import {
     useLastDatapointStore,
     type LatestDataPoint,
 } from '@/store/omnibusStore'
+import { useGraphDataStore } from '@/store/graphDataStore'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
 
 interface SensorModuleProps {
     // Identity & config (from GraphConfig)
@@ -20,6 +20,9 @@ interface SensorModuleProps {
     graphType: string
     displayedHistory: string
     id: string
+
+    // Data to display (accumulated into graphDataStore, passed in from the dashboard)
+    data: DataPoint[]
 
     // Chart display props
     maxDataPoints?: number
@@ -123,6 +126,7 @@ export const SensorModule = memo(function SensorModule({
     graphType = 'Graph',
     displayedHistory = '30s',
     id,
+    data,
     maxDataPoints = 100,
     timeWindowSeconds: timeWindowSecondsOverride,
     minUpdateIntervalMs = DEFAULT_MIN_UPDATE_INTERVAL_MS,
@@ -134,7 +138,6 @@ export const SensorModule = memo(function SensorModule({
     onDelete,
     onEdit,
 }: SensorModuleProps) {
-    const [data, setData] = useState<DataPoint[]>([])
     const prevChannelRef = useRef(channelName)
     const lastTimestampRef = useRef<number | null>(null)
     const timeWindowSeconds =
@@ -142,7 +145,7 @@ export const SensorModule = memo(function SensorModule({
 
     useEffect(() => {
         if (prevChannelRef.current !== channelName) {
-            setData([])
+            useGraphDataStore.getState().setData(id, [])
             lastTimestampRef.current = null
         }
         prevChannelRef.current = channelName
@@ -165,19 +168,19 @@ export const SensorModule = memo(function SensorModule({
 
                 const cutoffTime =
                     newDataPoint.timestamp - timeWindowSeconds * 1000
-                setData((prev) =>
-                    [
-                        ...filterStaleData(prev, cutoffTime),
-                        {
-                            timestamp: newDataPoint.timestamp,
-                            value: newDataPoint.value,
-                        },
-                    ].slice(-maxDataPoints)
-                )
+                const prev = useGraphDataStore.getState().data[id] ?? []
+                const newData = [
+                    ...filterStaleData(prev, cutoffTime),
+                    {
+                        timestamp: newDataPoint.timestamp,
+                        value: newDataPoint.value,
+                    },
+                ].slice(-maxDataPoints)
+                useGraphDataStore.getState().setData(id, newData)
             }
         )
         return unsubscribe
-    }, [channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
+    }, [id, channelName, timeWindowSeconds, maxDataPoints, minUpdateIntervalMs])
 
     const dataWithOffset = useMemo(() => {
         if (offset === 0) return data
@@ -201,9 +204,8 @@ export const SensorModule = memo(function SensorModule({
     }, [onDelete, id])
 
     const handleSetZeroPoint = () => {
-        if (data.length === 0) return
-        const values = data.map((d) => d.value)
-        const avg = values.reduce((a, b) => a + b, 0) / values.length
+        const avg = useGraphDataStore.getState().getGraphAverage(id)
+        if (avg === null) return
         onEdit(id, { offset: parseFloat((-avg).toFixed(2)) })
     }
 

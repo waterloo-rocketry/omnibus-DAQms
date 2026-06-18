@@ -2,7 +2,9 @@ import { Plus } from 'lucide-react'
 import { SensorModule } from '../SensorModule'
 import { Button } from '@/components/ui/button'
 import { useDashboardStore } from '@/store/dashboardStore'
+import { useGraphDataStore } from '@/store/graphDataStore'
 import type { GraphConfig } from '@/store/dashboardStore/types'
+import { useCallback } from 'react'
 
 type RenderSlot =
     | { type: 'single'; config: GraphConfig }
@@ -27,9 +29,19 @@ function buildSlots(configs: GraphConfig[]): RenderSlot[] {
 
 export const LiveDataDashboard = () => {
     const graphConfigs = useDashboardStore((s) => s.graphConfigs)
-    const deleteGraph = useDashboardStore((s) => s.deleteGraph)
     const editGraphProps = useDashboardStore((s) => s.editGraphProps)
     const setAddDataOpen = useDashboardStore((s) => s.setAddDataOpen)
+    const deleteGraph = useDashboardStore((s) => s.deleteGraph)
+    const deleteGraphData = useGraphDataStore((s) => s.removeData)
+    const graphData = useGraphDataStore((s) => s.data)
+
+    const onDelete = useCallback(
+        (id: string) => {
+            deleteGraph(id)
+            deleteGraphData(id)
+        },
+        [deleteGraph, deleteGraphData]
+    )
 
     if (graphConfigs.length === 0) {
         return (
@@ -74,7 +86,8 @@ export const LiveDataDashboard = () => {
                                     offset={a.offset}
                                     graphType={a.graphType}
                                     displayedHistory={a.displayedHistory}
-                                    onDelete={deleteGraph}
+                                    data={graphData[a.id] ?? []}
+                                    onDelete={onDelete}
                                     onEdit={editGraphProps}
                                 />
                                 <SensorModule
@@ -86,7 +99,8 @@ export const LiveDataDashboard = () => {
                                     offset={b.offset}
                                     graphType={b.graphType}
                                     displayedHistory={b.displayedHistory}
-                                    onDelete={deleteGraph}
+                                    data={graphData[b.id] ?? []}
+                                    onDelete={onDelete}
                                     onEdit={editGraphProps}
                                 />
                             </div>
@@ -103,7 +117,8 @@ export const LiveDataDashboard = () => {
                             offset={config.offset}
                             graphType={config.graphType}
                             displayedHistory={config.displayedHistory}
-                            onDelete={deleteGraph}
+                            data={graphData[config.id] ?? []}
+                            onDelete={onDelete}
                             onEdit={editGraphProps}
                         />
                     )
