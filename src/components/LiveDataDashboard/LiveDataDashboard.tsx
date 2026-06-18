@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useDashboardStore } from '@/store/dashboardStore'
 import { useGraphDataStore } from '@/store/graphDataStore'
 import type { GraphConfig } from '@/store/dashboardStore/types'
+import { useCallback } from 'react'
 
 type RenderSlot =
     | { type: 'single'; config: GraphConfig }
@@ -34,10 +35,10 @@ export const LiveDataDashboard = () => {
     const deleteGraphData = useGraphDataStore((s) => s.removeData)
     const graphData = useGraphDataStore((s) => s.data)
 
-    const onDelete = (id: string) => {
+    const onDelete = useCallback((id:string) => {
         deleteGraph(id)
         deleteGraphData(id)
-    }
+    }, [deleteGraph, deleteGraphData])
 
     if (graphConfigs.length === 0) {
         return (
