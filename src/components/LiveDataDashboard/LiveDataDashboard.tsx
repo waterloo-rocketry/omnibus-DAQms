@@ -35,10 +35,13 @@ export const LiveDataDashboard = () => {
     const deleteGraphData = useGraphDataStore((s) => s.removeData)
     const graphData = useGraphDataStore((s) => s.data)
 
-    const onDelete = useCallback((id:string) => {
-        deleteGraph(id)
-        deleteGraphData(id)
-    }, [deleteGraph, deleteGraphData])
+    const onDelete = useCallback(
+        (id: string) => {
+            deleteGraph(id)
+            deleteGraphData(id)
+        },
+        [deleteGraph, deleteGraphData]
+    )
 
     if (graphConfigs.length === 0) {
         return (
