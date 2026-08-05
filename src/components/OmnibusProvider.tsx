@@ -1,7 +1,12 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { communicator } from '@waterloorocketry/omnibus-ts'
-import type { DAQMessage, ConnectionStatus } from '@waterloorocketry/omnibus-ts'
+import type {
+    DAQMessage,
+    ParsleyMessage,
+    ConnectionStatus,
+} from '@waterloorocketry/omnibus-ts'
 import { useLastDatapointStore } from '../store/omnibusStore'
+import { parseParsleyAnalogMessage } from '@/lib/parsley'
 
 import { OmnibusContext } from '../context/OmnibusContext'
 import type { OmnibusContextValue } from '../context/OmnibusContext.ts'
@@ -11,7 +16,7 @@ const DEFAULT_SERVER_URL = 'http://DAQ.local:6767'
 /**
  * Omnibus Provider Component
  *
- * Uses @waterloorocketry/omnibus-ts communicator() to receive typed DAQ messages
+ * Uses @waterloorocketry/omnibus-ts communicator() to receive typed messages
  * with Zod validation and automatic snake_case to camelCase conversion.
  */
 const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -61,6 +66,22 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
         []
     )
 
+    const parseParsleyMessage = useCallback(
+        (msg: {
+            channel: string
+            timestamp: number
+            payload: ParsleyMessage
+        }) => {
+            const update = parseParsleyAnalogMessage(msg)
+            if (update === null) return
+
+            useLastDatapointStore
+                .getState()
+                .updateSeries(update.seriesName, update.dataPoint)
+        },
+        []
+    )
+
     useEffect(() => {
         setConnectionStatus('connecting')
         setError(null)
@@ -83,18 +104,23 @@ const OmnibusProvider: React.FC<{ children: React.ReactNode }> = ({
         )
 
         // Use receive('DAQ', ...) to handle typed DAQ messages with Zod validation
-        const unsubReceive = comm.receiver.receive<DAQMessage>(
+        const unsubDaqReceive = comm.receiver.receive<DAQMessage>(
             'DAQ',
             parseMessage
+        )
+        const unsubParsleyReceive = comm.receiver.receive<ParsleyMessage>(
+            'CAN/Parsley',
+            parseParsleyMessage
         )
 
         return () => {
             unsubConnection()
-            unsubReceive()
+            unsubDaqReceive()
+            unsubParsleyReceive()
             comm.disconnect()
             commRef.current = null
         }
-    }, [parseMessage, serverUrl])
+    }, [parseMessage, parseParsleyMessage, serverUrl])
 
     const value: OmnibusContextValue = {
         connectionStatus,
