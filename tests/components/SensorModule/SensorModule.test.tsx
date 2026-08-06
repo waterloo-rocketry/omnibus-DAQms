@@ -97,7 +97,7 @@ describe('SensorModule', () => {
         it('displays -- when no data available', () => {
             render(<TestSensorModule {...defaultProps} />)
 
-            expect(screen.getByText('--')).toBeInTheDocument()
+            expect(screen.getByTitle('No data')).toHaveTextContent('--')
         })
 
         it('truncates value to 6 characters when too long', async () => {
@@ -117,8 +117,8 @@ describe('SensorModule', () => {
     })
 
     describe('Rate Calculation', () => {
-        it('does not display rate with insufficient data', async () => {
-            const { container } = render(<TestSensorModule {...defaultProps} />)
+        it('displays an unavailable rate with insufficient data', async () => {
+            render(<TestSensorModule {...defaultProps} />)
 
             useLastDatapointStore.getState().updateSeries('test-channel', {
                 value: 45.98,
@@ -130,33 +130,64 @@ describe('SensorModule', () => {
                 expect(screen.getByText('45.98')).toBeInTheDocument()
             })
 
-            const rateDisplay = container.querySelector('.font-mono')
-            expect(rateDisplay).not.toBeInTheDocument()
+            expect(screen.getByText('--')).toHaveClass('font-mono')
         })
 
-        it('displays the average of slopes from the trailing five seconds', async () => {
-            render(
-                <TestSensorModule {...defaultProps} minUpdateIntervalMs={0} />
+        it('averages the latest full-plot best-fit slopes', async () => {
+            const now = Date.now()
+            let data = Array.from({ length: 10 }, (_, index) => ({
+                timestamp: now + index * 1000,
+                value: index * 2,
+            }))
+            const { rerender } = render(
+                <SensorModule {...defaultProps} data={data} />
             )
 
-            const now = Date.now()
-            const dataPoints = [
-                { timestamp: now - 6000, value: 100 },
-                { timestamp: now - 5000, value: 0 },
-                { timestamp: now - 4000, value: 1 },
-                { timestamp: now - 2000, value: 7 },
-                { timestamp: now, value: 9 },
+            await waitFor(() => {
+                expect(screen.getByText('+2.000/s')).toBeInTheDocument()
+            })
+
+            const expectedRates = [
+                '+2.000/s',
+                '+2.103/s',
+                '+2.264/s',
+                '+2.457/s',
+                '+2.667/s',
+                '+2.882/s',
+                '+3.098/s',
+                '+3.310/s',
+                '+3.516/s',
+                '+3.886/s',
             ]
 
-            for (const point of dataPoints) {
-                useLastDatapointStore.getState().updateSeries('test-channel', {
-                    ...point,
-                    type: 'DAQ',
+            for (let index = 10; index < 20; index++) {
+                data = [
+                    ...data,
+                    {
+                        timestamp: now + index * 1000,
+                        value: index * 10 - 80,
+                    },
+                ]
+                rerender(<SensorModule {...defaultProps} data={data} />)
+
+                await waitFor(() => {
+                    expect(
+                        screen.getByText(expectedRates[index - 10])
+                    ).toBeInTheDocument()
                 })
             }
+        })
+
+        it('uses the least-squares slope through points in each window', async () => {
+            const data = Array.from({ length: 10 }, (_, index) => ({
+                timestamp: index * 1000,
+                value: index < 5 ? 0 : 10,
+            }))
+
+            render(<SensorModule {...defaultProps} data={data} />)
 
             await waitFor(() => {
-                expect(screen.getByText('+1.667/s')).toBeInTheDocument()
+                expect(screen.getByText('+1.515/s')).toBeInTheDocument()
             })
         })
     })
@@ -195,8 +226,9 @@ describe('SensorModule', () => {
                 expect(screen.getByTitle('99')).toHaveTextContent('99.00')
             })
 
-            const rateDisplay = container.querySelector('.font-mono')
-            expect(rateDisplay).not.toBeInTheDocument()
+            expect(container.querySelector('.font-mono')).toHaveTextContent(
+                '--'
+            )
         })
 
         it('respects maxDataPoints by dropping oldest points', async () => {

@@ -1,4 +1,4 @@
-import { memo, useMemo, useRef, useEffect, useCallback } from 'react'
+import { memo, useMemo, useRef, useEffect, useCallback, useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import D3Chart from './D3Chart'
 import EditGraphDropDown from './EditGraphDropDown'
@@ -40,7 +40,7 @@ interface SensorModuleProps {
 }
 
 const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
-const RATE_WINDOW_MS = 5000
+const RATE_SLOPE_HISTORY_SIZE = 10
 
 const HISTORY_SECONDS: Record<string, number> = {
     '30s': 30,
@@ -75,34 +75,35 @@ function formatValue(value: number): string {
     return value.toFixed(decimals)
 }
 
-// Utility: Calculate the average point-to-point rate over the trailing window.
-function calculateRate(data: DataPoint[]): number | null {
+// Utility: Calculate the least-squares slope through all points in the plot.
+function calculateBestFitSlope(data: DataPoint[]): number | null {
     if (data.length < 2) return null
 
-    const latestTimestamp = data[data.length - 1].timestamp
-    const recent = data.filter(
-        (point) => point.timestamp >= latestTimestamp - RATE_WINDOW_MS
+    const firstTimestamp = data[0].timestamp
+    const meanTimeSeconds =
+        data.reduce(
+            (total, point) => total + (point.timestamp - firstTimestamp) / 1000,
+            0
+        ) / data.length
+    const meanValue =
+        data.reduce((total, point) => total + point.value, 0) / data.length
+
+    const { covariance, timeVariance } = data.reduce(
+        (totals, point) => {
+            const timeDelta =
+                (point.timestamp - firstTimestamp) / 1000 - meanTimeSeconds
+            const valueDelta = point.value - meanValue
+            return {
+                covariance: totals.covariance + timeDelta * valueDelta,
+                timeVariance: totals.timeVariance + timeDelta * timeDelta,
+            }
+        },
+        { covariance: 0, timeVariance: 0 }
     )
-    if (recent.length < 2) return null
+    if (timeVariance === 0) return null
 
-    let totalSlope = 0
-    let slopeCount = 0
-
-    for (let index = 1; index < recent.length; index++) {
-        const previous = recent[index - 1]
-        const current = recent[index]
-        const timeDiffSeconds = (current.timestamp - previous.timestamp) / 1000
-
-        if (timeDiffSeconds <= 0) continue
-
-        const slope = (current.value - previous.value) / timeDiffSeconds
-        if (!Number.isFinite(slope)) continue
-
-        totalSlope += slope
-        slopeCount++
-    }
-
-    return slopeCount > 0 ? totalSlope / slopeCount : null
+    const slope = covariance / timeVariance
+    return Number.isFinite(slope) ? slope : null
 }
 
 // Utility: Remove stale data points outside time window
@@ -154,6 +155,11 @@ export const SensorModule = memo(function SensorModule({
 }: SensorModuleProps) {
     const prevChannelRef = useRef(channelName)
     const lastTimestampRef = useRef<number | null>(null)
+    const rateStateRef = useRef({
+        lastTimestamp: null as number | null,
+        slopes: [] as number[],
+    })
+    const [rate, setRate] = useState<number | null>(null)
     const timeWindowSeconds =
         timeWindowSecondsOverride ?? parseDisplayedHistory(displayedHistory)
 
@@ -209,7 +215,42 @@ export const SensorModule = memo(function SensorModule({
         return data[data.length - 1].value + offset
     }, [data, offset])
 
-    const rate = useMemo(() => calculateRate(data), [data])
+    useEffect(() => {
+        if (data.length === 0) {
+            rateStateRef.current = {
+                lastTimestamp: null,
+                slopes: [],
+            }
+            setRate(null)
+            return
+        }
+
+        const latestTimestamp = data[data.length - 1].timestamp
+        const rateState = rateStateRef.current
+
+        if (rateState.lastTimestamp === null) {
+            rateState.slopes = []
+        } else if (latestTimestamp < rateState.lastTimestamp) {
+            rateState.slopes = []
+        } else if (latestTimestamp === rateState.lastTimestamp) {
+            return
+        }
+
+        rateState.lastTimestamp = latestTimestamp
+        const slope = calculateBestFitSlope(data)
+        if (slope === null) {
+            setRate(null)
+            return
+        }
+
+        rateState.slopes = [...rateState.slopes, slope].slice(
+            -RATE_SLOPE_HISTORY_SIZE
+        )
+        setRate(
+            rateState.slopes.reduce((total, value) => total + value, 0) /
+                rateState.slopes.length
+        )
+    }, [data])
 
     const displayTitle = title || channelName
 
@@ -296,12 +337,15 @@ export const SensorModule = memo(function SensorModule({
 
                         {/* Rate indicator */}
                         <div className="min-h-[28px] flex items-center">
-                            {rate !== null && (
-                                <div className="bg-background/80 px-2 py-1 rounded text-xs font-mono border w-fit">
-                                    {rate >= 0 ? '+' : ''}
-                                    {rate.toFixed(3)}/s
-                                </div>
-                            )}
+                            <div className="bg-background/80 px-2 py-1 rounded text-xs font-mono border w-fit">
+                                {rate === null ?
+                                    '--'
+                                :   <>
+                                        {rate >= 0 ? '+' : ''}
+                                        {rate.toFixed(3)}/s
+                                    </>
+                                }
+                            </div>
                         </div>
 
                         {/* Chart area */}
