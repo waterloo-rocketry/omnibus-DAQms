@@ -128,4 +128,15 @@ describe('AddDataDialog', () => {
             'Zebra',
         ])
     })
+
+    it('wraps long CAN series names', () => {
+        const longName =
+            'INJECTOR/mock-injector/SENSOR_ANALOG16/SENSOR_PT_CHANNEL_1/value'
+        seedChannels({
+            [longName]: { value: 42, timestamp: 1000, type: 'CAN/Parsley' },
+        })
+        render(<AddDataDialog open={true} onOpenChange={() => {}} />)
+
+        expect(screen.getByText(longName)).toHaveClass('break-all')
+    })
 })

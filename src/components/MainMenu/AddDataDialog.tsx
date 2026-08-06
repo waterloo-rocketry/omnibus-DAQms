@@ -80,7 +80,7 @@ export function AddDataDialog({ open, onOpenChange }: AddDataDialogProps) {
                                     }
                                 />
                                 <span
-                                    className="truncate flex-1 text-sm"
+                                    className="min-w-0 flex-1 break-all text-sm"
                                     title={name}
                                 >
                                     {name}
