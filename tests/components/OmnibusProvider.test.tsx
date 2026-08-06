@@ -22,11 +22,9 @@ vi.mock('@waterloorocketry/omnibus-ts', () => ({
             receive: vi.fn(
                 (channel: string, callback: (message: unknown) => void) => {
                     mocks.callbacks.set(channel, callback)
-                    return (
-                        channel === 'DAQ' ?
+                    return channel === 'DAQ' ?
                             mocks.unsubscribeDaq
                         :   mocks.unsubscribeParsley
-                    )
                 }
             ),
         },
@@ -34,9 +32,10 @@ vi.mock('@waterloorocketry/omnibus-ts', () => ({
     })),
 }))
 
-function makeParsleyMessage(
-    overrides: Partial<ParsleyMessage> = {}
-): { timestamp: number; payload: ParsleyMessage } {
+function makeParsleyMessage(overrides: Partial<ParsleyMessage> = {}): {
+    timestamp: number
+    payload: ParsleyMessage
+} {
     return {
         timestamp: 123.456,
         payload: {

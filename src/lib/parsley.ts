@@ -11,9 +11,7 @@ export interface ParsedParsleySeriesUpdate {
     dataPoint: LatestDataPoint
 }
 
-function isParsleyAnalogPayload(
-    data: unknown
-): data is ParsleyAnalogPayload {
+function isParsleyAnalogPayload(data: unknown): data is ParsleyAnalogPayload {
     return (
         typeof data === 'object' &&
         data !== null &&
@@ -24,9 +22,10 @@ function isParsleyAnalogPayload(
     )
 }
 
-export function parseParsleyAnalogMessage(
-    msg: { timestamp: number; payload: ParsleyMessage }
-): ParsedParsleySeriesUpdate | null {
+export function parseParsleyAnalogMessage(msg: {
+    timestamp: number
+    payload: ParsleyMessage
+}): ParsedParsleySeriesUpdate | null {
     const { payload } = msg
 
     if (

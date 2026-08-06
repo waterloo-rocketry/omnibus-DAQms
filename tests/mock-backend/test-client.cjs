@@ -10,7 +10,9 @@ const receivedChannels = new Set()
 
 socket.on('connect', () => {
     console.log('Connected to server')
-    console.log('Listening for DAQ/Fake and CAN/Parsley/MockInjector messages...\n')
+    console.log(
+        'Listening for DAQ/Fake and CAN/Parsley/MockInjector messages...\n'
+    )
 })
 
 // Listen for channel-based events (matches omnibus-ts protocol)

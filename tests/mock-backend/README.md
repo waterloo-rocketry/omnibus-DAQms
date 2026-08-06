@@ -41,7 +41,8 @@ node server.cjs
             "Fake7": [0.89, 0.123, 0.456 /* ... 25 random floats 0-1 */]
         },
         "relative_timestamps": [
-            1234567890.123, 1234567890.124 /* ... 25 timestamps at 1ms intervals */
+            1234567890.123,
+            1234567890.124 /* ... 25 timestamps at 1ms intervals */
         ],
         "sample_rate": 1000,
         "message_format_version": 3
