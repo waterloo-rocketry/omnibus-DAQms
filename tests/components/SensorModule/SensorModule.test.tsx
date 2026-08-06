@@ -133,6 +133,32 @@ describe('SensorModule', () => {
             const rateDisplay = container.querySelector('.font-mono')
             expect(rateDisplay).not.toBeInTheDocument()
         })
+
+        it('displays the average of slopes from the trailing five seconds', async () => {
+            render(
+                <TestSensorModule {...defaultProps} minUpdateIntervalMs={0} />
+            )
+
+            const now = Date.now()
+            const dataPoints = [
+                { timestamp: now - 6000, value: 100 },
+                { timestamp: now - 5000, value: 0 },
+                { timestamp: now - 4000, value: 1 },
+                { timestamp: now - 2000, value: 7 },
+                { timestamp: now, value: 9 },
+            ]
+
+            for (const point of dataPoints) {
+                useLastDatapointStore.getState().updateSeries('test-channel', {
+                    ...point,
+                    type: 'DAQ',
+                })
+            }
+
+            await waitFor(() => {
+                expect(screen.getByText('+1.667/s')).toBeInTheDocument()
+            })
+        })
     })
 
     describe('Time Window Filtering', () => {

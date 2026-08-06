@@ -40,6 +40,7 @@ interface SensorModuleProps {
 }
 
 const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
+const RATE_WINDOW_MS = 5000
 
 const HISTORY_SECONDS: Record<string, number> = {
     '30s': 30,
@@ -74,21 +75,34 @@ function formatValue(value: number): string {
     return value.toFixed(decimals)
 }
 
-// Utility: Calculate rate of change from recent data
+// Utility: Calculate the average point-to-point rate over the trailing window.
 function calculateRate(data: DataPoint[]): number | null {
     if (data.length < 2) return null
 
-    const recent = data.slice(-10)
+    const latestTimestamp = data[data.length - 1].timestamp
+    const recent = data.filter(
+        (point) => point.timestamp >= latestTimestamp - RATE_WINDOW_MS
+    )
     if (recent.length < 2) return null
 
-    const first = recent[0]
-    const last = recent[recent.length - 1]
-    const timeDiffSeconds = (last.timestamp - first.timestamp) / 1000
+    let totalSlope = 0
+    let slopeCount = 0
 
-    if (timeDiffSeconds === 0) return null
+    for (let index = 1; index < recent.length; index++) {
+        const previous = recent[index - 1]
+        const current = recent[index]
+        const timeDiffSeconds = (current.timestamp - previous.timestamp) / 1000
 
-    const valueDiff = last.value - first.value
-    return valueDiff / timeDiffSeconds
+        if (timeDiffSeconds <= 0) continue
+
+        const slope = (current.value - previous.value) / timeDiffSeconds
+        if (!Number.isFinite(slope)) continue
+
+        totalSlope += slope
+        slopeCount++
+    }
+
+    return slopeCount > 0 ? totalSlope / slopeCount : null
 }
 
 // Utility: Remove stale data points outside time window
