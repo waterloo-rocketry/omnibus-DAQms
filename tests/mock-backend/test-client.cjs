@@ -6,21 +6,19 @@ const socket = io('http://localhost:6767', {
     transports: ['websocket'],
 })
 
-let messageCount = 0
+const receivedChannels = new Set()
 
 socket.on('connect', () => {
     console.log('Connected to server')
-    console.log('Listening for DAQ/Fake messages...\n')
+    console.log(
+        'Listening for DAQ/Fake and CAN/Parsley/MockInjector messages...\n'
+    )
 })
 
 // Listen for channel-based events (matches omnibus-ts protocol)
 socket.onAny((event, timestamp, payload) => {
-    if (!event.startsWith('DAQ/')) return
-
-    messageCount++
-
-    if (messageCount <= 3) {
-        console.log(`\nMessage #${messageCount}:`)
+    if (event.startsWith('DAQ/')) {
+        receivedChannels.add('DAQ')
         console.log(`Channel: ${event}`)
         console.log(`Timestamp: ${timestamp}`)
         console.log(`Sample Rate: ${payload.sample_rate}`)
@@ -33,12 +31,22 @@ socket.onAny((event, timestamp, payload) => {
                 .join(', ')}]`
         )
         console.log(
-            `Relative timestamps (first 3): [${payload.relative_timestamps_nanoseconds.slice(0, 3).join(', ')}]`
+            `Relative timestamps (first 3): [${payload.relative_timestamps.slice(0, 3).join(', ')}]`
         )
+    } else if (event.startsWith('CAN/Parsley/')) {
+        receivedChannels.add('CAN/Parsley')
+        console.log(`Channel: ${event}`)
+        console.log(`Timestamp: ${timestamp}`)
+        console.log(`Board: ${payload.board_type_id}/${payload.board_inst_id}`)
+        console.log(`Message: ${payload.msg_type}/${payload.msg_metadata}`)
+        console.log(`Payload time: ${payload.data.time}s`)
+        console.log(`Value: ${payload.data.value}`)
+    } else {
+        return
     }
 
-    if (messageCount === 3) {
-        console.log('\nTest successful! Received 3 messages.')
+    if (receivedChannels.size === 2) {
+        console.log('\nTest successful! Received DAQ and CAN/Parsley messages.')
         console.log('Disconnecting...')
         socket.disconnect()
         process.exit(0)
