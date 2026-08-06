@@ -5,6 +5,8 @@ const io = new Server(6767, {
     cors: { origin: '*' },
     parser,
 })
+const PARSLEY_TIME_MAX_MS = 2 ** 16
+const parsleyTimeOrigin = Date.now()
 
 function generateDaqPayload() {
     const timestamp = Date.now()
@@ -33,6 +35,30 @@ function generateDaqPayload() {
     }
 }
 
+function generateParsleyPayload(sensorIndex) {
+    const now = Date.now()
+    const timestamp = now / 1000
+    const rollingTimeSeconds =
+        ((now - parsleyTimeOrigin) % PARSLEY_TIME_MAX_MS) / 1000
+
+    return {
+        timestamp,
+        payload: {
+            board_type_id: 'INJECTOR',
+            board_inst_id: 'mock-injector',
+            msg_prio: 'MEDIUM',
+            msg_type: 'SENSOR_ANALOG16',
+            msg_metadata: `SENSOR_PT_CHANNEL_${sensorIndex + 1}`,
+            data: {
+                time: rollingTimeSeconds,
+                value: Math.random(),
+            },
+            parsley: 'mock-parsley',
+            message_format_version: 2,
+        },
+    }
+}
+
 io.on('connection', (socket) => {
     console.log(`Client connected: ${socket.id}`)
 
@@ -48,6 +74,16 @@ setInterval(() => {
     io.emit('DAQ/Fake', timestamp, payload)
 }, 25)
 
-console.log('Mock DAQ server running on port 6767 (msgpack parser)')
-console.log('Emitting "DAQ/Fake" events at 40 Hz (every 25ms)')
-console.log('Data format: 8 channels (Fake0-Fake7), 25 samples each')
+// Emit four INJECTOR SENSOR_ANALOG16 series at 10 Hz.
+setInterval(() => {
+    for (let sensorIndex = 0; sensorIndex < 4; sensorIndex++) {
+        const { timestamp, payload } = generateParsleyPayload(sensorIndex)
+        io.emit('CAN/Parsley/MockInjector', timestamp, payload)
+    }
+}, 100)
+
+console.log('Mock Omnibus server running on port 6767 (msgpack parser)')
+console.log('Emitting "DAQ/Fake" events at 40 Hz (8 channels, 25 samples each)')
+console.log(
+    'Emitting "CAN/Parsley/MockInjector" events at 10 Hz (4 injector analog series)'
+)

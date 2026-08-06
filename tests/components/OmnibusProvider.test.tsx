@@ -44,6 +44,7 @@ function makeParsleyMessage(
             boardInstId: 'injector-2',
             msgPrio: 'MEDIUM',
             msgType: 'SENSOR_ANALOG16',
+            msgMetadata: 'SENSOR_PT_CHANNEL_1',
             data: { time: 99, value: 42.5 },
             parsley: 'parsley-1',
             messageFormatVersion: 2,
@@ -55,7 +56,8 @@ function makeParsleyMessage(
 describe('parseParsleyAnalogMessage', () => {
     it('flattens an injector analog message using its Omnibus timestamp', () => {
         expect(parseParsleyAnalogMessage(makeParsleyMessage())).toEqual({
-            seriesName: 'INJECTOR/injector-2/SENSOR_ANALOG16',
+            seriesName:
+                'INJECTOR/injector-2/SENSOR_ANALOG16/SENSOR_PT_CHANNEL_1/value',
             dataPoint: {
                 value: 42.5,
                 timestamp: 123456,
@@ -93,7 +95,7 @@ describe('OmnibusProvider', () => {
         mocks.callbacks.get('CAN/Parsley')?.(makeParsleyMessage())
 
         expect(useLastDatapointStore.getState().series).toEqual({
-            'INJECTOR/injector-2/SENSOR_ANALOG16': {
+            'INJECTOR/injector-2/SENSOR_ANALOG16/SENSOR_PT_CHANNEL_1/value': {
                 value: 42.5,
                 timestamp: 123456,
                 type: 'CAN/Parsley',

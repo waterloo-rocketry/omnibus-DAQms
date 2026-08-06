@@ -1,6 +1,6 @@
-# Mock DAQ Backend Server
+# Mock Omnibus Backend Server
 
-A Node.js SocketIO server that emits DAQ/Fake test data for frontend development.
+A Node.js SocketIO server that emits DAQ and Parsley test data for frontend development.
 
 ## Quick Start
 
@@ -17,12 +17,12 @@ node server.cjs
 ### Server Configuration
 
 - **Technology**: Node.js with socket.io
-- **Port**: 8081
+- **Port**: 6767
 - **CORS**: Enabled for all origins
 
 ### SocketIO Events
 
-**Server → Client**: `message`
+**Server → Client**: channel-based Socket.IO events, with timestamp and payload arguments.
 
 ```json
 {
@@ -40,10 +40,31 @@ node server.cjs
             "Fake6": [0.789, 0.012, 0.345 /* ... 25 random floats 0-1 */],
             "Fake7": [0.89, 0.123, 0.456 /* ... 25 random floats 0-1 */]
         },
-        "relative_timestamps_nanoseconds": [
-            0, 1000000, 2000000 /* ... 25 values, increment by 1000000 */
+        "relative_timestamps": [
+            1234567890.123, 1234567890.124 /* ... 25 timestamps at 1ms intervals */
         ],
         "sample_rate": 1000,
+        "message_format_version": 3
+    }
+}
+```
+
+**Server → Client**: `CAN/Parsley/MockInjector`
+
+```json
+{
+    "timestamp": 1234567890.123,
+    "payload": {
+        "board_type_id": "INJECTOR",
+        "board_inst_id": "mock-injector",
+        "msg_prio": "MEDIUM",
+        "msg_type": "SENSOR_ANALOG16",
+        "msg_metadata": "SENSOR_PT_CHANNEL_1",
+        "data": {
+            "time": 12.345,
+            "value": 0.42
+        },
+        "parsley": "mock-parsley",
         "message_format_version": 2
     }
 }
@@ -51,12 +72,11 @@ node server.cjs
 
 ### Emission Behavior
 
-- **Rate**: 40 Hz (emit every 25ms)
-- **Data**: 8 channels (Fake0-Fake7)
-- **Samples**: 25 per channel per message
-- **Values**: Random floats between 0-1
-- **Timestamps**: Unix timestamp in seconds (e.g., `Date.now() / 1000`)
-- **Relative timestamps**: Array of 25 integers starting at 0, incrementing by 1000000 (1ms in nanoseconds)
+- **DAQ/Fake**: 40 Hz, 8 channels (Fake0-Fake7), and 25 random samples per channel.
+- **CAN/Parsley/MockInjector**: 10 Hz, four `INJECTOR` / `SENSOR_ANALOG16` messages with metadata values `SENSOR_PT_CHANNEL_1` through `SENSOR_PT_CHANNEL_4`.
+- **Values**: Random floats between 0-1.
+- **Timestamps**: Unix timestamps in seconds (e.g., `Date.now() / 1000`).
+- **Parsley payload time**: A wrapping unsigned 16-bit millisecond counter, divided by 1000 before being sent as seconds. It ranges from `0` through `65.535` and then wraps.
 
 ## Testing
 
@@ -67,7 +87,7 @@ In a separate terminal window:
 ```bash
 # Make sure the server is running (npm start in another terminal)
 # Then run the test client:
-node test-client.js
+node test-client.cjs
 ```
 
 This will connect, display the first 3 messages, and verify the server is working correctly.

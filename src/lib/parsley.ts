@@ -38,7 +38,7 @@ export function parseParsleyAnalogMessage(
     }
 
     return {
-        seriesName: `${payload.boardTypeId}/${payload.boardInstId}/${payload.msgType}`,
+        seriesName: `${payload.boardTypeId}/${payload.boardInstId}/${payload.msgType}/${payload.msgMetadata}/value`,
         dataPoint: {
             value: payload.data.value,
             timestamp: msg.timestamp * 1000,
