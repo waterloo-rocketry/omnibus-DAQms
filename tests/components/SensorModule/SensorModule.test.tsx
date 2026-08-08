@@ -178,6 +178,41 @@ describe('SensorModule', () => {
             }
         })
 
+        it('discards stale slope history after a gap of insufficient data', async () => {
+            const validData = [
+                { timestamp: 0, value: 0 },
+                { timestamp: 1000, value: 10 },
+            ]
+            const { rerender } = render(
+                <SensorModule {...defaultProps} data={validData} />
+            )
+
+            await waitFor(() => {
+                expect(screen.getByText('+10.000/s')).toBeInTheDocument()
+            })
+
+            // Drop to a single point: not enough data for a slope.
+            const insufficientData = [{ timestamp: 2000, value: 10 }]
+            rerender(<SensorModule {...defaultProps} data={insufficientData} />)
+
+            await waitFor(() => {
+                expect(screen.getByText('--')).toBeInTheDocument()
+            })
+
+            // Valid data again, with a different slope than before the gap.
+            const newValidData = [
+                { timestamp: 2000, value: 10 },
+                { timestamp: 3000, value: 50 },
+            ]
+            rerender(<SensorModule {...defaultProps} data={newValidData} />)
+
+            // Final rate must reflect only the new slope, not an average
+            // with the stale slope from before the gap.
+            await waitFor(() => {
+                expect(screen.getByText('+40.000/s')).toBeInTheDocument()
+            })
+        })
+
         it('uses the least-squares slope through points in each window', async () => {
             const data = Array.from({ length: 10 }, (_, index) => ({
                 timestamp: index * 1000,

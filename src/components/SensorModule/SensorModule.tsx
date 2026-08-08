@@ -239,6 +239,7 @@ export const SensorModule = memo(function SensorModule({
         rateState.lastTimestamp = latestTimestamp
         const slope = calculateBestFitSlope(data)
         if (slope === null) {
+            rateState.slopes = []
             setRate(null)
             return
         }
