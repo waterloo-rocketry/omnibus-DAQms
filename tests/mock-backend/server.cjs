@@ -8,6 +8,10 @@ const io = new Server(6767, {
 const PARSLEY_TIME_MAX_MS = 2 ** 16
 const parsleyTimeOrigin = Date.now()
 
+const SLOPE_PER_SECOND = 2
+const SLOPE_NOISE_AMPLITUDE = 2
+const serverStartTimestamp = Date.now()
+
 function generateDaqPayload() {
     const timestamp = Date.now()
     const data = {}
@@ -16,6 +20,13 @@ function generateDaqPayload() {
     for (let i = 0; i < 8; i++) {
         data[`Fake${i}`] = Array.from({ length: 25 }, () => Math.random())
     }
+
+    data.FakeSlope = Array.from(
+        { length: 25 },
+        (_, i) =>
+            ((timestamp + i - serverStartTimestamp) / 1000) * SLOPE_PER_SECOND +
+            (Math.random() * 2 - 1) * SLOPE_NOISE_AMPLITUDE
+    )
 
     // Generate relative timestamps (25 samples, 1ms apart, in seconds)
     const relative_timestamps = Array.from(
@@ -86,4 +97,7 @@ console.log('Mock Omnibus server running on port 6767 (msgpack parser)')
 console.log('Emitting "DAQ/Fake" events at 40 Hz (8 channels, 25 samples each)')
 console.log(
     'Emitting "CAN/Parsley/MockInjector" events at 10 Hz (4 injector analog series)'
+)
+console.log(
+    'FakeSlope trends upward at 2.000 units/s with +/-2.000 units noise'
 )

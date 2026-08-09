@@ -112,7 +112,7 @@ export default function D3Chart({
         d3.select(yAxisRef.current).call(yAxis)
         d3.select(yAxisRef.current)
             .selectAll('text')
-            .attr('font-size', 11)
+            .attr('font-size', 16)
             .attr('fill', 'var(--muted-foreground)')
     }, [yScale, rangeTickCount, innerH])
 
@@ -179,7 +179,7 @@ export default function D3Chart({
                                 y={16}
                                 textAnchor="middle"
                                 style={{
-                                    fontSize: 11,
+                                    fontSize: 16,
                                     fill: 'var(--muted-foreground)',
                                 }}
                             >
