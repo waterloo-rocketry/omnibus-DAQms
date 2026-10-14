@@ -18,8 +18,8 @@ function generateDaqPayload() {
 
     // Generate 8 channels with 25 samples each
     for (let i = 0; i < 8; i++) {
-         data[`Fake${i}`] = Array.from({ length: 25 }, () => Math.random())
-        
+        data[`Fake${i}`] = Array.from({ length: 25 }, () => Math.random())
+
         // Tests for big swings and spikes
         //data[`Fake${i}`] = Array.from({ length: 25 }, () => {
         //  const sign = Math.random() > 0.5 ? 1 : -1;

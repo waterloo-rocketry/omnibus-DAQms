@@ -15,6 +15,7 @@ interface D3ChartProps {
     fixedDomain?: [number, number]
     domainTickCount?: number //MUST BE > 0
     timeWindowSeconds?: number
+    delayMs?: number // Chart runs this far behind the newest point so the line tip can glide
 }
 
 export default function D3Chart({
@@ -30,6 +31,7 @@ export default function D3Chart({
     rangeTickCount = 5,
     domainTickCount = 5,
     timeWindowSeconds,
+    delayMs = 50, // Higher will make chart tip move smoother but have more delayed data
 }: D3ChartProps) {
     const { top = 10, right = 33, bottom = 24, left = 70 } = margin
 
@@ -46,20 +48,24 @@ export default function D3Chart({
             return timeWindowSeconds * 1000
         }
         if (data.length < 2) return 1000
-        return Math.max(data[data.length - 1].timestamp - data[0].timestamp, 1000)
+        return Math.max(
+            data[data.length - 1].timestamp - data[0].timestamp,
+            1000
+        )
     }, [timeWindowSeconds, data])
 
     const pxPerMs = innerW / windowMs
 
-    // X scale
+    // X scale: right edge is delayMs behind the newest point
     const xScale = useMemo(() => {
-        const end =
+        const newest =
             data.length > 0 ? data[data.length - 1].timestamp : Date.now()
+        const end = newest - delayMs
         return d3
             .scaleTime()
             .domain([new Date(end - windowMs), new Date(end)])
             .range([0, innerW])
-    }, [data, innerW, windowMs])
+    }, [data, innerW, windowMs, delayMs])
 
     // Fixed Pos X Ticks
     const xTicks = useMemo(() => {
@@ -195,7 +201,9 @@ export default function D3Chart({
                         <path
                             d={pathD}
                             fill="none"
-                            stroke={strokeClassName ? 'currentColor' : strokeColor}
+                            stroke={
+                                strokeClassName ? 'currentColor' : strokeColor
+                            }
                             className={strokeClassName}
                             strokeWidth={strokeWidth}
                             strokeLinejoin="round"
