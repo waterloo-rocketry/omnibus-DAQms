@@ -1,4 +1,4 @@
-import { useRef, useMemo, useLayoutEffect } from 'react'
+import { useRef, useMemo, useLayoutEffect, useId } from 'react'
 import * as d3 from 'd3'
 import type { DataPoint } from '@/types/omnibus'
 
@@ -13,6 +13,7 @@ interface D3ChartProps {
     rangeTickCount?: number // MUST BE > 0
     fixedDomain?: [number, number]
     domainTickCount?: number //MUST BE > 0
+    timeWindowSeconds?: number
 }
 
 export default function D3Chart({
@@ -26,6 +27,7 @@ export default function D3Chart({
     fixedDomain,
     rangeTickCount = 5,
     domainTickCount = 5,
+    timeWindowSeconds,
 }: D3ChartProps) {
     const { top = 10, right = 33, bottom = 24, left = 70 } = margin
 
@@ -33,17 +35,29 @@ export default function D3Chart({
     const innerH = Math.max(0, height - top - bottom)
 
     const yAxisRef = useRef<SVGGElement>(null)
+    const beltRef = useRef<SVGGElement>(null)
+    // unique per chart instance so multiple graphs don't share a clip
+    const clipId = `clip-${useId().replace(/:/g, '')}`
+
+    const windowMs = useMemo(() => {
+        if (timeWindowSeconds && timeWindowSeconds > 0) {
+            return timeWindowSeconds * 1000
+        }
+        if (data.length < 2) return 1000
+        return Math.max(data[data.length - 1].timestamp - data[0].timestamp, 1000)
+    }, [timeWindowSeconds, data])
+
+    const pxPerMs = innerW / windowMs
 
     // X scale
     const xScale = useMemo(() => {
-        if (data.length === 0) {
-            const now = new Date()
-            return d3.scaleTime().domain([now, now]).range([0, innerW])
-        }
-        const times = data.map((d) => new Date(d.timestamp))
-        const domain = d3.extent(times) as [Date, Date]
-        return d3.scaleTime().domain(domain).range([0, innerW])
-    }, [data, innerW])
+        const end =
+            data.length > 0 ? data[data.length - 1].timestamp : Date.now()
+        return d3
+            .scaleTime()
+            .domain([new Date(end - windowMs), new Date(end)])
+            .range([0, innerW])
+    }, [data, innerW, windowMs])
 
     // Fixed Pos X Ticks
     const xTicks = useMemo(() => {
@@ -102,6 +116,24 @@ export default function D3Chart({
         return data.length ? (line(data) ?? '') : ''
     }, [data, xScale, yScale])
 
+    // Conveyor belt: reset on each new path, slide left every frame
+    useLayoutEffect(() => {
+        const belt = beltRef.current
+        if (!belt) return
+        belt.setAttribute('transform', 'translate(0,0)')
+        if (!pathD || pxPerMs <= 0) return
+
+        const start = performance.now()
+        let raf = 0
+        const tick = (now: number) => {
+            const dx = Math.min((now - start) * pxPerMs, innerW)
+            belt.setAttribute('transform', `translate(${-dx},0)`)
+            if (dx < innerW) raf = requestAnimationFrame(tick)
+        }
+        raf = requestAnimationFrame(tick)
+        return () => cancelAnimationFrame(raf)
+    }, [pathD, pxPerMs, innerW])
+
     // Render y-axis using D3
     useLayoutEffect(() => {
         if (!yAxisRef.current) return
@@ -124,6 +156,16 @@ export default function D3Chart({
             preserveAspectRatio="none"
             role="img"
         >
+            <defs>
+                <clipPath id={clipId}>
+                    <rect
+                        x={0}
+                        y={-strokeWidth}
+                        width={innerW}
+                        height={innerH + strokeWidth * 2}
+                    />
+                </clipPath>
+            </defs>
             <g transform={`translate(${margin.left},${top})`}>
                 {/* Horizontal y-axis stuff */}
                 <g aria-hidden="true">
@@ -146,14 +188,18 @@ export default function D3Chart({
                 </g>
 
                 {/* Data path */}
-                <path
-                    d={pathD}
-                    fill="none"
-                    stroke={strokeColor}
-                    strokeWidth={strokeWidth}
-                    strokeLinejoin="round"
-                    strokeLinecap="round"
-                />
+                <g clipPath={`url(#${clipId})`}>
+                    <g ref={beltRef}>
+                        <path
+                            d={pathD}
+                            fill="none"
+                            stroke={strokeColor}
+                            strokeWidth={strokeWidth}
+                            strokeLinejoin="round"
+                            strokeLinecap="round"
+                        />
+                    </g>
+                </g>
 
                 {/* X axis manual fixed-position ticks */}
                 <g transform={`translate(0, ${innerH})`} aria-hidden="true">

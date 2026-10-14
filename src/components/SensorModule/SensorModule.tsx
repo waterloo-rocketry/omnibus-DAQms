@@ -358,6 +358,7 @@ export const SensorModule = memo(function SensorModule({
                                 rangeTickCount={rangeTickCount}
                                 fixedDomain={fixedDomain}
                                 domainTickCount={domainTickCount}
+                                timeWindowSeconds={(maxDataPoints * minUpdateIntervalMs) / 1000}
                             />
                         </div>
 
