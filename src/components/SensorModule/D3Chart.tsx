@@ -9,6 +9,7 @@ interface D3ChartProps {
 
     margin?: { top?: number; right?: number; bottom?: number; left?: number }
     strokeColor?: string
+    strokeClassName?: string
     strokeWidth?: number
     rangeTickCount?: number // MUST BE > 0
     fixedDomain?: [number, number]
@@ -23,6 +24,7 @@ export default function D3Chart({
 
     margin = { top: 10, right: 33, bottom: 24, left: 70 },
     strokeColor = 'var(--chart-1)',
+    strokeClassName,
     strokeWidth = 2,
     fixedDomain,
     rangeTickCount = 5,
@@ -193,7 +195,8 @@ export default function D3Chart({
                         <path
                             d={pathD}
                             fill="none"
-                            stroke={strokeColor}
+                            stroke={strokeClassName ? 'currentColor' : strokeColor}
+                            className={strokeClassName}
                             strokeWidth={strokeWidth}
                             strokeLinejoin="round"
                             strokeLinecap="round"
