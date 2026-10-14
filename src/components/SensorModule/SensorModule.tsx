@@ -353,11 +353,15 @@ export const SensorModule = memo(function SensorModule({
                         <div className="min-h-[150px]">
                             <D3Chart
                                 data={dataWithOffset}
+                                strokeClassName={titleColor}
                                 strokeColor={strokeColor}
                                 strokeWidth={strokeWidth}
                                 rangeTickCount={rangeTickCount}
                                 fixedDomain={fixedDomain}
                                 domainTickCount={domainTickCount}
+                                timeWindowSeconds={
+                                    (maxDataPoints * minUpdateIntervalMs) / 1000
+                                }
                             />
                         </div>
 
