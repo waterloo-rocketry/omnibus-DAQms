@@ -1,9 +1,16 @@
 name: CI
 
+# Runs when DAQms changes
 on:
     push:
         branches: [main]
-    pull_request: {}
+        paths: ['areas/apps/daqms/**']
+    pull_request:
+        paths: ['areas/apps/daqms/**']
+
+defaults:
+    run:
+        working-directory: areas/apps/daqms
 
 jobs:
     lint:
@@ -15,6 +22,7 @@ jobs:
               with:
                   node-version: 24
                   cache: npm
+                  cache-dependency-path: areas/apps/daqms/package-lock.json
             - run: npm ci
             - run: npm run lint
 
@@ -27,6 +35,7 @@ jobs:
               with:
                   node-version: 24
                   cache: npm
+                  cache-dependency-path: areas/apps/daqms/package-lock.json
             - run: npm ci
             - run: npm run typecheck
 
@@ -39,6 +48,7 @@ jobs:
               with:
                   node-version: 24
                   cache: npm
+                  cache-dependency-path: areas/apps/daqms/package-lock.json
             - run: npm ci
             - run: npm run test
 
@@ -51,5 +61,6 @@ jobs:
               with:
                   node-version: 24
                   cache: npm
+                  cache-dependency-path: areas/apps/daqms/package-lock.json
             - run: npm ci
             - run: npm run format:check
