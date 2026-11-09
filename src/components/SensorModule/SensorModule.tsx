@@ -189,13 +189,20 @@ export const SensorModule = memo(function SensorModule({
                 const cutoffTime =
                     newDataPoint.timestamp - timeWindowSeconds * 1000
                 const prev = useGraphDataStore.getState().data[id] ?? []
+                const pointsNeededForWindow = Math.ceil(
+                    (timeWindowSeconds * 1000) / minUpdateIntervalMs
+                )
+                const retainedPointLimit = Math.max(
+                    maxDataPoints,
+                    pointsNeededForWindow
+                )
                 const newData = [
                     ...filterStaleData(prev, cutoffTime),
                     {
                         timestamp: newDataPoint.timestamp,
                         value: newDataPoint.value,
                     },
-                ].slice(-maxDataPoints)
+                ].slice(-retainedPointLimit)
                 useGraphDataStore.getState().setData(id, newData)
             }
         )
@@ -359,9 +366,7 @@ export const SensorModule = memo(function SensorModule({
                                 rangeTickCount={rangeTickCount}
                                 fixedDomain={fixedDomain}
                                 domainTickCount={domainTickCount}
-                                timeWindowSeconds={
-                                    (maxDataPoints * minUpdateIntervalMs) / 1000
-                                }
+                                timeWindowSeconds={timeWindowSeconds}
                             />
                         </div>
 
