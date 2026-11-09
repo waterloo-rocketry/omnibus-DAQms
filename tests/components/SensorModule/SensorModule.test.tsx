@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import type { ComponentProps } from 'react'
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { SensorModule } from '@/components/SensorModule'
 import { useLastDatapointStore } from '@/store/omnibusStore'
@@ -228,6 +228,70 @@ describe('SensorModule', () => {
     })
 
     describe('Time Window Filtering', () => {
+        it('retains the selected history window even when it needs more than maxDataPoints', () => {
+            const firstTimestamp = 1_000_000
+            render(
+                <TestSensorModule
+                    {...defaultProps}
+                    timeWindowSeconds={30}
+                    maxDataPoints={100}
+                    minUpdateIntervalMs={100}
+                />
+            )
+
+            act(() => {
+                for (let index = 0; index < 105; index++) {
+                    useLastDatapointStore
+                        .getState()
+                        .updateSeries('test-channel', {
+                            value: index,
+                            timestamp: firstTimestamp + index * 100,
+                            type: 'DAQ',
+                        })
+                }
+            })
+
+            const points =
+                useGraphDataStore.getState().data[defaultProps.id] ?? []
+            expect(points).toHaveLength(105)
+            expect(points[0].timestamp).toBe(firstTimestamp)
+            expect(points[104].timestamp).toBe(firstTimestamp + 10_400)
+        })
+
+        it.each([
+            ['5s', 5],
+            ['10s', 10],
+        ])('retains only the selected %s window', (history, seconds) => {
+            const firstTimestamp = 1_000_000
+            render(
+                <TestSensorModule
+                    {...defaultProps}
+                    displayedHistory={history}
+                    minUpdateIntervalMs={100}
+                />
+            )
+
+            act(() => {
+                for (let index = 0; index <= seconds * 10 + 10; index++) {
+                    useLastDatapointStore
+                        .getState()
+                        .updateSeries('test-channel', {
+                            value: index,
+                            timestamp: firstTimestamp + index * 100,
+                            type: 'DAQ',
+                        })
+                }
+            })
+
+            const points =
+                useGraphDataStore.getState().data[defaultProps.id] ?? []
+            const latestTimestamp = firstTimestamp + (seconds * 10 + 10) * 100
+            expect(points[0].timestamp).toBeGreaterThan(
+                latestTimestamp - seconds * 1000
+            )
+            expect(points[points.length - 1].timestamp).toBe(latestTimestamp)
+        })
+
         it('filters out data points older than timeWindowSeconds', async () => {
             const now = Date.now()
 
@@ -292,6 +356,9 @@ describe('SensorModule', () => {
             }
 
             expect(screen.getByTitle('40')).toHaveTextContent('40.00')
+            expect(
+                useGraphDataStore.getState().data[defaultProps.id]
+            ).toHaveLength(3)
         })
     })
 

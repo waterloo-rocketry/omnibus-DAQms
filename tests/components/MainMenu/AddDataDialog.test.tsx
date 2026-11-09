@@ -78,6 +78,57 @@ describe('AddDataDialog', () => {
             'OPT-101',
         ])
         expect(configs[0].title).toBe(configs[0].channelName)
+        expect(configs[0]).toMatchObject({
+            titleColor: 'text-foreground',
+            offset: 0,
+            graphType: 'Graph',
+            displayedHistory: '30s',
+        })
+    })
+
+    it('applies selected graph settings to added channels', async () => {
+        seedChannels({
+            'OPT-101': { value: 42, timestamp: 1000, type: 'DAQ' },
+        })
+        render(<AddDataDialog open={true} onOpenChange={() => {}} />)
+
+        await userEvent.type(screen.getByLabelText('Title'), 'Pressure')
+        await userEvent.clear(screen.getByLabelText('Offset'))
+        await userEvent.type(screen.getByLabelText('Offset'), '-2.5')
+        await userEvent.click(
+            screen.getByRole('button', { name: 'Blue title color' })
+        )
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'History' }))
+        await userEvent.click(screen.getByRole('option', { name: '5min' }))
+        await userEvent.click(screen.getByRole('combobox', { name: 'Type' }))
+        await userEvent.click(screen.getByRole('option', { name: 'Number' }))
+
+        expect(
+            screen.queryByRole('combobox', { name: 'History' })
+        ).not.toBeInTheDocument()
+
+        await userEvent.click(screen.getByText('OPT-101'))
+        await userEvent.click(screen.getByRole('button', { name: 'Add' }))
+
+        expect(useDashboardStore.getState().graphConfigs[0]).toMatchObject({
+            title: 'Pressure',
+            titleColor: 'text-blue-500',
+            offset: -2.5,
+            graphType: 'Number',
+            displayedHistory: '5min',
+        })
+    })
+
+    it('offers 5-second and 10-second history windows', async () => {
+        seedChannels({
+            'OPT-101': { value: 42, timestamp: 1000, type: 'DAQ' },
+        })
+        render(<AddDataDialog open={true} onOpenChange={() => {}} />)
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'History' }))
+        expect(screen.getByRole('option', { name: '5s' })).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: '10s' })).toBeInTheDocument()
     })
 
     it('dialog closes after Add', async () => {
