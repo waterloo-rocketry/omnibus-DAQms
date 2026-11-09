@@ -32,9 +32,13 @@ vi.mock('@waterloorocketry/omnibus-ts', () => ({
     })),
 }))
 
+type ParsleyMessageWithMetadata = ParsleyMessage & {
+    msgMetadata: string | number
+}
+
 function makeParsleyMessage(overrides: Partial<ParsleyMessage> = {}): {
     timestamp: number
-    payload: ParsleyMessage
+    payload: ParsleyMessageWithMetadata
 } {
     return {
         timestamp: 123.456,
