@@ -140,7 +140,7 @@ export default function D3Chart({
         }
         raf = requestAnimationFrame(tick)
         return () => cancelAnimationFrame(raf)
-    }, [pathD, pxPerMs, innerW])
+    }, [data, pathD, pxPerMs, innerW])
 
     // Render y-axis using D3
     useLayoutEffect(() => {
