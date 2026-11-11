@@ -31,6 +31,9 @@ export function parseParsleyAnalogMessage(msg: {
     if (
         payload.boardTypeId !== 'INJECTOR' ||
         payload.msgType !== 'SENSOR_ANALOG16' ||
+        !('msgMetadata' in payload) ||
+        (typeof payload.msgMetadata !== 'string' &&
+            typeof payload.msgMetadata !== 'number') ||
         !isParsleyAnalogPayload(payload.data)
     ) {
         return null

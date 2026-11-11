@@ -20,6 +20,8 @@ import {
 import { TITLE_COLORS } from '@/store/dashboardStore/types'
 import type { GraphConfigEditable } from '@/store/dashboardStore/types'
 
+const HISTORY_OPTIONS = ['5s', '10s', '30s', '1min', '5min', '10min', '30min']
+
 interface EditGraphDialogProps {
     open: boolean
     onOpenChange: (open: boolean) => void
@@ -31,8 +33,6 @@ interface EditGraphDialogProps {
     displayedHistory: string
     onEdit: (id: string, changes: Partial<GraphConfigEditable>) => void
 }
-
-// const HISTORY_OPTIONS = ['30s', '1min', '5min', '10min', '30min']
 
 export default function EditGraphDialog({
     open,
@@ -123,7 +123,7 @@ export default function EditGraphDialog({
                                     value={localGraphType}
                                     onValueChange={setLocalGraphType}
                                 >
-                                    <SelectTrigger>
+                                    <SelectTrigger aria-label="Type">
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -153,24 +153,29 @@ export default function EditGraphDialog({
                                 />
                             </div>
 
-                            {/* <div className="grid gap-3"> */}
-                            {/*     <Label>History</Label> */}
-                            {/*     <Select */}
-                            {/*         value={history} */}
-                            {/*         onValueChange={setHistory} */}
-                            {/*     > */}
-                            {/*         <SelectTrigger> */}
-                            {/*             <SelectValue placeholder="History" /> */}
-                            {/*         </SelectTrigger> */}
-                            {/*         <SelectContent> */}
-                            {/*             {HISTORY_OPTIONS.map((h) => ( */}
-                            {/*                 <SelectItem key={h} value={h}> */}
-                            {/*                     {h} */}
-                            {/*                 </SelectItem> */}
-                            {/*             ))} */}
-                            {/*         </SelectContent> */}
-                            {/*     </Select> */}
-                            {/* </div> */}
+                            {localGraphType !== 'Number' && (
+                                <div className="grid gap-3">
+                                    <Label>History</Label>
+                                    <Select
+                                        value={history}
+                                        onValueChange={setHistory}
+                                    >
+                                        <SelectTrigger aria-label="History">
+                                            <SelectValue placeholder="History" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {HISTORY_OPTIONS.map((item) => (
+                                                <SelectItem
+                                                    key={item}
+                                                    value={item}
+                                                >
+                                                    {item}
+                                                </SelectItem>
+                                            ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                            )}
                         </div>
                     </div>
 

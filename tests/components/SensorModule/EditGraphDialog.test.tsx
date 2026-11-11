@@ -23,6 +23,26 @@ describe('EditGraphDialog', () => {
         expect(input.placeholder).toBe('1.2')
     })
 
+    it('preserves initialized settings when saved without changes', async () => {
+        const onEdit = vi.fn()
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
+
+        await userEvent.click(screen.getByText('Save changes'))
+
+        await waitFor(() => {
+            expect(onEdit).toHaveBeenCalledWith(
+                'test-id',
+                expect.objectContaining({
+                    title: 'Initial Title',
+                    titleColor: 'black',
+                    offset: 1.2,
+                    graphType: 'Graph',
+                    displayedHistory: '30s',
+                })
+            )
+        })
+    })
+
     it('updates graph title on save', async () => {
         const onEdit = vi.fn()
         render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
@@ -60,6 +80,54 @@ describe('EditGraphDialog', () => {
                 expect.objectContaining({
                     titleColor: 'text-blue-500',
                 })
+            )
+        })
+    })
+
+    it('updates displayed history on save', async () => {
+        const onEdit = vi.fn()
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'History' }))
+        await userEvent.click(screen.getByRole('option', { name: '5min' }))
+        await userEvent.click(screen.getByText('Save changes'))
+
+        await waitFor(() => {
+            expect(onEdit).toHaveBeenCalledWith(
+                'test-id',
+                expect.objectContaining({
+                    displayedHistory: '5min',
+                })
+            )
+        })
+    })
+
+    it('offers short history windows and hides history for Number graphs', async () => {
+        const onEdit = vi.fn()
+        render(<EditGraphDialog {...baseProps} onEdit={onEdit} />)
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'History' }))
+        expect(screen.getByRole('option', { name: '5s' })).toBeInTheDocument()
+        expect(screen.getByRole('option', { name: '10s' })).toBeInTheDocument()
+        await userEvent.click(screen.getByRole('option', { name: '10s' }))
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'Type' }))
+        await userEvent.click(screen.getByRole('option', { name: 'Number' }))
+        expect(
+            screen.queryByRole('combobox', { name: 'History' })
+        ).not.toBeInTheDocument()
+
+        await userEvent.click(screen.getByRole('combobox', { name: 'Type' }))
+        await userEvent.click(screen.getByRole('option', { name: 'Graph' }))
+        expect(
+            screen.getByRole('combobox', { name: 'History' })
+        ).toHaveTextContent('10s')
+
+        await userEvent.click(screen.getByText('Save changes'))
+        await waitFor(() => {
+            expect(onEdit).toHaveBeenCalledWith(
+                'test-id',
+                expect.objectContaining({ displayedHistory: '10s' })
             )
         })
     })

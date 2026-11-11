@@ -43,6 +43,8 @@ const DEFAULT_MIN_UPDATE_INTERVAL_MS = 100 // 10 Hz max
 const RATE_SLOPE_HISTORY_SIZE = 10
 
 const HISTORY_SECONDS: Record<string, number> = {
+    '5s': 5,
+    '10s': 10,
     '30s': 30,
     '1min': 60,
     '5min': 300,
@@ -189,13 +191,23 @@ export const SensorModule = memo(function SensorModule({
                 const cutoffTime =
                     newDataPoint.timestamp - timeWindowSeconds * 1000
                 const prev = useGraphDataStore.getState().data[id] ?? []
+                const pointsNeededForWindow =
+                    minUpdateIntervalMs > 0 ?
+                        Math.ceil(
+                            (timeWindowSeconds * 1000) / minUpdateIntervalMs
+                        )
+                    :   maxDataPoints
+                const retainedPointLimit = Math.max(
+                    maxDataPoints,
+                    pointsNeededForWindow
+                )
                 const newData = [
                     ...filterStaleData(prev, cutoffTime),
                     {
                         timestamp: newDataPoint.timestamp,
                         value: newDataPoint.value,
                     },
-                ].slice(-maxDataPoints)
+                ].slice(-retainedPointLimit)
                 useGraphDataStore.getState().setData(id, newData)
             }
         )
@@ -353,11 +365,13 @@ export const SensorModule = memo(function SensorModule({
                         <div className="min-h-[150px]">
                             <D3Chart
                                 data={dataWithOffset}
+                                strokeClassName={titleColor}
                                 strokeColor={strokeColor}
                                 strokeWidth={strokeWidth}
                                 rangeTickCount={rangeTickCount}
                                 fixedDomain={fixedDomain}
                                 domainTickCount={domainTickCount}
+                                timeWindowSeconds={timeWindowSeconds}
                             />
                         </div>
 
